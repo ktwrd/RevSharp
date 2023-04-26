@@ -2,18 +2,21 @@
 using System.Text.Json;
 using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
+using RevSharp.Core.Models;
 using RevSharp.Core.Models.WebSocket;
 using WSClient = Websocket.Client.WebsocketClient;
 
 namespace RevSharp.Core;
 
 internal delegate void WebSocketMessageDelegate(string content, byte[] binary, WebSocketMessageType messageType);
+internal delegate void EventReceivedDelegate(string eventType, string content);
 internal class WebsocketClient
 {
     private readonly Client _client;
     internal WebsocketClient(Client client)
     {
         _client = client;
+        TextMessageReceived += c => ParseMessage(c).Wait();
     }
 
     #region Events
@@ -58,6 +61,36 @@ internal class WebsocketClient
             }
         });
         await WebSocketClient.Start();
+    }
+
+    internal static Dictionary<string, Type> ResponseTypeMap = new Dictionary<string, Type>()
+    {
+        {"Authenticated", typeof(BaseWebSocketMessage)}
+    };
+
+    internal event VoidDelegate AuthenticatedEvent;
+    internal event EventReceivedDelegate EventReceived;
+    private async Task ParseMessage(string content)
+    {
+        var messageType = GetMessageType(content);
+        if (messageType == null)
+            return;
+        var deser = JsonSerializer.Deserialize<BaseWebSocketMessage>(content, Client.SerializerOptions);
+        switch (deser.Type)
+        {
+            case "Authenticated":
+                AuthenticatedEvent?.Invoke();
+                break;
+        }
+        EventReceived?.Invoke(deser.Type, content);
+    }
+
+    internal Type? GetMessageType(string message)
+    {
+        var data = JsonSerializer.Deserialize<BaseWebSocketMessage>(message, Client.SerializerOptions);
+        if (data == null)
+            return null;
+        return ResponseTypeMap.TryGetValue(data.Type, out var type) ? type : null;
     }
 
     internal async Task Authenticate()
