@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevSharp.Core", "RevSharp.Core\RevSharp.Core.csproj", "{BB7CFA79-5A32-497A-865B-6D62658B91E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevSharp.ReBot", "RevSharp.ReBot\RevSharp.ReBot.csproj", "{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB7CFA79-5A32-497A-865B-6D62658B91E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB7CFA79-5A32-497A-865B-6D62658B91E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB7CFA79-5A32-497A-865B-6D62658B91E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB7CFA79-5A32-497A-865B-6D62658B91E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
