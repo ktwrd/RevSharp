@@ -25,6 +25,7 @@ public class Client
         IncludeFields = true
     };
     
+    #region Constructors
     internal Client()
     {
         Token = "";
@@ -39,12 +40,15 @@ public class Client
         Token = token;
         TokenIsBot = isBot;
     }
+    #endregion
 
     internal async Task<HttpResponseMessage> GetAsync(string url)
     {
         var response = await HttpClient.GetAsync($"{Endpoint}{url}");
         return response;
     }
+    
+    #region Session Management
     public async Task LoginAsync()
     {
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
@@ -61,6 +65,8 @@ public class Client
     {
         await WSClient.Disconnect();
     }
+    #endregion
+    
     /// <summary>
     /// Set endpoint to custom one
     /// </summary>
