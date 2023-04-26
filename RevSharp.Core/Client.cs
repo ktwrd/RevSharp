@@ -57,7 +57,10 @@ public class Client
         await WSClient.Connect();
         await WSClient.Authenticate();
     }
-
+    public async Task DisconnectAsync()
+    {
+        await WSClient.Disconnect();
+    }
     /// <summary>
     /// Set endpoint to custom one
     /// </summary>
