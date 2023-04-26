@@ -40,6 +40,11 @@ public class Client
         TokenIsBot = isBot;
     }
 
+    internal async Task<HttpResponseMessage> GetAsync(string url)
+    {
+        var response = await HttpClient.GetAsync($"{Endpoint}{url}");
+        return response;
+    }
     public async Task LoginAsync()
     {
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
