@@ -86,6 +86,20 @@ public class Server : ISnowflake, IFetchable
 
         return true;
     }
+    
+    public Server()
+    {}
+
+    public Server(string id)
+    {
+        Id = id;
+    }
+
+    public Task<bool> InviteBot(Client client, string botId)
+        => client.Bot.Invite(botId, Id);
+
+    public Task<bool> InviteBot(Client client, Bot bot)
+        => client.Bot.Invite(bot, this);
 }
 
 public enum ServerFlags

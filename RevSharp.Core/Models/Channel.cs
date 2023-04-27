@@ -28,6 +28,18 @@ public class BaseChannel : ISnowflake
         return data;
     }
 
+    public async Task<Message?> GetMessage(Client client, string id)
+    {
+        var message = new Message
+        {
+            Id = id,
+            ChannelId = Id
+        };
+        if (await message.Fetch(client))
+            return message;
+        return null;
+    }
+
     protected Task<T?> GetGeneric<T>(Client client)
         => GetGeneric<T>(Id, client);
     public BaseChannel()
