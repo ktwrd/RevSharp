@@ -40,6 +40,12 @@ public class Message : ISnowflake
         var response = await client.PutAsync($"/channels/{ChannelId}/ack/{Id}");
         return response.StatusCode == HttpStatusCode.NoContent;
     }
+    public async Task<bool> Delete(Client client)
+    {
+        var response = await client.DeleteAsync($"/channels/{ChannelId}/messages/{Id}");
+        return response.StatusCode == HttpStatusCode.NoContent;
+    }
+    
     public async Task<bool> Fetch(Client client)
     {
         var response = await client.GetAsync($"/channels/{ChannelId}/messages/{Id}");
@@ -67,7 +73,6 @@ public class Message : ISnowflake
         Masquerade = data.Masquerade;
         return true;
     }
-
     public static Message? ParseMessage(string content)
     {
         var data = JsonSerializer.Deserialize<Message>(content, Client.SerializerOptions);
@@ -77,11 +82,6 @@ public class Message : ISnowflake
         return data;
     }
 
-    public async Task<bool> Delete(Client client)
-    {
-        var response = await client.DeleteAsync($"/channels/{ChannelId}/messages/{Id}");
-        return response.StatusCode == HttpStatusCode.NoContent;
-    }
 }
 
 public class Interactions
