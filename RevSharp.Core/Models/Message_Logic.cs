@@ -6,16 +6,21 @@ namespace RevSharp.Core.Models;
 
 public partial class Message
 {
-    
     public async Task<bool> Acknowledge(Client client)
     {
         var response = await client.PutAsync($"/channels/{ChannelId}/ack/{Id}");
         return response.StatusCode == HttpStatusCode.NoContent;
     }
+    public Task<bool> Acknowledge()
+        => Acknowledge(Client);
+    
     public Task<bool> Delete(Client client)
     {
         return Delete(client, ChannelId, Id);
     }
+    public Task<bool> Delete()
+        => Delete(Client);
+    
     public Task<Message?> Reply(Client client, DataMessageSend data, bool mention = true)
     {
         data.Replies = new[]
@@ -24,11 +29,18 @@ public partial class Message
         };
         return Send(client, ChannelId, data);
     }
+    public Task<Message?> Reply(DataMessageSend data, bool mention = true)
+        => Reply(Client, data, mention);
+    
     public static async Task<Message?> Send(
         Client client,
         string channelId,
         DataMessageSend data)
     {
+        if (client == null)
+        {
+            throw new Exception("Client is null");
+        }
         data.Nonce = GeneralHelper.GenerateUID();
         var content = JsonSerializer.Serialize(data, Client.SerializerOptions);
         var response = await client.PostAsync($"/channels/{channelId}/messages", new StringContent(content));
@@ -48,7 +60,6 @@ public partial class Message
         return response.StatusCode == HttpStatusCode.NoContent;
     }
     #endregion
-
     
     #region Overloads
     public Task<Message?> Reply(
@@ -74,6 +85,22 @@ public partial class Message
         };
         return Reply(client, data);
     }
+
+    public Task<Message?> Reply(
+        string? content,
+        bool mention = true,
+        SendableEmbed[]? embeds = null,
+        Masquerade? masquerade = null,
+        Interactions[]? interactions = null,
+        string[]? attachments = null)
+        => Reply(
+            Client,
+            content,
+            mention,
+            embeds,
+            masquerade,
+            interactions,
+            attachments);
     public static Task<Message?> Send(Client client,
         string channelId,
         string? content,

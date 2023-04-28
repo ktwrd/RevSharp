@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public partial class Message : ISnowflake
+public partial class Message : Clientable, ISnowflake
 {
     [JsonPropertyName("_id")]
     public string Id { get; set; }
@@ -35,6 +35,19 @@ public partial class Message : ISnowflake
     [JsonPropertyName("Masquerade")]
     public Masquerade? Masquerade { get; set; }
 
+    public Message()
+        : this(null, "", "")
+    {}
+    public Message(string id, string channelId)
+        : this(null, id, channelId)
+    {}
+
+    internal Message(Client? client, string id, string channelId)
+        : base(client)
+    {
+        Id = id;
+        ChannelId = channelId;
+    }
 
     internal async Task<Message?> Fetch(Client client, string channelId, string messageId)
     {
