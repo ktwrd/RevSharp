@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using kate.shared.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -23,8 +24,12 @@ public partial class Message
         };
         return Send(client, ChannelId, data);
     }
-    public static async Task<Message?> Send(Client client, string channelId, DataMessageSend data)
+    public static async Task<Message?> Send(
+        Client client,
+        string channelId,
+        DataMessageSend data)
     {
+        data.Nonce = GeneralHelper.GenerateUID();
         var content = JsonSerializer.Serialize(data, Client.SerializerOptions);
         var response = await client.PostAsync($"/channels/{channelId}/messages", new StringContent(content));
         if (response.StatusCode != HttpStatusCode.OK)
