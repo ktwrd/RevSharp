@@ -65,7 +65,7 @@ internal class WebsocketClient
 
     internal static Dictionary<string, Type> ResponseTypeMap = new Dictionary<string, Type>()
     {
-        {"Authenticated", typeof(BaseWebSocketMessage)}
+        { "Authenticated", typeof(BaseTypedResponse) },
     };
 
     internal event VoidDelegate AuthenticatedEvent;
@@ -75,7 +75,7 @@ internal class WebsocketClient
         var messageType = GetMessageType(content);
         if (messageType == null)
             return;
-        var deser = JsonSerializer.Deserialize<BaseWebSocketMessage>(content, Client.SerializerOptions);
+        var deser = JsonSerializer.Deserialize<BaseTypedResponse>(content, Client.SerializerOptions);
         switch (deser.Type)
         {
             case "Authenticated":
@@ -87,7 +87,7 @@ internal class WebsocketClient
 
     internal Type? GetMessageType(string message)
     {
-        var data = JsonSerializer.Deserialize<BaseWebSocketMessage>(message, Client.SerializerOptions);
+        var data = JsonSerializer.Deserialize<BaseTypedResponse>(message, Client.SerializerOptions);
         if (data == null)
             return null;
         return ResponseTypeMap.TryGetValue(data.Type, out var type) ? type : null;

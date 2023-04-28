@@ -2,7 +2,7 @@
 
 namespace RevSharp.Core.Models.WebSocket;
 
-public class ReadyMessage : BaseWebSocketMessage
+public class ReadyMessage : BaseTypedResponse
 {
     [JsonPropertyName("type")]
     public new string Type => "Ready";

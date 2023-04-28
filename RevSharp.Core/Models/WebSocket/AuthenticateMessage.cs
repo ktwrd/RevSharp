@@ -2,7 +2,7 @@
 
 namespace RevSharp.Core.Models.WebSocket;
 
-public class AuthenticateMessage : BaseWebSocketMessage
+public class AuthenticateMessage : BaseTypedResponse
 {
     [JsonPropertyName("type")]
     public new string Type => "Authenticate";
