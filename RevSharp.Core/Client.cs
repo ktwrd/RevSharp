@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using RevSharp.Core.Controllers;
+using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
@@ -26,6 +27,8 @@ public class Client
         IgnoreReadOnlyProperties = true,
         IncludeFields = true
     };
+
+    public event MessageDelegate MessageReceived;
     
     public BotController Bot { get; private set; }
     
@@ -38,6 +41,8 @@ public class Client
         WSClient = new WebsocketClient(this);
         HttpClient = new HttpClient();
         Bot = new BotController(this);
+        ServerCache = new Dictionary<string, Server>();
+        UserCache = new Dictionary<string, User>();
     }
     public Client(string token, bool isBot)
         : base()
@@ -46,8 +51,28 @@ public class Client
         TokenIsBot = isBot;
     }
     #endregion
-    
-    public User CurrentUser { get; private set; }
+
+    public User? CurrentUser => UserCache[CurrentUserId];
+    public string CurrentUserId { get; private set; }
+
+    public async Task<Server?> GetServer(string serverId)
+    {
+        Server server;
+        bool inCache = ServerCache.ContainsKey(serverId);
+        if (inCache)
+            server = ServerCache[serverId];
+        else
+            server = new Server(this, serverId);
+
+        if (await server.Fetch())
+        {
+            if (!inCache)
+                ServerCache.Add(serverId, server);
+            return server;
+        }
+        return null;
+    }
+    internal Dictionary<string, Server> ServerCache { get; set; }
 
     /// <summary>
     /// Update <see cref="CurrentUser"/> with latest details
@@ -55,20 +80,28 @@ public class Client
     /// <returns>Was successful with fetching user</returns>
     public async Task<bool> FetchCurrentUser()
     {
-        var data = await FetchUser("@me");
-        if (data == null)
-            return false;
-        CurrentUser = data;
-        return true;
+        var data = await GetUser("@me");
+        return data != null;
     }
-    public async Task<User?> FetchUser(string id)
+    public async Task<User?> GetUser(string id)
     {
-        var user = new User(id);
+        User user;
+        bool inCache = UserCache.ContainsKey(id);
+        if (inCache)
+            user = UserCache[id];
+        else
+            user = new User(this, id);
         var success = await user.Fetch(this);
-        if (!success)
-            return null;
-        return user;
+        if (await user.Fetch())
+        {
+            if (!inCache)
+                UserCache.Add(user.Id, user);
+            return user;
+        }
+
+        return null;
     }
+    internal Dictionary<string, User> UserCache { get; set; }
 
     public async Task<bool> ChangeUsername(string username, string currentPassword)
     {
