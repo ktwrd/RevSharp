@@ -7,6 +7,8 @@ namespace RevSharp.Core.Models;
 
 public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
 {
+    [JsonIgnore]
+    public bool IsCurrentUser { get; internal set; }
     [JsonPropertyName("_id")]
     public string Id { get; set; }
     [JsonPropertyName("username")]
@@ -45,6 +47,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         : base(client)
     {
         Id = id;
+        IsCurrentUser = false;
     }
     
     internal static async Task<User?> Get(string id, Client client)
@@ -115,6 +118,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     public Task<DirectMessageChannel?> FetchDMChannel()
         => FetchDMChannel(Client);
 
+    
     #region Relationships
 
     public async Task<UserMutualResponse?> FetchMutuals(Client client)
