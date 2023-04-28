@@ -70,12 +70,14 @@ internal class WebsocketClient
 
     internal event VoidDelegate AuthenticatedEvent;
     internal event EventReceivedDelegate EventReceived;
-    private async Task ParseMessage(string content)
+    private Task ParseMessage(string content)
     {
         var messageType = GetMessageType(content);
         if (messageType == null)
-            return;
+            return Task.CompletedTask;
         var deser = JsonSerializer.Deserialize<BaseTypedResponse>(content, Client.SerializerOptions);
+        if (deser == null)
+            return Task.CompletedTask;
         switch (deser.Type)
         {
             case "Authenticated":
@@ -83,6 +85,7 @@ internal class WebsocketClient
                 break;
         }
         EventReceived?.Invoke(deser.Type, content);
+        return Task.CompletedTask;
     }
 
     internal Type? GetMessageType(string message)
