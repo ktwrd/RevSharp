@@ -60,8 +60,6 @@ public partial class Message : Clientable, ISnowflake
             return message;
         return null;
     }
-
-    
     public async Task<bool> Fetch(Client client)
     {
         var response = await client.GetAsync($"/channels/{ChannelId}/messages/{Id}");
@@ -115,67 +113,4 @@ public class DataMessageSend
     public Masquerade? Masquerade { get; set; }
     [JsonPropertyName("interactions")]
     public Interactions[]? Interactions { get; set; }
-}
-
-public class Reply : ISnowflake
-{
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
-    [JsonPropertyName("mention")]
-    public bool Mention { get; set; }
-
-    public Reply()
-    {
-        Id = "";
-        Mention = true;
-    }
-
-    public Reply(Message message, bool mention = true)
-    {
-        Id = message.Id;
-        Mention = mention;
-    }
-}
-
-public class Interactions
-{
-    [JsonPropertyName("reactions")]
-    public string[] Reactions { get; set; }
-    [JsonPropertyName("restrict_reactions")]
-    public bool RestrictReactions { get; set; }
-}
-
-public class Masquerade
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-    [JsonPropertyName("avatar")]
-    public string Avatar { get; set; }
-    [JsonPropertyName("colour")]
-    public string Colour { get; set; }
-}
-
-public class SystemMessage
-{
-    public string Type { get; set; }
-    public string? Content { get; set; }
-    public string? Id { get; set; }
-    public string? By { get; set; }
-    public string? Name { get; set; }
-    public string? From { get; set; }
-    public string? To { get; set; }
-}
-
-public enum SystemMessageType
-{
-    text,
-    user_added,
-    user_remove,
-    user_joined,
-    user_left,
-    user_kicked,
-    channel_renamed,
-    channel_description_changed,
-    channel_icon_changed,
-    channel_ownership_changed
 }
