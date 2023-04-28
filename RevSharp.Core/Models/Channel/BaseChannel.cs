@@ -5,7 +5,7 @@ using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
 
-public class BaseChannel : Clientable, ISnowflake
+public class BaseChannel : Clientable, ISnowflake, IFetchable
 {
     /// <summary>
     /// Unique Id
@@ -18,6 +18,10 @@ public class BaseChannel : Clientable, ISnowflake
     [JsonPropertyName("channel_type")]
     public string ChannelType { get; set; }
 
+    public virtual Task<bool> Fetch(Client client)
+    {
+        throw new NotImplementedException();
+    }
     protected async Task<T?> GetGeneric<T>(string id, Client client) where T : BaseChannel
     {
         var response = await client.GetAsync($"/channels/{id}");

@@ -14,7 +14,7 @@ public class SavedMessagesChannel : MessageableChannel, IFetchable
     [JsonPropertyName("user")]
     public string UserId { get; set; }
 
-    public async Task<bool> Fetch(Client client)
+    public override async Task<bool> Fetch(Client client)
     {
         var data = await GetGeneric<SavedMessagesChannel>(client);
         if (data == null)

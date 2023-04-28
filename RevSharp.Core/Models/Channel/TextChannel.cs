@@ -41,7 +41,7 @@ public class TextChannel : BaseChannel, IFetchable
     [JsonPropertyName("nsfw")]
     public bool IsNsfw { get; set; }
 
-    public async Task<bool> Fetch(Client client)
+    public override async Task<bool> Fetch(Client client)
     {
         var data = await GetGeneric<TextChannel>(client);
         if (data == null)

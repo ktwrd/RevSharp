@@ -23,7 +23,7 @@ public class DirectMessageChannel : BaseChannel, IFetchable
     [JsonPropertyName("last_message_id")]
     public string? LastMessageId { get; set; }
 
-    public async Task<bool> Fetch(Client client)
+    public override async Task<bool> Fetch(Client client)
     {
         var data = await GetGeneric<DirectMessageChannel>(client);
         if (data == null)

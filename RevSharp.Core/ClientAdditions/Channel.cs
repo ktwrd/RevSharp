@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
@@ -49,6 +51,49 @@ public partial class Client
         if (!inCache)
             ChannelCache.Add(data.Id, data);
         return ChannelCache[data.Id] as SavedMessagesChannel;
+    }
+
+    private void WSHandle_ChannelCreate(string json)
+    {
+        var data = ChannelHelper.ParseChannel(json);
+        if (data == null)
+            return;
+        data.Client = this;
+        ChannelCache.TryAdd(data.Id, data);
+    }
+
+    public async Task<BaseChannel?> GetChannel(string channelId)
+    {
+        // todo
+    }
+
+    private async void WSHandle_ChannelUpdated(string json)
+    {
+        var data = ChannelHelper.ParseChannel(json);
+        if (data == null)
+            return;
+
+        if (!ChannelCache.TryGetValue(data.Id, out var value))
+        {
+            await GetChannel(data.Id);
+        }
+        
+        if (await value.Fetch(this))
+        {
+            ChannelUpdated?.Invoke(data, ChannelCache[data.Id]);   
+        }
 
     }
+
+    private void WSHandle_ChannelDelete(string json)
+    {
+        var data = ChannelHelper.ParseChannel(json);
+        if (data == null)
+            return;
+        ChannelCache.Remove(data.Id);
+        ChannelDeleted?.Invoke(data.Id);
+    }
+
+    public event GenericDelegate<string> ChannelDeleted;
+    public event ChannelUpdateDelegate ChannelUpdated;
 }

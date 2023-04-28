@@ -75,7 +75,7 @@ internal class WebsocketClient
     internal event VoidDelegate AuthenticatedEventReceived;
     internal event GenericDelegate<BonfireError?> ErrorReceived;
     internal event GenericDelegate<int> PongReceived;
-    internal event GenericDelegate<ReadyMessage> ReadyReceived;
+    internal event ReadyMessageDelegate ReadyReceived;
     internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
     private Task ParseMessage(string content)
@@ -101,7 +101,7 @@ internal class WebsocketClient
             case "Ready":
                 var readyData = JsonSerializer.Deserialize<ReadyMessage>(content, Client.SerializerOptions);
                 if (readyData != null)
-                    ReadyReceived?.Invoke(readyData);
+                    ReadyReceived?.Invoke(readyData, content);
                 break;
             case "Message":
                 var messageData = Message.Parse(content);
