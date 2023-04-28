@@ -3,6 +3,21 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
+public class SendableEmbed
+{
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+    [JsonPropertyName("icon_url")]
+    public string? IconUrl { get; set; }
+    [JsonPropertyName("url")]
+    public string? Url { get; set; }
+    [JsonPropertyName("title")]
+    public string? Title { get; set; }
+    [JsonPropertyName("media")]
+    public string? Media { get; set; }
+    [JsonPropertyName("colour")]
+    public string? Colour { get; set; }
+}
 public class BaseEmbed
 {
     public string Type { get; set; }
