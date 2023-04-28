@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class User : /*IUser,*/ ISnowflake, IFetchable
+public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
 {
     [JsonPropertyName("_id")]
     public string Id { get; set; }
@@ -33,14 +33,21 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
     public bool IsOnline { get; set; }
 
     public User()
+        : this(null, "")
     {}
 
     public User(string id)
+        : this(null, id)
+    {
+    }
+
+    public User(Client client, string id)
+        : base(client)
     {
         Id = id;
     }
     
-    public static async Task<User?> Get(string id, Client client)
+    internal static async Task<User?> Get(string id, Client client)
     {
         var response = await client.GetAsync($"/users/{id}");
         if (response.StatusCode != HttpStatusCode.OK)
@@ -80,6 +87,9 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
         return true;
     }
 
+    public Task<bool> Fetch()
+        => Fetch(_client);
+
     public async Task<UserProfile?> FetchProfile(Client client)
     {
         var data = await UserProfile.Fetch(client, Id);
@@ -87,6 +97,9 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
             Profile = data;
         return data == null ? null : Profile;
     }
+
+    public Task<UserProfile?> FetchProfile()
+        => FetchProfile(_client);
     
     public async Task<DirectMessageChannel?> FetchDMChannel(Client client)
     {
@@ -99,6 +112,9 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
         return data;
     }
 
+    public Task<DirectMessageChannel?> FetchDMChannel()
+        => FetchDMChannel(_client);
+
     #region Relationships
 
     public async Task<UserMutualResponse?> FetchMutuals(Client client)
@@ -108,6 +124,9 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
             return m;
         return null;
     }
+
+    public Task<UserMutualResponse?> FetchMutuals()
+        => FetchMutuals(_client);
     
     #region Friend State
     /// <param name="state">True: Accept friend request, False: deny friend request/remove as friend</param>
@@ -169,9 +188,17 @@ public class User : /*IUser,*/ ISnowflake, IFetchable
 
     public Task<bool> Block(Client client)
         => SetBlockState(client, true);
+
+    public Task<bool> Block()
+        => Block(_client);
     public Task<bool> Unblock(Client client)
         => SetBlockState(client, false);
+
+    public Task<bool> Unblock()
+        => Unblock(_client);
+
     #endregion
+
     #endregion
 }
 

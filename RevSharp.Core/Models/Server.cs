@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class Server : ISnowflake, IFetchable
+public class Server : Clientable, ISnowflake, IFetchable
 {
     [JsonPropertyName("_id")]
     public string Id { get; set; }
@@ -45,7 +45,7 @@ public class Server : ISnowflake, IFetchable
     [JsonPropertyName("discoverable")]
     public bool IsDiscoverable { get; set; }
 
-    public static async Task<Server?> Get(string id, Client client, bool fetchOwner = true)
+    internal static async Task<Server?> Get(string id, Client client, bool fetchOwner = true)
     {
         var response = await client.GetAsync($"/servers/{id}");
         if (response.StatusCode != HttpStatusCode.OK)
@@ -86,11 +86,21 @@ public class Server : ISnowflake, IFetchable
 
         return true;
     }
+
+    public Task<bool> Fetch()
+        => Fetch(_client);
     
     public Server()
+        : this(null, "")
     {}
 
     public Server(string id)
+        : this(null, id)
+    {
+    }
+
+    internal Server(Client client, string id)
+        : base(client)
     {
         Id = id;
     }
@@ -98,8 +108,14 @@ public class Server : ISnowflake, IFetchable
     public Task<bool> InviteBot(Client client, string botId)
         => client.Bot.Invite(botId, Id);
 
+    public Task<bool> InviteBot(string botId)
+        => InviteBot(_client, botId);
+
     public Task<bool> InviteBot(Client client, Bot bot)
         => client.Bot.Invite(bot, this);
+
+    public Task<bool> InviteBot(Bot bot)
+        => InviteBot(_client, bot);
 }
 
 public enum ServerFlags
