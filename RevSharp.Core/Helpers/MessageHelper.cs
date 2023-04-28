@@ -20,17 +20,6 @@ public static class MessageHelper
         {"ChannelIconChanged", typeof(SystemChannelIconChangedMessage)},
         {"ChannelOwnershipChanged", typeof(SystemChannelOwnershipChangedMessage)},
     };
-    public static Message? ParseMessage(string json)
-    {
-        var messageObject = STJson.Deserialize<Message>(json, Client.SerializerOptions);
-        if (messageObject == null)
-            return null;
-
-        messageObject.SystemMessage = ParseSystemMessage(json);
-        messageObject.Embeds = ParseMessageEmbeds(json);
-        
-        return messageObject;
-    }
 
     public static SystemMessage? ParseSystemMessage(string json)
     {

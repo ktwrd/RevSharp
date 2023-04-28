@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -67,33 +68,39 @@ public partial class Message : Clientable, ISnowflake
             return false;
 
         var stringContent = response.Content.ReadAsStringAsync().Result;
-        var data = JsonSerializer.Deserialize<Message>(stringContent, Client.SerializerOptions);
+        var data = Parse(stringContent);
         if (data == null)
             return false;
         
-        Id = data.Id;
-        Nonce = data.Nonce;
-        ChannelId = data.ChannelId;
-        AuthorId = data.AuthorId;
-        Content = data.Content;
-        SystemMessage = data.SystemMessage;
-        Attachments = data.Attachments;
-        EditedAt = data.EditedAt;
-        Embeds = EmbedHelper.GetEmbedsFromMessage(stringContent);
-        MentionIds = data.MentionIds;
-        MessageReplyIds = data.MessageReplyIds;
-        Reactions = data.Reactions;
-        Interactions = data.Interactions;
-        Masquerade = data.Masquerade;
+        Inject(data, this);
         return true;
     }
-    public static Message? ParseMessage(string content)
+    public static Message? Parse(string content)
     {
         var data = JsonSerializer.Deserialize<Message>(content, Client.SerializerOptions);
         if (data == null)
             return null;
-        data.Embeds = EmbedHelper.GetEmbedsFromMessage(content);
+        data.Embeds = MessageHelper.ParseMessageEmbeds(content);
+        data.SystemMessage = MessageHelper.ParseSystemMessage(content);
         return data;
+    }
+
+    public static void Inject(Message source, Message target)
+    {
+        target.Id = source.Id;
+        target.Nonce = source.Nonce;
+        target.ChannelId = source.ChannelId;
+        target.AuthorId = source.AuthorId;
+        target.Content = source.Content;
+        target.SystemMessage = source.SystemMessage;
+        target.Attachments = source.Attachments;
+        target.EditedAt = source.EditedAt;
+        target.Embeds = source.Embeds;
+        target.MentionIds = source.MentionIds;
+        target.MessageReplyIds = source.MessageReplyIds;
+        target.Reactions = source.Reactions;
+        target.Interactions = source.Interactions;
+        target.Masquerade = source.Masquerade;
     }
 }
 

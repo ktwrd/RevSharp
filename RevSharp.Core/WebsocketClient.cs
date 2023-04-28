@@ -104,7 +104,7 @@ internal class WebsocketClient
                     ReadyReceived?.Invoke(readyData);
                 break;
             case "Message":
-                var messageData = JsonSerializer.Deserialize<Message>(content, Client.SerializerOptions);
+                var messageData = Message.Parse(content);
                 if (messageData != null)
                 {
                     messageData.Client = _client;
