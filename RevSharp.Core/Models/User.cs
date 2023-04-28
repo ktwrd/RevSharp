@@ -88,7 +88,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     }
 
     public Task<bool> Fetch()
-        => Fetch(_client);
+        => Fetch(Client);
 
     public async Task<UserProfile?> FetchProfile(Client client)
     {
@@ -99,7 +99,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     }
 
     public Task<UserProfile?> FetchProfile()
-        => FetchProfile(_client);
+        => FetchProfile(Client);
     
     public async Task<DirectMessageChannel?> FetchDMChannel(Client client)
     {
@@ -113,7 +113,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     }
 
     public Task<DirectMessageChannel?> FetchDMChannel()
-        => FetchDMChannel(_client);
+        => FetchDMChannel(Client);
 
     #region Relationships
 
@@ -126,7 +126,7 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     }
 
     public Task<UserMutualResponse?> FetchMutuals()
-        => FetchMutuals(_client);
+        => FetchMutuals(Client);
     
     #region Friend State
     /// <param name="state">True: Accept friend request, False: deny friend request/remove as friend</param>
@@ -190,12 +190,12 @@ public class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         => SetBlockState(client, true);
 
     public Task<bool> Block()
-        => Block(_client);
+        => Block(Client);
     public Task<bool> Unblock(Client client)
         => SetBlockState(client, false);
 
     public Task<bool> Unblock()
-        => Unblock(_client);
+        => Unblock(Client);
 
     #endregion
 

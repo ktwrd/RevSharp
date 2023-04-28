@@ -88,7 +88,7 @@ public class Server : Clientable, ISnowflake, IFetchable
     }
 
     public Task<bool> Fetch()
-        => Fetch(_client);
+        => Fetch(Client);
     
     public Server()
         : this(null, "")
@@ -109,13 +109,13 @@ public class Server : Clientable, ISnowflake, IFetchable
         => client.Bot.Invite(botId, Id);
 
     public Task<bool> InviteBot(string botId)
-        => InviteBot(_client, botId);
+        => InviteBot(Client, botId);
 
     public Task<bool> InviteBot(Client client, Bot bot)
         => client.Bot.Invite(bot, this);
 
     public Task<bool> InviteBot(Bot bot)
-        => InviteBot(_client, bot);
+        => InviteBot(Client, bot);
 }
 
 public enum ServerFlags
