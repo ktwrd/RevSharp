@@ -8,12 +8,11 @@ using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
 
-public class Client
+public partial class Client
 {
     internal string Token {get; private set; }
     internal bool TokenIsBot { get; private set; }
-    internal HttpClient HttpClient;
-    internal WebsocketClient WSClient;
+    internal WebsocketClient WSClient { get; set; }
     /// <summary>
     /// Revolt endpoint to hit, Default: <see cref="DefaultEndpoint"/>
     /// </summary>
@@ -27,8 +26,6 @@ public class Client
         IgnoreReadOnlyProperties = true,
         IncludeFields = true
     };
-
-    public event MessageDelegate MessageReceived;
     
     public BotController Bot { get; private set; }
     
@@ -43,159 +40,13 @@ public class Client
         Bot = new BotController(this);
         ServerCache = new Dictionary<string, Server>();
         UserCache = new Dictionary<string, User>();
+        ChannelCache = new Dictionary<string, BaseChannel>();
     }
     public Client(string token, bool isBot)
         : base()
     {
         Token = token;
         TokenIsBot = isBot;
-    }
-    #endregion
-
-    public User? CurrentUser => UserCache[CurrentUserId];
-    public string CurrentUserId { get; private set; }
-
-    public async Task<Server?> GetServer(string serverId)
-    {
-        Server server;
-        bool inCache = ServerCache.ContainsKey(serverId);
-        if (inCache)
-            server = ServerCache[serverId];
-        else
-            server = new Server(this, serverId);
-
-        if (await server.Fetch())
-        {
-            if (!inCache)
-                ServerCache.Add(serverId, server);
-            return server;
-        }
-        return null;
-    }
-    internal Dictionary<string, Server> ServerCache { get; set; }
-
-    /// <summary>
-    /// Update <see cref="CurrentUser"/> with latest details
-    /// </summary>
-    /// <returns>Was successful with fetching user</returns>
-    public async Task<bool> FetchCurrentUser()
-    {
-        var data = await GetUser("@me");
-        return data != null;
-    }
-    public async Task<User?> GetUser(string id)
-    {
-        User user;
-        bool inCache = UserCache.ContainsKey(id);
-        if (inCache)
-            user = UserCache[id];
-        else
-            user = new User(this, id);
-        var success = await user.Fetch(this);
-        if (await user.Fetch())
-        {
-            if (!inCache)
-                UserCache.Add(user.Id, user);
-            return user;
-        }
-
-        return null;
-    }
-    internal Dictionary<string, User> UserCache { get; set; }
-
-    public async Task<bool> ChangeUsername(string username, string currentPassword)
-    {
-        var response = await PatchAsync("/users/@me/username", new Dictionary<string, object>()
-        {
-            { "username", username },
-            { "password", currentPassword }
-        });
-        if (response.StatusCode != HttpStatusCode.OK)
-            return false;
-
-        return await CurrentUser.Fetch(this);
-    }
-    
-    public async Task<SavedMessagesChannel?> FetchSavedMessagesChannel()
-    {
-        if (CurrentUser == null)
-            return null;
-        var response = await GetAsync($"/users/{CurrentUser.Id}/dm");
-        if (response.StatusCode != HttpStatusCode.OK)
-            return null;
-
-        var stringContent = response.Content.ReadAsStringAsync().Result;
-        var data = JsonSerializer.Deserialize<SavedMessagesChannel>(stringContent, SerializerOptions);
-        if (data != null && await data.Fetch(this) == false)
-            return null;
-        return data;
-    }
-    
-    #region HttpClient Wrappers
-
-    private void CheckResponseError(HttpResponseMessage response)
-    {
-        if (response.StatusCode == HttpStatusCode.BadRequest)
-        {
-            var stringContent = response.Content.ReadAsStringAsync().Result;
-            var data = JsonSerializer.Deserialize<BaseWebSocketMessage>(stringContent, SerializerOptions);
-            if (data == null)
-                return;
-            throw new Exception($"Bad Request, {data.Type}");
-        }
-    }
-    internal async Task<HttpResponseMessage> GetAsync(string url)
-    {
-        var response = await HttpClient.GetAsync($"{Endpoint}{url}");
-        CheckResponseError(response);
-        return response;
-    }
-
-    internal async Task<HttpResponseMessage> PatchAsync(string url, HttpContent content)
-    {
-        var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
-        CheckResponseError(response);
-        return response;
-    }
-    internal async Task<HttpResponseMessage> PatchAsync(string url, Dictionary<string, object> data)
-    {
-        var content = JsonContent.Create(data, options: SerializerOptions);
-        var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
-        CheckResponseError(response);
-        return response;
-    }
-    internal async Task<HttpResponseMessage> PutAsync(string url, HttpContent? content=null)
-    {
-        content ??= new StringContent("");
-        var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
-        CheckResponseError(response);
-        return response;
-    }
-    internal async Task<HttpResponseMessage> PutAsync(string url, Dictionary<string, object> data)
-    {
-        var content = JsonContent.Create(data, options: SerializerOptions);
-        var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
-        CheckResponseError(response);
-        return response;
-    }
-
-    internal async Task<HttpResponseMessage> PostAsync(string url, HttpContent content)
-    {
-        var response = await HttpClient.PostAsync($"{Endpoint}{url}", content);
-        CheckResponseError(response);
-        return response;
-    }
-    internal Task<HttpResponseMessage> PostAsync(string url, Dictionary<string, object> data)
-    {
-        var content = JsonContent.Create(data, options: SerializerOptions);
-        return PostAsync(url, content);
-    }
-
-    internal async Task<HttpResponseMessage> DeleteAsync(string url)
-    {
-        var response = await HttpClient.DeleteAsync(url);
-        CheckResponseError(response);
-        return response;
     }
     #endregion
     
