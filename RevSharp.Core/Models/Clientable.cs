@@ -2,9 +2,9 @@ namespace RevSharp.Core.Models;
 
 public class Clientable
 {
-    internal Client? Client { get; private set; }
+    internal Client? Client { get; set; }
     
-    internal Clientable(Client client)
+    internal Clientable(Client? client)
     {
         Client = client;
     }
