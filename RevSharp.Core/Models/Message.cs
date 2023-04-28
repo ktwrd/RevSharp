@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class Message : ISnowflake
+public partial class Message : ISnowflake
 {
     [JsonPropertyName("_id")]
     public string Id { get; set; }
@@ -35,16 +35,19 @@ public class Message : ISnowflake
     [JsonPropertyName("Masquerade")]
     public Masquerade? Masquerade { get; set; }
 
-    public async Task<bool> Acknowledge(Client client)
+
+    internal async Task<Message?> Fetch(Client client, string channelId, string messageId)
     {
-        var response = await client.PutAsync($"/channels/{ChannelId}/ack/{Id}");
-        return response.StatusCode == HttpStatusCode.NoContent;
+        var message = new Message
+        {
+            ChannelId = channelId,
+            Id = messageId
+        };
+        if (await message.Fetch(client))
+            return message;
+        return null;
     }
-    public async Task<bool> Delete(Client client)
-    {
-        var response = await client.DeleteAsync($"/channels/{ChannelId}/messages/{Id}");
-        return response.StatusCode == HttpStatusCode.NoContent;
-    }
+
     
     public async Task<bool> Fetch(Client client)
     {
@@ -81,7 +84,44 @@ public class Message : ISnowflake
         data.Embeds = EmbedHelper.GetEmbedsFromMessage(content);
         return data;
     }
+}
 
+public class DataMessageSend
+{
+    [JsonPropertyName("nonce")]
+    public string? Nonce { get; set; }
+    [JsonPropertyName("content")]
+    public string? Content { get; set; }
+    [JsonPropertyName("attachments")]
+    public string[]? Attachments { get; set; }
+    [JsonPropertyName("replies")]
+    public Reply[]? Replies { get; set; }
+    [JsonPropertyName("embeds")]
+    public SendableEmbed[]? Embeds { get; set; }
+    [JsonPropertyName("masquerade")]
+    public Masquerade? Masquerade { get; set; }
+    [JsonPropertyName("interactions")]
+    public Interactions[]? Interactions { get; set; }
+}
+
+public class Reply : ISnowflake
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+    [JsonPropertyName("mention")]
+    public bool Mention { get; set; }
+
+    public Reply()
+    {
+        Id = "";
+        Mention = true;
+    }
+
+    public Reply(Message message, bool mention = true)
+    {
+        Id = message.Id;
+        Mention = mention;
+    }
 }
 
 public class Interactions
