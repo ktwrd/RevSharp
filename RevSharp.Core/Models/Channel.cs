@@ -30,6 +30,14 @@ public class BaseChannel : ISnowflake
     protected Task<T?> GetGeneric<T>(Client client) where T : BaseChannel
         => GetGeneric<T>(Id, client);
 
+    public Task<bool> DeleteMessage(Client client, string messageId)
+    {
+        return Message.Delete(client, Id, messageId);
+    }
+    public Task<bool> DeleteMessage(Client client, Message message)
+    {
+        return Message.Delete(client, Id, message.Id);
+    }
     public async Task<Message?> GetMessage(Client client, string id)
     {
         var message = new Message
@@ -41,6 +49,33 @@ public class BaseChannel : ISnowflake
             return message;
         return null;
     }
+    public Task<Message?> SendMessage(
+        Client client,
+        string? content,
+        Reply[]? replies,
+        SendableEmbed[]? embeds,
+        Masquerade? masquerade,
+        Interactions[]? interactions,
+        string[]? attachments)
+    {
+        var data = new DataMessageSend()
+        {
+            Content = content,
+            Attachments = attachments,
+            Replies = replies,
+            Embeds = embeds,
+            Masquerade = masquerade,
+            Interactions = interactions
+        };
+        return SendMessage(client, data);
+    }
+    public Task<Message?> SendMessage(
+        Client client,
+        DataMessageSend data)
+    {
+        return Message.Send(client, Id, data);
+    }
+    
     public BaseChannel()
     {}
 
