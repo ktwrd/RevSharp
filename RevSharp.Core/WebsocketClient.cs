@@ -66,9 +66,17 @@ internal class WebsocketClient
     internal static Dictionary<string, Type> ResponseTypeMap = new Dictionary<string, Type>()
     {
         { "Authenticated", typeof(BaseTypedResponse) },
+        { "Error", typeof(BonfireError) },
+        { "Pong", typeof(BonfireGenericData<int>) },
+        { "Ready", typeof(ReadyMessage) },
+        { "Message", typeof(BonfireMessage) }
     };
 
-    internal event VoidDelegate AuthenticatedEvent;
+    internal event VoidDelegate AuthenticatedEventReceived;
+    internal event GenericDelegate<BonfireError?> ErrorReceived;
+    internal event GenericDelegate<int> PongReceived;
+    internal event GenericDelegate<ReadyMessage> ReadyReceived;
+    internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
     private Task ParseMessage(string content)
     {
@@ -81,7 +89,27 @@ internal class WebsocketClient
         switch (deser.Type)
         {
             case "Authenticated":
-                AuthenticatedEvent?.Invoke();
+                AuthenticatedEventReceived?.Invoke();
+                break;
+            case "Error":
+                ErrorReceived?.Invoke(JsonSerializer.Deserialize<BonfireError>(content, Client.SerializerOptions));
+                break;
+            case "Pong":
+                var pongData = JsonSerializer.Deserialize<BonfireGenericData<int>>(content, Client.SerializerOptions);
+                PongReceived?.Invoke(pongData?.Data ?? 0);
+                break;
+            case "Ready":
+                var readyData = JsonSerializer.Deserialize<ReadyMessage>(content, Client.SerializerOptions);
+                if (readyData != null)
+                    ReadyReceived?.Invoke(readyData);
+                break;
+            case "Message":
+                var messageData = JsonSerializer.Deserialize<Message>(content, Client.SerializerOptions);
+                if (messageData != null)
+                {
+                    messageData.Client = _client;
+                    MessageReceived?.Invoke(messageData);
+                }
                 break;
         }
         EventReceived?.Invoke(deser.Type, content);
