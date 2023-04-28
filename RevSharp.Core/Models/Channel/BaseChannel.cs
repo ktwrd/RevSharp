@@ -109,19 +109,28 @@ public class BaseChannel : Clientable, ISnowflake
     {
     }
 
-    public BaseChannel(Client client, string id)
+    internal BaseChannel(Client? client, string id)
         : base(client)
     {
         Id = id;
-        if (client != null)
-        {
-            client.MessageReceived += (m) =>
-            {
-                if (m.ChannelId == Id)
-                    MessageReceived?.Invoke(m);
-            };
-        }
+        ChannelType = "Unknown";
+        InitializeClientEvents();
+    }
+
+    private void InitializeClientEvents()
+    {
+        if (Client == null)
+            return;
+        Client.MessageReceived += OnMessageRecieved;
     }
 
     public event MessageDelegate MessageReceived;
+
+    private void OnMessageRecieved(Message message)
+    {
+        if (MessageReceived != null)
+        {
+            MessageReceived?.Invoke(message);
+        }
+    }
 }
