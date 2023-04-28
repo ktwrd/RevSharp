@@ -6,7 +6,7 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// Personal "Saved Notes" channel which allows users to save messages
 /// </summary>
-public class SavedMessagesChannel : BaseChannel, IFetchable
+public class SavedMessagesChannel : MessageableChannel, IFetchable
 {
     /// <summary>
     /// Id of the user this channel belongs to
@@ -22,4 +22,7 @@ public class SavedMessagesChannel : BaseChannel, IFetchable
         UserId = data.UserId;
         return true;
     }
+
+    public Task<bool> Fetch()
+        => Fetch(Client);
 }
