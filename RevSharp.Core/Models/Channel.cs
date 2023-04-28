@@ -17,7 +17,7 @@ public class BaseChannel : ISnowflake
     [JsonPropertyName("channel_type")]
     public string ChannelType { get; set; }
 
-    protected async Task<T?> GetGeneric<T>(string id, Client client)
+    protected async Task<T?> GetGeneric<T>(string id, Client client) where T : BaseChannel
     {
         var response = await client.GetAsync($"/channels/{id}");
         if (response.StatusCode != HttpStatusCode.OK)
@@ -27,6 +27,8 @@ public class BaseChannel : ISnowflake
         var data = JsonSerializer.Deserialize<T>(stringContent, Client.SerializerOptions);
         return data;
     }
+    protected Task<T?> GetGeneric<T>(Client client) where T : BaseChannel
+        => GetGeneric<T>(Id, client);
 
     public async Task<Message?> GetMessage(Client client, string id)
     {
@@ -39,9 +41,6 @@ public class BaseChannel : ISnowflake
             return message;
         return null;
     }
-
-    protected Task<T?> GetGeneric<T>(Client client)
-        => GetGeneric<T>(Id, client);
     public BaseChannel()
     {}
 
