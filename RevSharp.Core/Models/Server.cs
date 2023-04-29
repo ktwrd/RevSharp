@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class Server : Clientable, ISnowflake, IFetchable
+public partial class Server : Clientable, ISnowflake, IFetchable
 {
     [JsonPropertyName("_id")]
     public string Id { get; set; }
@@ -104,17 +104,5 @@ public class Server : Clientable, ISnowflake, IFetchable
     {
         Id = id;
     }
-
-    public Task<bool> InviteBot(Client client, string botId)
-        => client.Bot.Invite(botId, Id);
-
-    public Task<bool> InviteBot(string botId)
-        => InviteBot(Client, botId);
-
-    public Task<bool> InviteBot(Client client, Bot bot)
-        => client.Bot.Invite(bot, this);
-
-    public Task<bool> InviteBot(Bot bot)
-        => InviteBot(Client, bot);
 }
 
