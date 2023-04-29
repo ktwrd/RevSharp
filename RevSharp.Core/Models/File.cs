@@ -2,7 +2,7 @@
 
 namespace RevSharp.Core.Models;
 
-public class File : /*IFile,*/ ISnowflake
+public class File : IFile<FileMetadata>, ISnowflake
 {
     /// <inheritdoc />
     [JsonPropertyName("_id")]

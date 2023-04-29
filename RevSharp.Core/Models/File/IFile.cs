@@ -1,6 +1,6 @@
 namespace RevSharp.Core.Models;
 
-public interface IFile : ISnowflake
+public interface IFile<IFM> : ISnowflake where IFM : IFileMetadata
 {
     /// <summary>
     /// Tag / bucket this file was uploaded to
@@ -13,7 +13,7 @@ public interface IFile : ISnowflake
     /// <summary>
     /// Parsed metadata of this file
     /// </summary>
-    IFileMetadata Metadata { get; set; }
+    IFM Metadata { get; set; }
     /// <summary>
     /// Raw content type of this file
     /// </summary>
