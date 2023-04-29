@@ -66,11 +66,3 @@ public class Emoji : IFetchable, ISnowflake
         return creatorSuccess;
     }
 }
-
-public class EmojiParent
-{
-    [JsonPropertyName("name")]
-    public string Type { get; set; }
-    [JsonPropertyName("id")]
-    public string? Id { get; set; }
-}
