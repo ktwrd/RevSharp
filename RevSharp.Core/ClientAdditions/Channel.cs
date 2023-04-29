@@ -64,7 +64,28 @@ public partial class Client
 
     public async Task<BaseChannel?> GetChannel(string channelId)
     {
-        // todo
+        if (ChannelCache.ContainsKey(channelId))
+        {
+            ChannelCache[channelId].Client = this;
+            if (await ChannelCache[channelId].Fetch(this))
+            {
+                return ChannelCache[channelId];
+            }
+            return null;
+        }
+        var response = await HttpClient.GetAsync($"/channels/{channelId}");
+        if (response.StatusCode != HttpStatusCode.OK)
+            return null;
+
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        var channel = ChannelHelper.ParseChannel(stringContent);
+        if (channel == null)
+            return null;
+
+        channel.Client = this;
+        ChannelCache.Add(channel.Id, channel);
+        
+        return channel;
     }
 
     private async void WSHandle_ChannelUpdated(string json)
