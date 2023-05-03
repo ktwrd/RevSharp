@@ -34,6 +34,14 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
         return data;
     }
 
+    public event GenericDelegate<string> MessageDeleted;
+
+    internal void OnMessageDeleted(string messageId)
+    {
+        if (MessageDeleted != null)
+            MessageDeleted?.Invoke(messageId);
+    }
+
     protected Task<T?> GetGeneric<T>(string id) where T : BaseChannel
         => GetGeneric<T>(id, Client);
     protected Task<T?> GetGeneric<T>(Client client) where T : BaseChannel
