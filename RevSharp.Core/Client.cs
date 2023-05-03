@@ -44,10 +44,10 @@ public partial class Client
     public BotController Bot { get; private set; }
     
     #region Constructors
-    internal Client()
+    public Client(string token, bool isBot)
     {
-        Token = "";
-        TokenIsBot = false;
+        Token = token;
+        TokenIsBot = isBot;
         Endpoint = DefaultEndpoint;
         WSClient = new WebsocketClient(this);
         HttpClient = new HttpClient();
@@ -55,12 +55,29 @@ public partial class Client
         ServerCache = new Dictionary<string, Server>();
         UserCache = new Dictionary<string, User>();
         ChannelCache = new Dictionary<string, BaseChannel>();
-    }
-    public Client(string token, bool isBot)
-        : base()
-    {
-        Token = token;
-        TokenIsBot = isBot;
+
+        WSClient.MessageReceived += (msg) =>
+        {
+            msg.Client = this;
+            MessageReceived?.Invoke(msg);
+        };
+        WSClient.ReadyReceived += (message, json) =>
+        {
+            Ready?.Invoke();
+            AddUsersToCache(message.Users);
+            AddServersToCache(message.Servers);
+        };
+        WSClient.AuthenticatedEventReceived += () =>
+        {
+            ClientAuthenticated?.Invoke();;
+        };
+        WSClient.ErrorReceived += (e) =>
+        {
+            if (e != null)
+            {
+                ErrorReceived?.Invoke(e.Error);
+            }
+        };
     }
     #endregion
     
