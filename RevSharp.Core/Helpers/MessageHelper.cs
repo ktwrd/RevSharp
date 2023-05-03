@@ -76,4 +76,23 @@ public static class MessageHelper
 
         return embedList.ToArray();
     }
+
+    public static BaseEmbed[]? ParseEmbeds(JToken[]? objEmbedArr)
+    {
+        if (objEmbedArr == null)
+            return null;
+        var embedList = new List<BaseEmbed>();
+        foreach (var item in objEmbedArr)
+        {
+            var itemObjectType = item["type"]?.ToString() ?? "";
+            if (itemObjectType.Length < 1)
+                continue;
+            if (!EmbedTypeMap.ContainsKey(itemObjectType))
+                continue;
+            if (item.ToObject(EmbedTypeMap[itemObjectType]) is BaseEmbed typeCasted)
+                embedList.Add(typeCasted);
+        }
+
+        return embedList.ToArray();
+    }
 }
