@@ -56,11 +56,12 @@ public partial class Client
         ServerCache = new Dictionary<string, Server>();
         UserCache = new Dictionary<string, User>();
         ChannelCache = new Dictionary<string, BaseChannel>();
+        MessageCache = new Dictionary<string, Message>();
 
         WSClient.MessageReceived += (msg) =>
         {
-            msg.Client = this;
-            MessageReceived?.Invoke(msg);
+            AddToCache(msg);
+            MessageReceived?.Invoke(MessageCache[msg.Id]);
         };
         WSClient.ReadyReceived += (message, json) =>
         {
