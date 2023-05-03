@@ -25,4 +25,24 @@ public partial class Client
                 list.Add(i.Id);
         return list.ToArray();
     }
+
+    internal async Task<Message?> GetMessage(string channelId, string messageId)
+    {
+        if (MessageCache.ContainsKey(messageId))
+        {
+            MessageCache[messageId].Client = this;
+            if (await MessageCache[messageId].Fetch(this))
+                return MessageCache[messageId];
+        }
+
+        var msg = new Message(this, channelId, messageId);
+        msg.Client = this;
+
+        if (!await msg.Fetch())
+            return null;
+
+        AddToCache(msg);
+        
+        return MessageCache[messageId];
+    }
 }
