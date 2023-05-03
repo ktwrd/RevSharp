@@ -5,7 +5,6 @@ namespace RevSharp.Core;
 
 public partial class Client
 {
-    public event MessageDelegate MessageReceived;
     internal Dictionary<string, User> UserCache { get; set; }
     public User? CurrentUser =>
         UserCache.TryGetValue(CurrentUserId, out var user) 
