@@ -47,6 +47,7 @@ internal class WebsocketClient
         if (_client.EndpointNodeInfo?.WebSocket == null)
             throw new Exception("_client.EndpointNodeInfo.WebSocket is null");
         string url = _client.EndpointNodeInfo?.WebSocket ?? "wss://ws.revolt.chat";
+        url += $"?version=1&format=json&token={_client.Token}";
         WebSocketClient = new WSClient(new Uri(url));
         WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
         WebSocketClient.MessageReceived.Subscribe((message) =>
