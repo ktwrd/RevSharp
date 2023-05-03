@@ -6,7 +6,7 @@ namespace RevSharp.Core;
 
 internal partial class WebsocketClient
 {
-    private Task ParseMessage_Message(string content, string type)
+    private async Task ParseMessage_Message(string content, string type)
     {
         switch (type)
         {
@@ -56,8 +56,14 @@ internal partial class WebsocketClient
                         _client.MessageCache[reactData.MessageId].OnReactAdd(reactData.UserId, reactData.Emoji);
                 }
                 break;
+            case "MessageUnreact":
+                var unreactData = JsonSerializer.Deserialize<MessageReactedEvent>(content, Client.SerializerOptions);
+                if (unreactData != null)
+                {
+                    if (await _client.GetMessageOrCache(unreactData.ChannelId, unreactData.MessageId) != null)
+                        _client.MessageCache[unreactData.MessageId].OnReactRemove(unreactData.UserId, unreactData.Emoji);
+                }
+                break;
         }
-
-        return Task.CompletedTask;
     }
 }

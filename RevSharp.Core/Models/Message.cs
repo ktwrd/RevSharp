@@ -125,4 +125,13 @@ public partial class Message : Clientable, ISnowflake
         }
         ReactAdd?.Invoke(userId, react, Id);
     }
+
+    public event MessageReactedDelegate ReactRemove;
+
+    internal void OnReactRemove(string userId, string react)
+    {
+        if (Reactions.ContainsKey(react))
+            Reactions[react] = Reactions[react].Where(v => v != userId).ToArray();
+        ReactRemove?.Invoke(userId, react, Id);
+    }
 }
