@@ -48,13 +48,13 @@ public partial class Client
         // add to cache if it's not there.
         if (!await user.Fetch()) return null;
         if (!inCache)
-            AddUserToCache(user);
+            AddToCache(user);
         
         return user;
     }
 
     /// <returns>Was this user in the cache already</returns>
-    internal bool AddUserToCache(User user)
+    internal bool AddToCache(User user)
     {
         if (UserCache.ContainsKey(user.Id))
             return true;
@@ -64,12 +64,12 @@ public partial class Client
     }
 
     /// <returns>User Ids that were in the cache already</returns>
-    internal string[] AddUsersToCache(User[] users)
+    internal string[] InsertIntoCache(User[] users)
     {
         var list = new List<string>();
         foreach (var i in users)
         {
-            if (AddUserToCache(i))
+            if (AddToCache(i))
                 list.Add(i.Id);
         }
 

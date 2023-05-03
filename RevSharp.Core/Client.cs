@@ -65,12 +65,12 @@ public partial class Client
         WSClient.ReadyReceived += (message, json) =>
         {
             Ready?.Invoke();
-            AddUsersToCache(message.Users);
-            AddServersToCache(message.Servers);
+            InsertIntoCache(message.Users);
+            InsertIntoCache(message.Servers);
         };
         WSClient.AuthenticatedEventReceived += () =>
         {
-            ClientAuthenticated?.Invoke();;
+            ClientAuthenticated?.Invoke();
         };
         WSClient.ErrorReceived += (e) =>
         {

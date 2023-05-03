@@ -26,7 +26,7 @@ public partial class Client
     }
 
     /// <returns>Was this server in the cache already</returns>
-    internal bool AddServerToCache(Server server)
+    internal bool AddToCache(Server server)
     {
         if (ServerCache.ContainsKey(server.Id))
             return true;
@@ -36,11 +36,11 @@ public partial class Client
     }
 
     /// <returns>Sever Ids that were in the cache already</returns>
-    internal string[] AddServersToCache(Server[] server)
+    internal string[] InsertIntoCache(Server[] server)
     {
         List<string> list = new List<string>();
         foreach (var i in server)
-            if (AddServerToCache(i))
+            if (AddToCache(i))
                 list.Add(i.Id);
         return list.ToArray();
     }

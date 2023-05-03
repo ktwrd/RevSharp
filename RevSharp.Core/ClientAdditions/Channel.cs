@@ -61,7 +61,7 @@ public partial class Client
     }
 
     /// <returns>Was this channel in the cache already</returns>
-    internal bool AddChannelToCache(BaseChannel channel)
+    internal bool AddToCache(BaseChannel channel)
     {
         if (ChannelCache.ContainsKey(channel.Id))
             return true;
@@ -71,12 +71,12 @@ public partial class Client
     }
 
     /// <returns>Channel Ids that were in the cache already</returns>
-    internal string[] AddChannelsToCache(BaseChannel[] channels)
+    internal string[] InsertIntoCache(BaseChannel[] channels)
     {
         var list = new List<string>();
         foreach (var i in channels)
         {
-            if (AddChannelToCache(i))
+            if (AddToCache(i))
                 list.Add(i.Id);
         }
 
