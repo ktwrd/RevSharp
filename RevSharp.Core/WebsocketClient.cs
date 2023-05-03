@@ -144,6 +144,15 @@ internal class WebsocketClient
         return Task.CompletedTask;
     }
 
+    public async Task Ping()
+    {
+        await SendMessage(new BonfireGenericData<int>()
+        {
+            Data = 0,
+            Type = "Ping"
+        });
+    }
+
     internal Type? GetMessageType(string message)
     {
         var data = JsonSerializer.Deserialize<BaseTypedResponse>(message, Client.SerializerOptions);
