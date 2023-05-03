@@ -16,6 +16,16 @@ public static class Program
         ReadConfig();
         Client = new Client(Config.Token, Config.IsBot);
         await Client.LoginAsync();
+        Client.MessageReceived += (message) =>
+        {
+            Console.WriteLine(string.Join("\n", new string[]
+            {
+                $"Content: {message.Content}",
+                $"Author:  {message.AuthorId}",
+                $"Channel: {message.ChannelId}"
+            }));
+        };
+        await Task.Delay(-1);
     }
     
     public static Config Config { get; set; }
