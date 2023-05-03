@@ -45,4 +45,15 @@ public partial class Client
         
         return MessageCache[messageId];
     }
+
+    /// <summary>
+    /// Return message from cache if it exists there. Otherwise return <see cref="GetMessage"/>
+    /// </summary>
+    internal async Task<Message?> GetMessageOrCache(string channelId, string messageId)
+    {
+        if (MessageCache.ContainsKey(messageId))
+            return MessageCache[messageId];
+
+        return await GetMessage(channelId, messageId);
+    }
 }
