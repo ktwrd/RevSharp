@@ -21,6 +21,27 @@ public partial class Client
         {
             Log.WriteLine($"{serverId} adding to cache");
             ServerCache.Add(serverId, server);
-        return server;
+        }
+        return ServerCache[serverId];
+    }
+
+    /// <returns>Was this server in the cache already</returns>
+    internal bool AddServerToCache(Server server)
+    {
+        if (ServerCache.ContainsKey(server.Id))
+            return true;
+        ServerCache.Add(server.Id, server);
+        server.Client = this;
+        return false;
+    }
+
+    /// <returns>Sever Ids that were in the cache already</returns>
+    internal string[] AddServersToCache(Server[] server)
+    {
+        List<string> list = new List<string>();
+        foreach (var i in server)
+            if (AddServerToCache(i))
+                list.Add(i.Id);
+        return list.ToArray();
     }
 }

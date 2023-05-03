@@ -48,9 +48,32 @@ public partial class Client
         // add to cache if it's not there.
         if (!await user.Fetch()) return null;
         if (!inCache)
-            UserCache.Add(user.Id, user);
+            AddUserToCache(user);
         
         return user;
+    }
+
+    /// <returns>Was this user in the cache already</returns>
+    internal bool AddUserToCache(User user)
+    {
+        if (UserCache.ContainsKey(user.Id))
+            return true;
+        UserCache.Add(user.Id, user);
+        UserCache[user.Id].Client = this;
+        return false;
+    }
+
+    /// <returns>User Ids that were in the cache already</returns>
+    internal string[] AddUsersToCache(User[] users)
+    {
+        var list = new List<string>();
+        foreach (var i in users)
+        {
+            if (AddUserToCache(i))
+                list.Add(i.Id);
+        }
+
+        return list.ToArray();
     }
     
     public Task<bool> ChangeUsername(string username, string currentPassword)

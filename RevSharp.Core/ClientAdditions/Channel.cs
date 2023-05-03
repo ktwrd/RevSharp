@@ -60,6 +60,29 @@ public partial class Client
         return ChannelCache[data.Id] as SavedMessagesChannel;
     }
 
+    /// <returns>Was this channel in the cache already</returns>
+    internal bool AddChannelToCache(BaseChannel channel)
+    {
+        if (ChannelCache.ContainsKey(channel.Id))
+            return true;
+        ChannelCache.Add(channel.Id, channel);
+        ChannelCache[channel.Id].Client = this;
+        return false;
+    }
+
+    /// <returns>Channel Ids that were in the cache already</returns>
+    internal string[] AddChannelsToCache(BaseChannel[] channels)
+    {
+        var list = new List<string>();
+        foreach (var i in channels)
+        {
+            if (AddChannelToCache(i))
+                list.Add(i.Id);
+        }
+
+        return list.ToArray();
+    }
+    
     private void WSHandle_ChannelCreate(string json)
     {
         var data = ChannelHelper.ParseChannel(json);
