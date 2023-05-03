@@ -24,7 +24,7 @@ public static class ChannelHelper
         var channelTypeName = channelObject.ChannelType;
         if (ChannelTypeMap.TryGetValue(channelTypeName, out var value))
         {
-            return (BaseChannel)JObject.Parse(json).ToObject(value)!;
+            return STJson.Deserialize(json, value, Client.SerializerOptions) as BaseChannel;
         }
 
         return null;
