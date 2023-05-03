@@ -19,6 +19,23 @@ internal partial class WebsocketClient
                     MessageReceived?.Invoke(messageData);
                 }
                 break;
+            case "MessageAppend":
+                var messageAppendData = MessageAppendEvent.Parse(content);
+                if (messageAppendData != null)
+                {
+                    if (_client.MessageCache.ContainsKey(messageAppendData.MessageId))
+                    {
+                        if (messageAppendData.Append.Embeds != null)
+                        {
+                            _client.MessageCache[messageAppendData.MessageId].Embeds = messageAppendData.Append.Embeds;
+                        }
+                    }
+                    else
+                    {
+                        _client.GetMessage(messageAppendData.ChannelId, messageAppendData.MessageId).Wait();
+                    }
+                }
+                break;
         }
 
         return Task.CompletedTask;
