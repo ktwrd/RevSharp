@@ -16,7 +16,7 @@ public class Clientable
 
     protected virtual void ClientInit()
     {
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
     
     internal Clientable(Client? client)
