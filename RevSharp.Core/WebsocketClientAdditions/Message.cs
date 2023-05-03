@@ -48,6 +48,14 @@ internal partial class WebsocketClient
                     _client.MessageCache.Remove(deleteData.MessageId);
                 }
                 break;
+            case "MessageReact":
+                var reactData = JsonSerializer.Deserialize<MessageReactedEvent>(content, Client.SerializerOptions);
+                if (reactData != null)
+                {
+                    if (await _client.GetMessageOrCache(reactData.ChannelId, reactData.MessageId) != null)
+                        _client.MessageCache[reactData.MessageId].OnReactAdd(reactData.UserId, reactData.Emoji);
+                }
+                break;
         }
 
         return Task.CompletedTask;

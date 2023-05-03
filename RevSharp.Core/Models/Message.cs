@@ -108,4 +108,21 @@ public partial class Message : Clientable, ISnowflake
         target.Interactions = source.Interactions;
         target.Masquerade = source.Masquerade;
     }
+
+    public event MessageReactedDelegate ReactAdd;
+    internal void OnReactAdd(string userId, string react)
+    {
+        if (Reactions.ContainsKey(react))
+        {
+            Reactions[react] = Reactions[react].Concat(new string[] { userId }).ToArray();
+        }
+        else
+        {
+            Reactions.Add(react, new string[]
+            {
+                userId
+            });
+        }
+        ReactAdd?.Invoke(userId, react, Id);
+    }
 }
