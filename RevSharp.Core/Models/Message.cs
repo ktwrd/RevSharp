@@ -46,6 +46,7 @@ public partial class Message : Clientable, ISnowflake
     internal Message(Client? client, string id, string channelId)
         : base(client)
     {
+        Client = client;
         Id = id;
         ChannelId = channelId;
     }
@@ -75,6 +76,9 @@ public partial class Message : Clientable, ISnowflake
         Inject(data, this);
         return true;
     }
+
+    public Task<bool> Fetch()
+        => Fetch(Client);
     public static Message? Parse(string content)
     {
         var data = JsonSerializer.Deserialize<Message>(content, Client.SerializerOptions);
