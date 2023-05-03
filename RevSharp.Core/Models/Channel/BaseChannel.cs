@@ -103,6 +103,16 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     }
     public Task<Message?> SendMessage(DataMessageSend data)
         => SendMessage(Client, data);
+
+    public async Task BeginTyping(Client client)
+    {
+        if (client.WSClient == null)
+            throw new Exception("Websocket Client not created");
+        await client.WSClient.SendMessage(new TypingSendEvent(Id));
+    }
+
+    public Task BeginTyping()
+        => BeginTyping(Client);
     
     public BaseChannel()
         : this(null, "")
