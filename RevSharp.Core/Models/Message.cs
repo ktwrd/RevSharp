@@ -49,6 +49,8 @@ public partial class Message : Clientable, ISnowflake
         Client = client;
         Id = id;
         ChannelId = channelId;
+        
+        Reactions = new Dictionary<string, string[]>();
     }
 
     internal async Task<Message?> Fetch(Client client, string channelId, string messageId)
