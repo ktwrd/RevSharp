@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Text.Json;
+using System.Timers;
 using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
