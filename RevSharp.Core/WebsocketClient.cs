@@ -21,7 +21,7 @@ internal class WebsocketClient
 
     #region Events
     internal event StringDelegate TextMessageReceived;
-    internal event GenericDelegate<byte[]> BinaryMessageRecieved;
+    internal event GenericDelegate<byte[]> BinaryMessageReceived;
     private void OnTextMessageReceived(string content)
     {
         if (TextMessageReceived != null)
@@ -30,11 +30,11 @@ internal class WebsocketClient
         }
     }
 
-    private void OnBinaryMessageRecieved(byte[] data)
+    private void OnBinaryMessageReceived(byte[] data)
     {
-        if (BinaryMessageRecieved != null)
+        if (BinaryMessageReceived != null)
         {
-            BinaryMessageRecieved?.Invoke(data);
+            BinaryMessageReceived?.Invoke(data);
         }
     }
     #endregion

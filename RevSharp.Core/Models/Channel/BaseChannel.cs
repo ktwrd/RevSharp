@@ -125,12 +125,12 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     {
         if (Client == null)
             return;
-        Client.MessageReceived += OnMessageRecieved;
+        Client.MessageReceived += OnMessageReceived;
     }
 
     public event MessageDelegate MessageReceived;
 
-    private void OnMessageRecieved(Message message)
+    private void OnMessageReceived(Message message)
     {
         if (MessageReceived != null)
         {
