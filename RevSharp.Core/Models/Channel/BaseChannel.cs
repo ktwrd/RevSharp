@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RevSharp.Core.Helpers;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core.Models;
 
@@ -113,6 +114,16 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
 
     public Task BeginTyping()
         => BeginTyping(Client);
+
+    public async Task EndTyping(Client client)
+    {
+        if (client.WSClient == null)
+            throw new Exception("Websocket Client not created");
+        await client.WSClient.SendMessage(new TypingSendEvent(Id));
+    }
+
+    public Task EndTyping()
+        => EndTyping(Client);
     
     public BaseChannel()
         : this(null, "")
