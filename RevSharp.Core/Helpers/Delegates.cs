@@ -9,3 +9,4 @@ public delegate void ReadyMessageDelegate(ReadyMessage message, string json);
 public delegate void ChannelUpdateDelegate(BaseChannel previous, BaseChannel current);
 public delegate void MessageDeleteDelegate(string messageId, string channelId);
 public delegate void MessageReactedDelegate(string userId, string react, string messageId);
+public delegate void ChannelDelegate(BaseChannel channel);
