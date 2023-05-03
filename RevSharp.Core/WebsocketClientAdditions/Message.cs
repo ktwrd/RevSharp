@@ -36,6 +36,18 @@ internal partial class WebsocketClient
                     }
                 }
                 break;
+            case "MessageDelete":
+                var deleteData = JsonSerializer.Deserialize<MessageDeletedEvent>(content, Client.SerializerOptions);
+                if (deleteData != null)
+                {
+                    if (_client.ChannelCache.ContainsKey(deleteData.ChannelId))
+                    {
+                        _client.ChannelCache[deleteData.ChannelId].OnMessageDeleted(deleteData.MessageId);
+                    }
+                    _client.OnMessageDeleted(deleteData.MessageId, deleteData.ChannelId);
+                    _client.MessageCache.Remove(deleteData.MessageId);
+                }
+                break;
         }
 
         return Task.CompletedTask;
