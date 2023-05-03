@@ -118,6 +118,10 @@ internal class WebsocketClient
             return Task.CompletedTask;
         }
         Log.Debug($"Received message {deser.Type}");
+        if (deser.Type.StartsWith("Message"))
+        {
+            ParseMessage_Message(content, deser.Type).Wait();
+        }
         switch (deser.Type)
         {
             case "Authenticated":
@@ -134,15 +138,6 @@ internal class WebsocketClient
                 var readyData = JsonSerializer.Deserialize<ReadyMessage>(content, Client.SerializerOptions);
                 if (readyData != null)
                     ReadyReceived?.Invoke(readyData, content);
-                break;
-            case "Message":
-                var messageData = Message.Parse(content);
-                if (messageData != null)
-                {
-                    Console.WriteLine("Invoking MessageReceived");
-                    messageData.Client = _client;
-                    MessageReceived?.Invoke(messageData);
-                }
                 break;
         }
         EventReceived?.Invoke(deser.Type, content);
