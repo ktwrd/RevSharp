@@ -68,10 +68,29 @@ internal class WebsocketClient
                     break;
             }
         });
+        WebSocketClient.DisconnectionHappened.Subscribe((info) =>
+        {
+            Log.Debug($"DisconnectionHappened {info.Type}");
+            Console.WriteLine(JsonSerializer.Serialize(new Dictionary<string, object>()
+            {
+                {"type", info.Type},
+                {"closeStatus", info.CloseStatus},
+                {"closeStatusDesc", info.CloseStatusDescription},
+                {"subProtocol", info.SubProtocol},
+                {"exception", info.Exception},
+                {"cancelReconnection", info.CancelReconnection},
+                {"cancelClosing", info.CancelClosing}
+            }, Client.SerializerOptions));
+        });
+        WebSocketClient.ReconnectionHappened.Subscribe((info) =>
+        {
+            Log.Debug($"ReconnectionHappened {info.Type}");
+        });
+        Log.WriteLine("Starting WS Client");
         await WebSocketClient.Start();
     }
 
-    internal static Dictionary<string, Type> ResponseTypeMap = new Dictionary<string, Type>()
+    private static Dictionary<string, Type> _responseTypeMap = new Dictionary<string, Type>()
     {
         { "Authenticated", typeof(BaseTypedResponse) },
         { "Error", typeof(BonfireError) },
@@ -120,6 +139,7 @@ internal class WebsocketClient
                 var messageData = Message.Parse(content);
                 if (messageData != null)
                 {
+                    Console.WriteLine("Invoking MessageReceived");
                     messageData.Client = _client;
                     MessageReceived?.Invoke(messageData);
                 }
@@ -134,7 +154,7 @@ internal class WebsocketClient
         var data = JsonSerializer.Deserialize<BaseTypedResponse>(message, Client.SerializerOptions);
         if (data == null)
             return null;
-        return ResponseTypeMap.TryGetValue(data.Type, out var type) ? type : null;
+        return _responseTypeMap.TryGetValue(data.Type, out var type) ? type : null;
     }
 
     internal async Task Authenticate()
