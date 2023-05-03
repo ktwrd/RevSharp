@@ -10,7 +10,7 @@ namespace RevSharp.Core;
 
 internal delegate void WebSocketMessageDelegate(string content, byte[] binary, WebSocketMessageType messageType);
 internal delegate void EventReceivedDelegate(string eventType, string content);
-internal class WebsocketClient
+internal partial class WebsocketClient
 {
     private readonly Client _client;
     internal WebsocketClient(Client client)
@@ -88,6 +88,34 @@ internal class WebsocketClient
         });
         Log.WriteLine("Starting WS Client");
         await WebSocketClient.Start();
+        CreatePingTimer();
+    }
+
+    private void CreatePingTimer()
+    {
+        if (_pingTimer != null)
+            return;
+        _pingTimer = new System.Timers.Timer();
+        _pingTimer.Interval = 5000;
+        _pingTimer.Elapsed += _pingTimer_Elapsed;
+        _pingTimer.Enabled = true;
+        _pingTimer.Start();
+    }
+    private System.Timers.Timer? _pingTimer = null;
+
+    private void _pingTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    {
+        _pingTimer?.Stop();
+        try
+        {
+            if (WebSocketClient?.IsRunning ?? false)
+                Ping().Wait();
+        }
+        catch (Exception exception)
+        {
+            Log.Error(exception);
+        }
+        _pingTimer?.Start();
     }
 
     private static Dictionary<string, Type> _responseTypeMap = new Dictionary<string, Type>()
