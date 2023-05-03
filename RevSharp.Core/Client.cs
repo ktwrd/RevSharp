@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using RevSharp.Core.Controllers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
@@ -84,6 +85,10 @@ public partial class Client
     #region Session Management
     public async Task LoginAsync()
     {
+        if (!await FetchNodeDetails(Endpoint))
+        {
+            throw new Exception("Failed to fetch node details");
+        }
         Log.WriteLine("Attempting Login");
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
         HttpClient.DefaultRequestHeaders.Remove("x-session-token");
