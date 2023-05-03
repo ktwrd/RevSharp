@@ -20,12 +20,26 @@ public partial class Client
 
     public const string DefaultEndpoint = "https://api.revolt.chat";
     internal RevoltNodeResponse? EndpointNodeInfo { get; private set; }
-    internal static JsonSerializerOptions SerializerOptions => new JsonSerializerOptions()
+
+    internal static JsonSerializerOptions SerializerOptions
     {
-        IgnoreReadOnlyFields = true,
-        IgnoreReadOnlyProperties = true,
-        IncludeFields = true
-    };
+        get
+        {
+            var options = new JsonSerializerOptions()
+            {
+                IgnoreReadOnlyFields = true,
+                IgnoreReadOnlyProperties = true,
+                IncludeFields = true,
+                #if DEBUG
+                WriteIndented = true
+                #endif
+            };
+
+            options.Converters.Add(new JsonStringEnumConverter());
+            
+            return options;
+        }
+    }
     
     public BotController Bot { get; private set; }
     
