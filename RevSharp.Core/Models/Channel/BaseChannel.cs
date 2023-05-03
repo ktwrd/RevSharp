@@ -23,6 +23,9 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     {
         throw new NotImplementedException();
     }
+
+    public Task<bool> Fetch()
+        => Fetch(Client);
     protected async Task<T?> GetGeneric<T>(string id, Client client) where T : BaseChannel
     {
         var response = await client.GetAsync($"/channels/{id}");
