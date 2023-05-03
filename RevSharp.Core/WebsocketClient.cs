@@ -43,6 +43,7 @@ internal class WebsocketClient
     internal WSClient? WebSocketClient { get; private set; }
     internal async Task Connect()
     {
+        Log.Debug("Connecting to Websocket");
         if (_client.EndpointNodeInfo?.WebSocket == null)
             throw new Exception("_client.EndpointNodeInfo.WebSocket is null");
         string url = _client.EndpointNodeInfo?.WebSocket ?? "wss://ws.revolt.chat";
@@ -50,13 +51,19 @@ internal class WebsocketClient
         WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
         WebSocketClient.MessageReceived.Subscribe((message) =>
         {
+            Log.Debug("------ Received Message" + "\n" + JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                {"type", message.MessageType},
+                {"text", message.Text},
+                {"binary", message.Binary}
+            }, Client.SerializerOptions));
             switch (message.MessageType)
             {
                 case WebSocketMessageType.Text:
                     OnTextMessageReceived(message.Text);
                     break;
                 case WebSocketMessageType.Binary:
-                    OnBinaryMessageRecieved(message.Binary);
+                    OnBinaryMessageReceived(message.Binary);
                     break;
             }
         });
@@ -80,12 +87,17 @@ internal class WebsocketClient
     internal event EventReceivedDelegate EventReceived;
     private Task ParseMessage(string content)
     {
+        Log.WriteLine("Parsing Message");
         var messageType = GetMessageType(content);
         if (messageType == null)
             return Task.CompletedTask;
         var deser = JsonSerializer.Deserialize<BaseTypedResponse>(content, Client.SerializerOptions);
         if (deser == null)
+        {
+            Log.Error($"Failed to deserialize\n--------\n{content}\n--------");
             return Task.CompletedTask;
+        }
+        Log.Debug($"Received message {deser.Type}");
         switch (deser.Type)
         {
             case "Authenticated":
@@ -126,6 +138,7 @@ internal class WebsocketClient
 
     internal async Task Authenticate()
     {
+        Log.WriteLine($"Sending auth message");
         await SendMessage(new AuthenticateMessage()
         {
             Token = _client.Token

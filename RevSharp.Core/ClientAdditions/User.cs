@@ -1,4 +1,5 @@
-﻿using RevSharp.Core.Helpers;
+﻿using kate.shared.Helpers;
+using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
@@ -18,6 +19,7 @@ public partial class Client
     /// <returns>Was successful with fetching user</returns>
     public async Task<bool> FetchCurrentUser()
     {
+        Log.WriteLine("Fetching user @me");
         var user = await GetUser("@me");
         if (user != null)
         {
@@ -34,6 +36,7 @@ public partial class Client
     /// <returns>Null if failed to fetch.</returns>
     public async Task<User?> GetUser(string id)
     {
+        Log.WriteLine($"Fetching user {id}");
         var inCache = UserCache.ContainsKey(id);
         
         // Create new user if doesn't exist in cache
@@ -52,6 +55,7 @@ public partial class Client
     
     public Task<bool> ChangeUsername(string username, string currentPassword)
     {
+        Log.WriteLine($"Changing username");
         return UserHelper.ChangeUsername(this, username, currentPassword);
     }
 }

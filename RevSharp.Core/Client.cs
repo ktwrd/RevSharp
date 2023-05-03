@@ -84,6 +84,7 @@ public partial class Client
     #region Session Management
     public async Task LoginAsync()
     {
+        Log.WriteLine("Attempting Login");
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
         HttpClient.DefaultRequestHeaders.Remove("x-session-token");
         if (TokenIsBot)
@@ -91,13 +92,16 @@ public partial class Client
         else
             HttpClient.DefaultRequestHeaders.Add("x-session-token", Token);
 
+        Log.WriteLine("Connecting to Bonfire");
         await WSClient.Connect();
+        Log.WriteLine("Authenticating with Bonfire");
         await WSClient.Authenticate();
 
         await FetchCurrentUser();
     }
     public async Task DisconnectAsync()
     {
+        Log.WriteLine("Disconnecting from Bonfire");
         await WSClient.Disconnect();
     }
     #endregion
@@ -109,9 +113,14 @@ public partial class Client
     /// <returns>Is the endpoint valid?</returns>
     public async Task<bool> SetEndpoint(string endpoint)
     {
+        Log.WriteLine("Setting endpoint");
         var result = await FetchNodeDetails(endpoint);
         if (result)
             Endpoint = endpoint;
+        else
+        {
+            Log.Error("Failed to fetch node details");
+        }
         return result;
     }
 
@@ -129,14 +138,16 @@ public partial class Client
             var deserialized = JsonSerializer.Deserialize<RevoltNodeResponse>(stringContent, SerializerOptions);
             if (deserialized != null)
             {
+                Log.WriteLine("Successfully fetched node details");
                 EndpointNodeInfo = deserialized;
                 return true;
             }
 
+            Log.Error("Failed to deserialize");
             return false;
         }
         #if DEBUG
-        Trace.WriteLine($"[Client->TestEndpoint] {endpoint} returned {response.StatusCode}\n{stringContent}");
+        Console.WriteLine($"[Client->TestEndpoint] {endpoint} returned {response.StatusCode}\n{stringContent}");
         Debugger.Break();
         #endif
         return false;
