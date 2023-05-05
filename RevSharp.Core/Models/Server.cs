@@ -68,23 +68,28 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         if (data == null)
             return false;
 
-        OwnerId = data.OwnerId;
-        Owner = data.Owner;
-        Name = data.Name;
-        Description = data.Description;
-        ChannelIds = data.ChannelIds;
-        Categories = data.Categories;
-        SystemMessageChannels = data.SystemMessageChannels;
-        Roles = data.Roles;
-        DefaultPermissions = data.DefaultPermissions;
-        Icon = data.Icon;
-        Banner = data.Banner;
-        Flags = data.Flags;
-        IsNsfw = data.IsNsfw;
-        EnableAnalytics = data.EnableAnalytics;
-        IsDiscoverable = data.IsDiscoverable;
+        Inject(data, this);
 
         return true;
+    }
+
+    internal static void Inject(Server source, Server target)
+    {
+        target.OwnerId = source.OwnerId;
+        target.Owner = source.Owner;
+        target.Name = source.Name;
+        target.Description = source.Description;
+        target.ChannelIds = source.ChannelIds;
+        target.Categories = source.Categories;
+        target.SystemMessageChannels = source.SystemMessageChannels;
+        target.Roles = source.Roles;
+        target.DefaultPermissions = source.DefaultPermissions;
+        target.Icon = source.Icon;
+        target.Banner = source.Banner;
+        target.Flags = source.Flags;
+        target.IsNsfw = source.IsNsfw;
+        target.EnableAnalytics = source.EnableAnalytics;
+        target.IsDiscoverable = source.IsDiscoverable;
     }
 
     public Task<bool> Fetch()
