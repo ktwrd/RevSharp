@@ -135,6 +135,19 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
 
     public Task EndTyping()
         => EndTyping(Client);
+
+    public async Task<ChannelInvite> CreateInvite(Client client)
+    {
+        var response = await client.PostAsync($"/channels/{Id}/invites", new StringContent(""));
+        if (response.StatusCode != HttpStatusCode.OK)
+            throw new Exception($"Failed to create invite, server responded with {response.StatusCode}");
+
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        var data = JsonSerializer.Deserialize<ChannelInvite>(stringContent, Client.SerializerOptions);
+        if (data == null)
+            throw new Exception("Failed to deserialize invite");
+        return data;
+    }
     
     public BaseChannel()
         : this(null, "")
