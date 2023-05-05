@@ -6,6 +6,10 @@ namespace RevSharp.Core.Models;
 
 public partial class Server
 {
+    /// <summary>
+    /// Edit Server
+    /// </summary>
+    /// <returns>Was it successful</returns>
     public async Task<bool> Edit(Client client, ServerData data)
     {
         var response = await client.PatchAsync($"/servers/{Id}", JsonContent.Create(data, options: Client.SerializerOptions));
@@ -18,9 +22,17 @@ public partial class Server
         Inject(deser, this);
         return true;
     }
+    /// <summary>
+    /// Edit Server
+    /// </summary>
+    /// <returns>Was it successful</returns>
     public Task<bool> Edit(ServerData data)
         => Edit(Client, data);
 
+    /// <summary>
+    /// Edit Server
+    /// </summary>
+    /// <returns>Was it successful</returns>
     public Task<bool> Edit(Client client,
         string? name = null,
         string? description = null,
@@ -47,6 +59,10 @@ public partial class Server
             });
     }
 
+    /// <summary>
+    /// Edit Server
+    /// </summary>
+    /// <returns>Was it successful</returns>
     public Task<bool> Edit(string? name = null,
         string? description = null,
         string? icon = null,
