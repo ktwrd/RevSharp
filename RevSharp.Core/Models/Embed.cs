@@ -18,6 +18,46 @@ public class SendableEmbed
     [JsonPropertyName("colour")]
     public string? Colour { get; set; }
 }
+
+public class EmbedBuilder : SendableEmbed
+{
+    public SendableEmbed WithDescription(string description)
+    {
+        Description = description;
+        return this;
+    }
+
+    public SendableEmbed WithIconUrl(string iconUrl)
+    {
+        IconUrl = iconUrl;
+        return this;
+    }
+
+    public SendableEmbed WithUrl(string url)
+    {
+        Url = url;
+        return this;
+    }
+
+    public SendableEmbed WithTitle(string title)
+    {
+        Title = title;
+        return this;
+    }
+
+    public SendableEmbed WithMedia(string url)
+    {
+        Media = url;
+        return this;
+    }
+
+    public SendableEmbed WithColour(string colour)
+    {
+        Colour = colour;
+        return this;
+    }
+}
+
 public class BaseEmbed
 {
     public string Type { get; set; }
