@@ -20,4 +20,10 @@ public class Reply : ISnowflake
         Id = message.Id;
         Mention = mention;
     }
+
+    public Reply(string messageId, bool mention = true)
+    {
+        Id = messageId;
+        Mention = mention;
+    }
 }
