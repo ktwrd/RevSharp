@@ -1,4 +1,9 @@
-﻿using RevSharp.Core.Models;
+﻿using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json.Linq;
+using RevSharp.Core.Helpers;
+using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
 
@@ -43,5 +48,69 @@ public partial class Client
             if (AddToCache(i))
                 list.Add(i.Id);
         return list.ToArray();
+    }
+
+    public Task<Server?> CreateServer(string name, string? description = null, bool nsfw = false)
+    {
+        if (name.Length is < 1 or > 32)
+            throw new Exception("name must be less than 32 and greater than 1");
+        if (description != null && description.Length is < 0 or > 1024)
+            throw new Exception("description must be less than 1024 and greater than 0");
+        return CreateServer(new CreateServerData()
+        {
+            Name = name,
+            Description = description,
+            IsNsfw = nsfw
+        });
+    }
+
+    public async Task<Server?> CreateServer(CreateServerData data)
+    {
+        var response = await PostAsync(
+            $"/servers/create",
+            JsonContent.Create(data, options: SerializerOptions));
+        if (response.StatusCode != HttpStatusCode.OK)
+            return null;
+
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        var parsed = CreateServerResponse.Parse(stringContent);
+
+        return await GetServer(parsed.Server.Id);
+    }
+}
+
+public class CreateServerData
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; }
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+    [JsonPropertyName("nsfw")]
+    public bool IsNsfw { get; set; }
+
+    public CreateServerData()
+    {
+        Name = "";
+        IsNsfw = false;
+    }
+}
+
+public class CreateServerResponse
+{
+    [JsonPropertyName("server")]
+    public Server Server { get; set; }
+    [JsonPropertyName("Channels")]
+    public BaseChannel[] Channels { get; set; }
+
+    public static CreateServerResponse Parse(string json)
+    {
+        var instance = System.Text.Json.JsonSerializer.Deserialize<CreateServerResponse>(json, Client.SerializerOptions);
+        var jobj = JObject.Parse(json);
+        var chnls = jobj["channels"].ToArray();
+        instance.Channels  = chnls
+            .Select(v => ChannelHelper.ParseChannel(v.ToString()))
+            .Where(v => v != null)
+            .ToArray();
+        return instance;
     }
 }
