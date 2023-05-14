@@ -1,3 +1,5 @@
+using RevSharp.Core.Models;
+
 namespace RevSharp.ReBot.Helpers;
 
 public class CommandInfo
@@ -28,5 +30,10 @@ public static class CommandHelper
             Arguments = args,
             Content = content
         };
+    }
+
+    public static CommandInfo? FetchInfo(Message message)
+    {
+        return FetchInfo(Program.Config.Prefix, message.Content ?? "");
     }
 }
