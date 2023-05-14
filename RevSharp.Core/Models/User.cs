@@ -34,6 +34,56 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     [JsonPropertyName("online")]
     public bool IsOnline { get; set; }
 
+    public long Permission
+    {
+        get
+        {
+            var permissions = 0L;
+            if (Relationship is UserRelationship.Friend or UserRelationship.User)
+            {
+                return long.MaxValue;
+            }
+
+            if (Relationship is UserRelationship.BlockedOther or UserRelationship.BlockedOther)
+            {
+                return (long)UserPermission.Access;
+            }
+
+            if (Relationship is UserRelationship.Incoming or UserRelationship.Outgoing)
+            {
+                permissions = (long)UserPermission.Access;
+            }
+
+            var opt = Client.ChannelCache.Where((v) =>
+            {
+                if (v.Value.ChannelType == "Group")
+                {
+                    var groupChannel = (GroupChannel)v.Value;
+                    if (groupChannel.RecipientIds.Contains(Id))
+                        return true;
+                }
+                else if (v.Value.ChannelType == "DirectMessage")
+                {
+                    var dmChannel = (DirectMessageChannel)v.Value;
+                    if (dmChannel.RecipientIds.Contains(Id))
+                        return true;
+                }
+
+                return false;
+            });
+            var altOpt = Client.ServerCache.Where((v) =>
+            {
+                return v.Value.Members.Any(m => m.Id.UserId == Id);
+            });
+            if (opt.Any() || altOpt.Any())
+            {
+                permissions |= (long)UserPermission.SendMessage;
+            }
+
+            return permissions;
+        }
+    }
+
     public User()
         : this(null, "")
     {}

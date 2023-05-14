@@ -40,7 +40,16 @@ public class TextChannel : BaseChannel, IFetchable
     /// </summary>
     [JsonPropertyName("nsfw")]
     public bool IsNsfw { get; set; }
-
+    /// <summary>
+    /// Default permissions assigned to users in this channel
+    /// </summary>
+    [JsonPropertyName("default_permissions")]
+    public PermissionCompare? DefaultPermissions { get; set; }
+    /// <summary>
+    /// Permissions assigned based on role to this channel
+    /// </summary>
+    [JsonPropertyName("role_permissions")]
+    public Dictionary<string, PermissionCompare> RolePermissions { get; set; }
     public override async Task<bool> Fetch(Client client)
     {
         var data = await GetGeneric<TextChannel>(client);

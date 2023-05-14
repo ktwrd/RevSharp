@@ -24,4 +24,6 @@ public class ServerRole
     /// </summary>
     [JsonPropertyName("rank")]
     public long Rank { get; set; }
+    [JsonPropertyName("permissions")]
+    public PermissionCompare Permissions { get; set; }
 }
