@@ -74,4 +74,12 @@ public class Config
 {
     public string Token { get; set; }
     public bool IsBot { get; set; }
+    public string Prefix { get; set; }
+
+    public Config()
+    {
+        Token = "";
+        IsBot = false;
+        Prefix = "r.";
+    }
 }
