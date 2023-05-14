@@ -34,10 +34,13 @@ public partial class Client
     /// </summary>
     /// <param name="id">User Id</param>
     /// <returns>Null if failed to fetch.</returns>
-    public async Task<User?> GetUser(string id)
+    public async Task<User?> GetUser(string id, bool forceFetch = true)
     {
         Log.WriteLine($"Fetching user {id}");
         var inCache = UserCache.ContainsKey(id);
+        
+        if (inCache && !forceFetch)
+            return UserCache[id];
         
         // Create new user if doesn't exist in cache
         var user = inCache

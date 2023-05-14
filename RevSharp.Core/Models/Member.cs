@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -20,9 +21,9 @@ public class Member : Clientable
     [JsonPropertyName("timeout")]
     public DateTimeOffset? TimeoutTimestamp { get; set; }
 
-    public async Task<Dictionary<string, ServerRole>?> FetchRoles(Client client)
+    public async Task<Dictionary<string, ServerRole>?> FetchRoles(Client client, bool forceFetch = true)
     {
-        var server = await client.GetServer(Id.ServerId);
+        var server = await client.GetServer(Id.ServerId, forceFetch: forceFetch);
         if (server == null)
             return null;
 
@@ -36,9 +37,9 @@ public class Member : Clientable
         return items;
     }
 
-    public async Task<List<(string, ServerRole)>?> FetchOrderedRoles(Client client)
+    public async Task<List<(string, ServerRole)>?> FetchOrderedRoles(Client client, bool forceFetch = true)
     {
-        var items = await FetchRoles(client);
+        var items = await FetchRoles(client, forceFetch: forceFetch);
         if (items == null)
             return null;
         var list = items.Select((v) =>
@@ -78,7 +79,7 @@ public class Member : Clientable
         target.TimeoutTimestamp = source.TimeoutTimestamp;
     }
 
-    public async Task<bool> HasPermission(Client client)
+    public async Task<bool> HasPermission(Client client, PermissionFlag flag, bool forceFetch = true)
     {
         var server = await client.GetServer(Id.ServerId);
         ServerRole? highestRole = null;
@@ -94,6 +95,9 @@ public class Member : Clientable
 
         return false;
     }
+
+    public Task<bool> HasPermission(PermissionFlag flag, bool forceFetch = true)
+        => HasPermission(Client, flag, forceFetch);
 
 }
 
