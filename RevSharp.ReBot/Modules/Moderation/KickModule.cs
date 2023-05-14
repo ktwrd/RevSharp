@@ -180,7 +180,12 @@ public class KickModule : BaseModule
         });
     }
 
-    public override bool HasHelpContent => true;
+    public override bool HasHelpContent =>
+    #if DEBUG
+        true;
+    #else
+        false;
+    #endif
     public override string? InternalName => "kick";
     public override string? HelpCategory => "moderation";
 }
