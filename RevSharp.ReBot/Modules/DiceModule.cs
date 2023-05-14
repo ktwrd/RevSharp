@@ -10,6 +10,22 @@ namespace RevSharp.ReBot.Modules;
 [RevSharpModule]
 public class DiceModule : BaseModule
 {
+    public override async Task Initialize(ReflectionInclude reflection)
+    {
+        var help = reflection.FetchModule<HelpModule>();
+        if (help != null)
+            help.HelpDict.Add("dice", string.Join("\n", new string[]
+            {
+                "```",
+                "r.dice <min> <max>     - generate random number (x-y)",
+                "r.dice <max>           - generate random number (0-x)",
+                "r.dice help            - display this message",
+                "",
+                "max: Maximum number for dice roll",
+                "min: Minimum number for dice roll (default: 0)",
+                "```"
+            }));
+    }
     public override async Task MessageReceived(Message message)
     {
         var info = CommandHelper.FetchInfo("r.", message.Content);
@@ -17,6 +33,7 @@ public class DiceModule : BaseModule
             return;
         if (info.Command != "dice")
             return;
+        var help = Reflection.FetchModule<HelpModule>();
 
         var numberRegex = new Regex(@"^[0-9]+$");
         int min = 0;
@@ -28,17 +45,7 @@ public class DiceModule : BaseModule
         if (info.Arguments.Count < 1 || (info.Arguments.Count > 0  && info.Arguments[0].ToLower() == "help"))
         {
             embed.Title += " - Usage";
-            embed.Description = string.Join("\n", new string[]
-            {
-                "```",
-                "r.dice <min> <max>     - generate random number (x-y)",
-                "r.dice <max>           - generate random number (0-x)",
-                "r.dice help            - display this message",
-                "",
-                "max: Maximum number for dice roll",
-                "min: Minimum number for dice roll (default: 0)",
-                "```"
-            });
+            embed.Description = help.HelpDict["dice"];
             embed.Colour = "red";
             await message.Reply("", embeds: new[] { embed });
             return;
