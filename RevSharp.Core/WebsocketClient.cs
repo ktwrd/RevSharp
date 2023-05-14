@@ -17,7 +17,10 @@ internal partial class WebsocketClient
     internal WebsocketClient(Client client)
     {
         _client = client;
-        TextMessageReceived += c => ParseMessage(c).Wait();
+        TextMessageReceived += async (c) =>
+        {
+            await ParseMessage(c);
+        };
     }
 
     #region Events
@@ -134,26 +137,26 @@ internal partial class WebsocketClient
     internal event ReadyMessageDelegate ReadyReceived;
     internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
-    private Task ParseMessage(string content)
+    private async Task ParseMessage(string content)
     {
         Log.WriteLine("Parsing Message");
         var messageType = GetMessageType(content);
         if (messageType == null)
-            return Task.CompletedTask;
+            return;
         var deser = JsonSerializer.Deserialize<BaseTypedResponse>(content, Client.SerializerOptions);
         if (deser == null)
         {
             Log.Error($"Failed to deserialize\n--------\n{content}\n--------");
-            return Task.CompletedTask;
+            return;
         }
         Log.Debug($"Received message {deser.Type}");
         if (deser.Type.StartsWith("Message"))
         {
-            ParseMessage_Message(content, deser.Type).Wait();
+            await ParseMessage_Message(content, deser.Type);
         }
 
         if (deser.Type.StartsWith("Channel"))
-            ParseMessage_Channel(content, deser.Type).Wait();
+            await ParseMessage_Channel(content, deser.Type);
         switch (deser.Type)
         {
             case "Authenticated":
@@ -173,7 +176,6 @@ internal partial class WebsocketClient
                 break;
         }
         EventReceived?.Invoke(deser.Type, content);
-        return Task.CompletedTask;
     }
 
     public async Task Ping()

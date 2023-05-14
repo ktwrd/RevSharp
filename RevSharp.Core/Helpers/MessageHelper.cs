@@ -62,6 +62,8 @@ public static class MessageHelper
         var objEmbedArr = obj["embeds"]?.ToArray();
         if (objEmbedArr == null)
             return null;
+        if (objEmbedArr.Length < 1)
+            return Array.Empty<BaseEmbed>();
         var embedList = new List<BaseEmbed>();
         foreach (var item in objEmbedArr)
         {
