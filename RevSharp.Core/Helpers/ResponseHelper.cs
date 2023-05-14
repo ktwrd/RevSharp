@@ -6,16 +6,15 @@ namespace RevSharp.Core.Helpers;
 
 public static class ResponseHelper
 {
-    public static Exception? ParseException(string content)
+    public static void ThrowException(string content)
     {
         var basedTypedResponse = JsonSerializer.Deserialize<BaseTypedResponse>(content, Client.SerializerOptions);
         switch (basedTypedResponse.Type)
         {
             case "MissingPermission":
-                return new MissingPermissionException(content);
-                break;
+                throw new MissingPermissionException(content);
             default:
-                return new RevoltException(basedTypedResponse.Type, content);
+                throw new RevoltException(basedTypedResponse.Type, content);
         }
         
     }

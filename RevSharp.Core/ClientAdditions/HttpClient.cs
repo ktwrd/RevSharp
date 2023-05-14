@@ -21,9 +21,9 @@ public partial class Client
         if (code is >= 400 and < 500)
         {
             var stringContent = response.Content.ReadAsStringAsync().Result;
-            var exception = ResponseHelper.ParseException(stringContent);
-            if (exception != null)
-                throw exception;
+            if (code == 429)
+                throw new RevoltException("TooManyRequests");
+            ResponseHelper.ThrowException(stringContent);
         }
     }
     
