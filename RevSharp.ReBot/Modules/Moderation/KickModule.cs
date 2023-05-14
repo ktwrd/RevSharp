@@ -45,21 +45,38 @@ public class KickModule : BaseModule
             return;
         }
 
-        var authorMember = await server.GetMember(message.AuthorId);
-        if (!await authorMember.HasPermission(PermissionFlag.KickMembers))
+        try
         {
-            embed.Description = "You do not have access to this command";
-            embed.Colour = "red";
-            await message.Reply(embed);
-            return;
-        }
+            var authorMember = await server.GetMember(message.AuthorId, forceFetch: false);
+            if (!await authorMember.HasPermission(PermissionFlag.KickMembers, forceFetch: false))
+            {
+                embed.Description = "You do not have access to this command";
+                embed.Colour = "red";
+                await message.Reply(embed);
+                return;
+            }
 
-        var selfMember = await server.GetMember(Client.CurrentUserId);
-        if (!await selfMember.HasPermission(PermissionFlag.KickMembers))
+            var selfMember = await server.GetMember(Client.CurrentUserId, forceFetch: false);
+            if (!await selfMember.HasPermission(PermissionFlag.KickMembers, forceFetch: false))
+            {
+                embed.Description = "I do not have permission to kick this member!";
+                embed.Colour = "red";
+                await message.Reply(embed);
+                return;
+            }
+        }
+        catch (RevoltException e)
         {
-            embed.Description = "I do not have permission to kick this member!";
+            embed.Description = string.Join("\n", new string[]
+            {
+                "Failed to run module!",
+                "```",
+                e.Message,
+                "```"
+            });
             embed.Colour = "red";
             await message.Reply(embed);
+            throw;
             return;
         }
 
