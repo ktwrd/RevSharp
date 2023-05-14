@@ -37,6 +37,35 @@ public partial class Message
     }
 
     public Task<Message?> Reply(
+        SendableEmbed embed,
+        bool mention = true,
+        Masquerade? masquerade = null,
+        Interactions[]? interactions = null,
+        string[]? attachments = null)
+        => Reply(
+            Client,
+            "",
+            mention,
+            new[] { embed },
+            masquerade,
+            interactions,
+            attachments);
+    public Task<Message?> Reply(
+        Client client,
+        SendableEmbed embed,
+        bool mention = true,
+        Masquerade? masquerade = null,
+        Interactions[]? interactions = null,
+        string[]? attachments = null)
+        => Reply(
+            client,
+            "",
+            mention,
+            new[] { embed },
+            masquerade,
+            interactions,
+            attachments);
+    public Task<Message?> Reply(
         string? content,
         bool mention = true,
         SendableEmbed[]? embeds = null,

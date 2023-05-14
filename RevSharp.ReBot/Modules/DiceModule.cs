@@ -47,7 +47,7 @@ public class DiceModule : BaseModule
             embed.Title += " - Usage";
             embed.Description = help.HelpDict["dice"];
             embed.Colour = "red";
-            await message.Reply("", embeds: new[] { embed });
+            await message.Reply(embed);
             return;
         }
 
@@ -57,7 +57,7 @@ public class DiceModule : BaseModule
             embed.Title += " - Error";
             embed.Description = $"Invalid Argument `{info.Arguments[0]}`";
             embed.Colour = "red";
-            await message.Reply("", embeds: new[] { embed });
+            await message.Reply(embed);
             return;
         }
 
@@ -68,7 +68,7 @@ public class DiceModule : BaseModule
                 embed.Title += " - Error";
                 embed.Description = $"Invalid Argument `{info.Arguments[1]}`";
                 embed.Colour = "red";
-                await message.Reply("", embeds: new[] { embed });
+                await message.Reply(embed);
                 return;
             }
         }
@@ -84,6 +84,6 @@ public class DiceModule : BaseModule
 
         int result = Program.Random.Next(min, max);
         embed.Description = $"## {result}";
-        await message.Reply("", embeds: new[] { embed });
+        await message.Reply(embed);
     }
 }

@@ -36,7 +36,7 @@ public class HelpModule : BaseModule
 
             embed.Colour = "orange";
             embed.Description = string.Join("\n", text);
-            await message.Reply("", embeds: new[] { embed });
+            await message.Reply(embed);
             return;
         }
 
@@ -44,14 +44,14 @@ public class HelpModule : BaseModule
         if (HelpDict.TryGetValue(info.Arguments[0], out var item))
         {
             embed.Description = item;
-            await message.Reply("", embeds: new[] { embed });
+            await message.Reply(embed);
         }
         // 0th argument given isn't a valid module. print error
         else
         {
             embed.Description = $"Module `{info.Arguments[0]}` not found";
             embed.Colour = "red";
-            await message.Reply("", embeds: new[] { embed });
+            await message.Reply(embed);
         }
     }
 }
