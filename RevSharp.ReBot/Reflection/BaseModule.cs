@@ -15,4 +15,13 @@ public class BaseModule
     {
         return Task.CompletedTask;
     }
+
+    public virtual string? HelpContent()
+    {
+        return null;
+    }
+
+    public virtual bool HasHelpContent => false;
+    public virtual string? InternalName => null;
+    public virtual string? HelpCategory => null;
 }
