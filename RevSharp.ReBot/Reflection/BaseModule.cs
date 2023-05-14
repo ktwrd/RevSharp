@@ -6,7 +6,8 @@ namespace RevSharp.ReBot.Reflection;
 public class BaseModule
 {
     public Client Client { get; set; }
-    public virtual Task Initialize()
+    public ReflectionInclude Reflection { get; set; }
+    public virtual Task Initialize(ReflectionInclude reflection)
     {
         return Task.CompletedTask;
     }
