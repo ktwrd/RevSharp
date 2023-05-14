@@ -9,8 +9,10 @@ public partial class Server
         var response = await client.DeleteAsync($"/servers/{Id}/members/{userId}");
         return response.StatusCode == HttpStatusCode.NoContent;
     }
-
     public Task<bool> KickMember(string userId)
         => KickMember(Client, userId);
-
+    public Task<bool> KickMember(Client client, User user)
+        => KickMember(client, user.Id);
+    public Task<bool> KickMember(User user)
+        => KickMember(Client, user.Id);
 }
