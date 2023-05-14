@@ -61,7 +61,7 @@ public class BotController : BaseController
         {
             { "server", serverId }
         });
-        return response.StatusCode == HttpStatusCode.NoContent;
+        return response.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.OK;
     }
 
     public Task<bool> Invite(Bot bot, Server server)
