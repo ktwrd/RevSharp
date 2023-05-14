@@ -44,7 +44,7 @@ public partial class Server : Clientable, ISnowflake, IFetchable
     public bool EnableAnalytics { get; set; }
     [JsonPropertyName("discoverable")]
     public bool IsDiscoverable { get; set; }
-
+    public List<Member> Members { get; set; }
     internal static async Task<Server?> Get(string id, Client client, bool fetchOwner = true)
     {
         var response = await client.GetAsync($"/servers/{id}");
@@ -68,9 +68,25 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         if (data == null)
             return false;
 
+        var members = await FetchMembers(client);
+        if (members == null)
+            return false;
+        data.Members = members.ToList();
         Inject(data, this);
 
         return true;
+    }
+
+    public async Task<Member[]?> FetchMembers(Client client)
+    {
+        var response = await client.GetAsync($"/servers/{Id}/members");
+        if (response.StatusCode != HttpStatusCode.OK)
+            return null;
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        var data = JsonSerializer.Deserialize<ServerMemberResult>(stringContent, Client.SerializerOptions);
+        foreach (var i in data.Members)
+            i.Client = Client;
+        return data.Members;
     }
 
     internal static void Inject(Server source, Server target)
@@ -108,6 +124,7 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         : base(client)
     {
         Id = id;
+        Members = new List<Member>();
     }
 }
 
