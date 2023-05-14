@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using RevSharp.Core;
+using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 using RevSharp.ReBot.Helpers;
 using RevSharp.ReBot.Reflection;
@@ -20,10 +21,48 @@ public class KickModule : BaseModule
         if (info == null || info.Command != "kick")
             return;
 
+        var embed = new SendableEmbed()
+        {
+            Title = "Moderation - Kick"
+        };
+        
         // Invalid amount of arguments
         if (info.Arguments.Count < 1)
         {
-            
+            embed.Title += " - Usage";
+            embed.Description = HelpContent();
+            embed.Colour = "orange";
+            await message.Reply(embed);
+            return;
+        }
+        
+        var server = await message.FetchServer();
+        if (server == null)
+        {
+            embed.Description = "Failed to fetch server!";
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
+        }
+
+        var author = await Program.Client.GetUser(message.AuthorId);
+        var channel = await Program.Client.GetChannel(message.ChannelId);
+        var userPerms = await PermissionHelper.CalculatePermission(Program.Client, author, channel);
+        if (!PermissionHelper.HasFlag(userPerms, (long)PermissionFlag.KickMembers))
+        {
+            embed.Description = "You do not have access to this command";
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
+        }
+
+        var selfPerms = await PermissionHelper.CalculatePermission(Program.Client, Program.Client.CurrentUser, channel);
+        if (!PermissionHelper.HasFlag(selfPerms, (long)PermissionFlag.KickMembers))
+        {
+            embed.Description = "I do not have permission to kick this member!";
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
         }
 
         string targetId = "";
@@ -40,20 +79,6 @@ public class KickModule : BaseModule
             {
                 targetId = match.Groups[1].Value.ToUpper();
             }
-        }
-
-        var embed = new SendableEmbed()
-        {
-            Title = "Moderation - Kick"
-        };
-        
-        var server = await message.FetchServer();
-        if (server == null)
-        {
-            embed.Description = "Failed to fetch server!";
-            embed.Colour = "red";
-            await message.Reply(embed);
-            return;
         }
 
         if (targetId.Length < 1)
@@ -126,4 +151,21 @@ public class KickModule : BaseModule
         }
         await message.Reply(embed);
     }
+
+    public override string? HelpContent()
+    {
+        return string.Join("\n", new string[]
+        {
+            "```",
+            "r.kick <user id>      - Kick member via user ID",
+            "r.kick <mention>      - Kick member via mention",
+            " ---- Example ----",
+            "r.kick <@01GZD4F61RBPJ5HWD08XB8F78N>",
+            "```"
+        });
+    }
+
+    public override bool HasHelpContent => true;
+    public override string? InternalName => "kick";
+    public override string? HelpCategory => "moderation";
 }
