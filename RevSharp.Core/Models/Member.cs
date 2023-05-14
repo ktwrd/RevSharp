@@ -81,19 +81,11 @@ public class Member : Clientable
 
     public async Task<bool> HasPermission(Client client, PermissionFlag flag, bool forceFetch = true)
     {
-        var server = await client.GetServer(Id.ServerId);
-        ServerRole? highestRole = null;
-        var sortedRoles = server.Roles
-            .OrderBy(v => v.Value.Rank);
-        foreach (var item in sortedRoles)
-        {
-            if (!RoleIds.Contains(item.Key))
-                continue;
-            
-            
-        }
+        var server = await client.GetServer(Id.ServerId, forceFetch: forceFetch);
+        var user = await client.GetUser(Id.UserId, forceFetch: forceFetch);
+        var data = await client.CalculatePermissions(user, server);
 
-        return false;
+        return PermissionHelper.HasFlag(data, (int)flag);
     }
 
     public Task<bool> HasPermission(PermissionFlag flag, bool forceFetch = true)
