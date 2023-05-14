@@ -10,21 +10,22 @@ namespace RevSharp.ReBot.Modules;
 [RevSharpModule]
 public class DiceModule : BaseModule
 {
-    public override async Task Initialize(ReflectionInclude reflection)
+    public override bool HasHelpContent => true;
+    public override string? InternalName => "dice";
+
+    public override string? HelpContent()
     {
-        var help = reflection.FetchModule<HelpModule>();
-        if (help != null)
-            help.HelpDict.Add("dice", string.Join("\n", new string[]
-            {
-                "```",
-                "r.dice <min> <max>     - generate random number (x-y)",
-                "r.dice <max>           - generate random number (0-x)",
-                "r.dice help            - display this message",
-                "",
-                "max: Maximum number for dice roll",
-                "min: Minimum number for dice roll (default: 0)",
-                "```"
-            }));
+        return string.Join("\n", new string[]
+        {
+            "```",
+            "r.dice <min> <max>     - generate random number (x-y)",
+            "r.dice <max>           - generate random number (0-x)",
+            "r.dice help            - display this message",
+            "",
+            "max: Maximum number for dice roll",
+            "min: Minimum number for dice roll (default: 0)",
+            "```"
+        });
     }
     public override async Task MessageReceived(Message message)
     {
