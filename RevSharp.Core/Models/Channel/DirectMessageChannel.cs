@@ -35,4 +35,9 @@ public class DirectMessageChannel : BaseChannel, IFetchable
 
         return true;
     }
+
+    public Task<User?> FetchRecipient(Client client)
+    {
+        return client.GetUser(RecipientIds.First());
+    }
 }
