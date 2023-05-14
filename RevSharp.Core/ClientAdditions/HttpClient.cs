@@ -35,7 +35,7 @@ public partial class Client
     }
     internal async Task<HttpResponseMessage> DeleteAsync(string url)
     {
-        var response = await HttpClient.DeleteAsync(url);
+        var response = await HttpClient.DeleteAsync($"{Endpoint}{url}");
         CheckResponseError(response);
         return response;
     }
