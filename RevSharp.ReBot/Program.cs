@@ -19,15 +19,6 @@ public static class Program
         Client = new Client(Config.Token, Config.IsBot);
         await InitializeModules();
         await Client.LoginAsync();
-        Client.MessageReceived += (message) =>
-        {
-            Console.WriteLine(string.Join("\n", new string[]
-            {
-                $"Content: {message.Content}",
-                $"Author:  {message.AuthorId}",
-                $"Channel: {message.ChannelId}"
-            }));
-        };
         await Task.Delay(-1);
     }
 
