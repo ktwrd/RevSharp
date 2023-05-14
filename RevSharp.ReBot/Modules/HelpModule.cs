@@ -35,10 +35,8 @@ public class HelpModule : BaseModule
                 .Trim()
                 .ToLower();
             
-            Console.WriteLine($"contains: {category} {HelpCategoryDictionary.ContainsKey(category)}");
             if (!HelpCategoryDictionary.ContainsKey(category))
                 HelpCategoryDictionary.Add(category, new Dictionary<string, string>());
-            Console.WriteLine($"contains: {category} {HelpCategoryDictionary.ContainsKey(category)}");
             if (!HelpCategoryDictionary[category].ContainsKey(key))
                 HelpCategoryDictionary[category].Add(key, content);
         }        
