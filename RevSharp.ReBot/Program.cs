@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using RevSharp.Core;
+using RevSharp.ReBot.Reflection;
 
 namespace RevSharp.ReBot;
 
@@ -15,6 +17,7 @@ public static class Program
     {
         ReadConfig();
         Client = new Client(Config.Token, Config.IsBot);
+        await InitializeModules();
         await Client.LoginAsync();
         Client.MessageReceived += (message) =>
         {
@@ -26,6 +29,12 @@ public static class Program
             }));
         };
         await Task.Delay(-1);
+    }
+
+    private static async Task InitializeModules()
+    {
+        var i = new ReflectionInclude(Client);
+        await i.Search(typeof(Program).Assembly);
     }
     
     public static Config Config { get; set; }
