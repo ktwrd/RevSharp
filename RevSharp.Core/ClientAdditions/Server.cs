@@ -10,9 +10,11 @@ namespace RevSharp.Core;
 public partial class Client
 {
     internal Dictionary<string, Server> ServerCache { get; set; }
-    public async Task<Server?> GetServer(string serverId)
+    public async Task<Server?> GetServer(string serverId, bool forceFetch = true)
     {
         var inCache = ServerCache.ContainsKey(serverId);
+        if (inCache && forceFetch == false)
+            return ServerCache[serverId];
         Log.WriteLine($"{serverId} is " + (inCache ? "in" : "not in") + " cache");
         // Use server from cache if it exists
         var server = inCache

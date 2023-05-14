@@ -93,12 +93,14 @@ public partial class Client
         ChannelCache.TryAdd(data.Id, data);
     }
 
-    public async Task<BaseChannel?> GetChannel(string channelId)
+    public async Task<BaseChannel?> GetChannel(string channelId, bool forceUpdate = false)
     {
         if (ChannelCache.ContainsKey(channelId))
         {
             Log.WriteLine($"{channelId} exists in cache. Fetching");
             ChannelCache[channelId].Client = this;
+            if (!forceUpdate)
+                return ChannelCache[channelId];
             if (await ChannelCache[channelId].Fetch(this))
             {
                 Log.WriteLine($"{channelId} fetch in cache complete. Returning ChannelCache[{channelId}]");
@@ -107,7 +109,7 @@ public partial class Client
             Log.WriteLine($"{channelId} fetch failed");
             return null;
         }
-        var response = await HttpClient.GetAsync($"/channels/{channelId}");
+        var response = await GetAsync($"/channels/{channelId}");
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
 
