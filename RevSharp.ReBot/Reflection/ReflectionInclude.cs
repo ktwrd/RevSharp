@@ -46,6 +46,11 @@ public class ReflectionInclude
 
         return null;
     }
+
+    public BaseModule[] FetchModules()
+    {
+        return Modules.ToArray();
+    }
     private async Task InitializeEvents<T>(T item, Type type) where T : BaseModule
     {
         item.Client = _client;
