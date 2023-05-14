@@ -68,7 +68,7 @@ internal static class Log
         internal static void SetColor(LogColor? color = null)
         {
             
-            string? envEnableColor = Environment.GetEnvironmentVariable("SKIDBOT_LOG_COLOR");
+            string? envEnableColor = Environment.GetEnvironmentVariable("REVSHARP_LOG_COLOR");
             if ((envEnableColor ?? "true") != "true")
                 return;
             LogColor targetColor = color ?? DefaultColor;
