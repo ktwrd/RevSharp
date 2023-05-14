@@ -45,10 +45,8 @@ public class KickModule : BaseModule
             return;
         }
 
-        var author = await Program.Client.GetUser(message.AuthorId);
-        var channel = await Program.Client.GetChannel(message.ChannelId);
-        var userPerms = await PermissionHelper.CalculatePermission(Program.Client, author, channel);
-        if (!PermissionHelper.HasFlag(userPerms, (long)PermissionFlag.KickMembers))
+        var authorMember = await server.GetMember(message.AuthorId);
+        if (!await authorMember.HasPermission(PermissionFlag.KickMembers))
         {
             embed.Description = "You do not have access to this command";
             embed.Colour = "red";
@@ -56,8 +54,8 @@ public class KickModule : BaseModule
             return;
         }
 
-        var selfPerms = await PermissionHelper.CalculatePermission(Program.Client, Program.Client.CurrentUser, channel);
-        if (!PermissionHelper.HasFlag(selfPerms, (long)PermissionFlag.KickMembers))
+        var selfMember = await server.GetMember(Client.CurrentUserId);
+        if (!await selfMember.HasPermission(PermissionFlag.KickMembers))
         {
             embed.Description = "I do not have permission to kick this member!";
             embed.Colour = "red";
