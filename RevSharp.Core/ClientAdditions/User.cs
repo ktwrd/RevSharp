@@ -12,7 +12,38 @@ public partial class Client
             ? user
             : null;
     public string CurrentUserId { get; private set; } = "";
-    
+
+    private Dictionary<string, Dictionary<string, long>> CachedPermission_Channel =
+        new Dictionary<string, Dictionary<string, long>>();
+
+    private Dictionary<string, Dictionary<string, long>> CachedPermission_Server =
+        new Dictionary<string, Dictionary<string, long>>();
+
+    public async Task<long> CalculatePermissions(User user, Server server)
+    {
+        CachedPermission_Server.TryAdd(user.Id, new Dictionary<string, long>());
+        if (CachedPermission_Server[user.Id].ContainsKey(server.Id))
+            return CachedPermission_Server[user.Id][server.Id];
+        long permissions = await PermissionHelper.CalculatePermission(this, user, server);
+        CachedPermission_Server[user.Id].TryAdd(server.Id, permissions);
+        return CachedPermission_Server[user.Id][server.Id];
+    }
+
+    public Task<long> CalculatePermissions(Server server)
+        => CalculatePermissions(CurrentUser, server);
+
+    public async Task<long> CalculatePermissions(User user, BaseChannel channel)
+    {
+        CachedPermission_Channel.TryAdd(user.Id, new Dictionary<string, long>());
+        if (CachedPermission_Channel[user.Id].ContainsKey(channel.Id))
+            return CachedPermission_Channel[user.Id][channel.Id];
+        long permissions = await PermissionHelper.CalculatePermission(this, user, channel);
+        CachedPermission_Channel[user.Id].TryAdd(channel.Id, permissions);
+        return CachedPermission_Channel[user.Id][channel.Id];
+    }
+
+    public Task<long> CalculatePermissions(BaseChannel channel)
+        => CalculatePermissions(CurrentUser, channel);
     /// <summary>
     /// Update <see cref="CurrentUser"/> with latest details
     /// </summary>
