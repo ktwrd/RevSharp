@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using RevSharp.Core;
 using RevSharp.Core.Models;
 using RevSharp.ReBot.Helpers;
 using RevSharp.ReBot.Reflection;
@@ -77,6 +78,27 @@ public class KickModule : BaseModule
         try
         {
             success = await server.KickMember(targetId);
+        }
+        catch (MissingPermissionException missingPermissionException)
+        {
+            embed.Description = string.Join("\n", new string[]
+            {
+                "Failed to kick member;",
+                $"Missing Permission `{missingPermissionException.Permission}`"
+            });
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
+        }
+        catch (RevoltException revoltException)
+        {
+            embed.Description = string.Join("\n", new string[]
+            {
+                $"Failed to kick member. (Reason: `{revoltException.Message}`)"
+            });
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
         }
         catch (Exception e)
         {
