@@ -42,3 +42,9 @@ public static class Program
     }
 }
 ```
+
+## Environment Variables
+| Name | Type | Default Value | Description |
+| ---- | ---- | ------------- | ----------- |
+| `REVSHARP_LOG_COLOR` | boolean | `true` | Custom color for log output. Anything other than `true` will disable the log color. |
+
