@@ -36,7 +36,8 @@ public static class Program
         var i = new ReflectionInclude(Client);
         await i.Search(typeof(Program).Assembly);
     }
-    
+
+    public static Random Random => new Random();
     public static Config Config { get; set; }
 
     public static string ConfigLocation
