@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
 namespace RevSharp.Core;
@@ -16,13 +17,13 @@ public partial class Client
     /// <exception cref="Exception">Value of <see cref="BaseTypedResponse.Type"/> when Status Code is 400 and the body deserialized successfully</exception>
     private void CheckResponseError(HttpResponseMessage response)
     {
-        if (response.StatusCode == HttpStatusCode.BadRequest)
+        int code = (int)response.StatusCode;
+        if (code is >= 400 and < 500)
         {
             var stringContent = response.Content.ReadAsStringAsync().Result;
-            var data = JsonSerializer.Deserialize<BaseTypedResponse>(stringContent, SerializerOptions);
-            if (data == null)
-                return;
-            throw new Exception($"Bad Request, {data.Type}");
+            var exception = ResponseHelper.ParseException(stringContent);
+            if (exception != null)
+                throw exception;
         }
     }
     
