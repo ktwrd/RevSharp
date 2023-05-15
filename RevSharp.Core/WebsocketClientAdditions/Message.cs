@@ -14,7 +14,7 @@ internal partial class WebsocketClient
                 var messageData = Message.Parse(content);
                 if (messageData != null)
                 {
-                    Console.WriteLine("Invoking MessageReceived");
+                    Log.Verbose("Invoking MessageReceived");
                     messageData.Client = _client;
                     MessageReceived?.Invoke(messageData);
                 }
