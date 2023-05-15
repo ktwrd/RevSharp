@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace RevSharp.Core;
 
@@ -111,10 +112,10 @@ internal static class Log
             => WriteLine(content, LogFlag.Warning, ShowMethodName, methodname, methodfile);
         internal static void Info(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content, LogFlag.Information, ShowMethodName, methodfile, methodfile);
+            => WriteLine(content, LogFlag.Information, ShowMethodName, methodname, methodfile);
         internal static void Note(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content, LogFlag.Note, ShowMethodName, methodfile, methodfile);
+            => WriteLine(content, LogFlag.Note, ShowMethodName, methodname, methodfile);
         internal static void Verbose(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
             => WriteLine(content, LogFlag.Verbose, ShowMethodName, methodname, methodfile);
@@ -133,10 +134,10 @@ internal static class Log
             => WriteLine(content.ToString(), LogFlag.Warning, ShowMethodName, methodname, methodfile);
         internal static void Info(object content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content.ToString(), LogFlag.Information, ShowMethodName, methodfile, methodfile);
+            => WriteLine(content.ToString(), LogFlag.Information, ShowMethodName, methodname, methodfile);
         internal static void Note(object content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content.ToString(), LogFlag.Note, ShowMethodName, methodfile, methodfile);
+            => WriteLine(content.ToString(), LogFlag.Note, ShowMethodName, methodname, methodfile);
         internal static void Verbose(object content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
             => WriteLine(content.ToString(), LogFlag.Verbose, ShowMethodName, methodname, methodfile);
@@ -145,7 +146,13 @@ internal static class Log
             => WriteLine(content.ToString(), LogFlag.Debug, ShowMethodName, methodname, methodfile);
         #endregion
 
-        internal static void WriteLine(string content, LogColor? color = null, string prefix = null, bool fetchMethodName = true, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
+        internal static void WriteLine(
+            string content,
+            LogColor? color = null,
+            string prefix = null,
+            bool fetchMethodName = true,
+            [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
         {
             // CreateTimer();
             SetColor(color);
@@ -161,7 +168,7 @@ internal static class Log
             [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
         {
             // When flag isn't as important as LogFlag we ignore
-            if (flag >= FeatureFlags.LogFlags)
+            if ((int)flag > (int)FeatureFlags.LogFlags)
                 return;
             (LogColor color, string prefix) = FlagConfig[flag];
             WriteLine(
