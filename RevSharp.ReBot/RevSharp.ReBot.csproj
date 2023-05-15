@@ -11,4 +11,8 @@
       <ProjectReference Include="..\RevSharp.Core\RevSharp.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MongoDB.Driver" Version="2.19.1" />
+    </ItemGroup>
+
 </Project>

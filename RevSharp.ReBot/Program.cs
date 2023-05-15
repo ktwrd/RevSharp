@@ -75,11 +75,15 @@ public class Config
     public string Token { get; set; }
     public bool IsBot { get; set; }
     public string Prefix { get; set; }
+    public string MongoConnectionUrl { get; set; }
+    public string MongoDatabaseName { get; set; }
 
     public Config()
     {
         Token = "";
         IsBot = false;
         Prefix = "r.";
+        MongoConnectionUrl = "mongodb://user:password@localhost:27021";
+        MongoDatabaseName = "skidbot_revolt";
     }
 }
