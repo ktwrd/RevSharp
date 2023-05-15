@@ -47,4 +47,9 @@ public static class Program
 | Name | Type | Default Value | Description |
 | ---- | ---- | ------------- | ----------- |
 | `REVSHARP_LOG_COLOR` | boolean | `true` | Custom color for log output. Anything other than `true` will disable the log color. |
+| `REVSHARP_DEBUG_WSLOG` | boolean | `false` | Display extended Websocket debug logs |
+| `REVSHARP_LOGFLAG` | int | `30` | Log flags. See [RevSharp.Core.LogFlags](RevSharp.Core/LogFlag.cs) for values |
+
+You can view all RevSharp environment variables at [RevSharp.Core.FeatureFlags](RevSharp.Core/FeatureFlags.cs)
+
 
