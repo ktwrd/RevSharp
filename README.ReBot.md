@@ -7,6 +7,13 @@ git clone https://github.com/ktwrd/revsharp.git
 cd revsharp
 ```
 
+Create MongoDB
+```bash
+./initializeMongoDB.sh
+# connection url;
+#      mongodb://user:password@localhost:27021
+```
+
 Run ReBot
 ```bash
 dotnet run --project RevSharp.ReBot
