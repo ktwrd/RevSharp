@@ -42,7 +42,7 @@ internal static class FeatureFlags
     {
         get
         {
-            var item = (LogFlag)ParseInt("REVSHARP_LOGFLAG", 30);
+            var item = (LogFlag)ParseInt("REVSHARP_LOGFLAG", (int)LogFlag.Information);
             return item;
         }
     }
