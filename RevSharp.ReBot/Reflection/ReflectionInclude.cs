@@ -56,7 +56,21 @@ public class ReflectionInclude
         item.Client = _client;
         _client.MessageReceived += async (m) =>
         {
-            await item.MessageReceived(m);
+            try
+            {
+                await item.MessageReceived(m);
+            }
+            catch (Exception e)
+            {
+                await m.Reply(string.Join("\n", new string[]
+                {
+                    $"Uncaught exception while running `{type.Name}.MessageReceived()`",
+                    "```",
+                    e.ToString(),
+                    "```"
+                }));
+                Console.Error.WriteLine(e);
+            }
         };
         
         await item.Initialize(this);
