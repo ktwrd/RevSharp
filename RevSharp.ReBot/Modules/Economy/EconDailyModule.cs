@@ -69,4 +69,19 @@ public class EconDailyModule : BaseModule
         });
         await message.Reply(embed);
     }
+
+    public override string? HelpContent()
+    {
+        return string.Join("\n", new string[]
+        {
+            "Get daily rewards for this server. Can only be called every 24hr",
+            "```",
+            "r.daily      - Get daily rewards",
+            "```"
+        });
+    }
+
+    public override bool HasHelpContent => true;
+    public override string? InternalName => "daily";
+    public override string? HelpCategory => "economy";
 }
