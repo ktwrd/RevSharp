@@ -10,28 +10,28 @@ internal static class Log
             internal ConsoleColor Background;
         }
         #region Init Colors
-        internal static LogColor WarnColor = new LogColor
+        private static LogColor WarnColor = new LogColor
         {
             Background = ConsoleColor.DarkYellow,
             Foreground = ConsoleColor.White
         };
-        internal static LogColor ErrorColor = new LogColor
+        private static LogColor ErrorColor = new LogColor
         {
             Background = ConsoleColor.DarkRed,
             Foreground = ConsoleColor.White
         };
-        internal static LogColor DebugColor = new LogColor
+        private static LogColor DebugColor = new LogColor
         {
             Background = ConsoleColor.DarkBlue,
             Foreground = ConsoleColor.White
         };
 
-        internal static LogColor NoteColor = new LogColor
+        private static LogColor NoteColor = new LogColor
         {
             Background = ConsoleColor.Magenta,
             Foreground = ConsoleColor.Black
         };
-        internal static LogColor DefaultColor = new LogColor
+        private static LogColor DefaultColor = new LogColor
         {
             Background = ConsoleColor.Black,
             Foreground = ConsoleColor.White
@@ -75,17 +75,19 @@ internal static class Log
             Console.BackgroundColor = targetColor.Background;
             Console.ForegroundColor = targetColor.Foreground;
         }
-        internal static string WarnPrefix = "[WARN]";
-        internal static string ErrorPrefix = "[ERR] ";
-        internal static string LogPrefix = "[LOG] ";
-        internal static string DebugPrefix = "[DEBG]";
-        internal static string NotePrefix = "[NOTE]";
-        internal static bool ShowMethodName = true;
-        internal static bool ShowTimestamp = false;
 
         internal static void Warn(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
             => WriteLine(content, WarnColor, WarnPrefix, ShowMethodName, methodname, methodfile);
+        private static string CriticalPrefix = "[CRIT]";
+        private static string WarnPrefix = "[WARN]";
+        private static string ErrorPrefix = "[ERR] ";
+        private static string LogPrefix = "[LOG] ";
+        private static string DebugPrefix = "[DEBG]";
+        private static string NotePrefix = "[NOTE]";
+        private static string VerbosePrefix = "[VERB]";
+        private static bool ShowMethodName = true;
+        private static bool ShowTimestamp = false;
 
         internal static void Error(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
