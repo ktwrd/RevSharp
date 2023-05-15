@@ -25,12 +25,12 @@ public partial class Client
         var inCache = SavedMessagesChannelId.Length > 0 && ChannelCache.ContainsKey(SavedMessagesChannelId);
         if (inCache)
         {
-            Log.WriteLine($"In cache, fetching and returning.");
+            Log.Verbose($"In cache, fetching and returning.");
             var c = ChannelCache[SavedMessagesChannelId] as SavedMessagesChannel;
             await c.Fetch();
             return c;
         }
-        Log.WriteLine($"Not in cache, fetching from API");
+        Log.Verbose($"Not in cache, fetching from API");
         var response = await GetAsync($"/users/{CurrentUserId}/dm");
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
@@ -44,7 +44,7 @@ public partial class Client
         // Make sure the client is us
         data.Client = this;
 
-        Log.WriteLine($"Attempting data.Fetch()");
+        Log.Verbose($"Attempting data.Fetch()");
         // Return null if failed to fetch
         if (!await data.Fetch())
             return null;
@@ -54,7 +54,7 @@ public partial class Client
         // return reference from ChannelCache
         if (!inCache)
         {
-            Log.WriteLine($"Adding to cache");
+            Log.Verbose($"Adding to cache");
             ChannelCache.Add(data.Id, data);
         }
         return ChannelCache[data.Id] as SavedMessagesChannel;
@@ -88,7 +88,7 @@ public partial class Client
         var data = ChannelHelper.ParseChannel(json);
         if (data == null)
             return;
-        Log.WriteLine($"{data.Id} Adding to cache");
+        Log.Verbose($"{data.Id} Adding to cache");
         data.Client = this;
         ChannelCache.TryAdd(data.Id, data);
     }
@@ -97,29 +97,32 @@ public partial class Client
     {
         if (ChannelCache.ContainsKey(channelId))
         {
-            Log.WriteLine($"{channelId} exists in cache. Fetching");
+            Log.Verbose($"{channelId} exists in cache. Fetching");
             ChannelCache[channelId].Client = this;
             if (!forceUpdate)
-                return ChannelCache[channelId];
-            if (await ChannelCache[channelId].Fetch(this))
             {
-                Log.WriteLine($"{channelId} fetch in cache complete. Returning ChannelCache[{channelId}]");
+                Log.Verbose("Not forcing fetch. Returning from cache");
                 return ChannelCache[channelId];
             }
-            Log.WriteLine($"{channelId} fetch failed");
+            if (await ChannelCache[channelId].Fetch(this))
+            {
+                Log.Verbose($"{channelId} fetch in cache complete. Returning ChannelCache[{channelId}]");
+                return ChannelCache[channelId];
+            }
+            Log.Warn($"{channelId} fetch failed");
             return null;
         }
         var response = await GetAsync($"/channels/{channelId}");
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
 
-        Log.WriteLine($"{channelId} not in cache, getting from api");
+        Log.Verbose($"{channelId} not in cache, getting from api");
         var stringContent = response.Content.ReadAsStringAsync().Result;
         var channel = ChannelHelper.ParseChannel(stringContent);
         if (channel == null)
             return null;
 
-        Log.WriteLine($"Adding {channelId} to cache");
+        Log.Verbose($"Adding {channelId} to cache");
         channel.Client = this;
         ChannelCache.Add(channel.Id, channel);
         
@@ -132,17 +135,17 @@ public partial class Client
         if (data == null)
             return;
 
-        Log.WriteLine($"{data.Id}");
+        Log.Verbose($"{data.Id}");
         if (!ChannelCache.TryGetValue(data.Id, out var value))
         {
-            Log.WriteLine($"Doesn't exist in cache, fetching");
+            Log.Verbose($"Doesn't exist in cache, fetching");
             await GetChannel(data.Id);
         }
         
-        Log.WriteLine($"Updating channel from cache");
+        Log.Verbose($"Updating channel from cache");
         if (await value.Fetch(this))
         {
-            Log.WriteLine($"Invoking ChannelUpdated");
+            Log.Verbose($"Invoking ChannelUpdated");
             ChannelUpdated?.Invoke(data, ChannelCache[data.Id]);   
         }
 
@@ -153,7 +156,7 @@ public partial class Client
         var data = ChannelHelper.ParseChannel(json);
         if (data == null)
             return;
-        Log.WriteLine($"{data.Id} Invoking ChannelDeleted");
+        Log.Verbose($"{data.Id} Invoking ChannelDeleted");
         ChannelCache.Remove(data.Id);
         ChannelDeleted?.Invoke(data.Id);
     }

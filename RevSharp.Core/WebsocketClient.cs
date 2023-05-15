@@ -99,7 +99,7 @@ internal partial class WebsocketClient
                 Log.Debug($"ReconnectionHappened {info.Type}");
             }
         });
-        Log.WriteLine("Starting WS Client");
+        Log.Info("Starting WS Client");
         await WebSocketClient.Start();
         CreatePingTimer();
     }
@@ -148,7 +148,7 @@ internal partial class WebsocketClient
     internal event EventReceivedDelegate EventReceived;
     private async Task ParseMessage(string content)
     {
-        Log.WriteLine("Parsing Message");
+        Log.Verbose("Parsing Message");
         var messageType = GetMessageType(content);
         if (messageType == null)
             return;
@@ -206,7 +206,7 @@ internal partial class WebsocketClient
 
     internal async Task Authenticate()
     {
-        Log.WriteLine($"Sending auth message");
+        Log.Verbose($"Sending auth message");
         await SendMessage(new AuthenticateMessage()
         {
             Token = _client.Token

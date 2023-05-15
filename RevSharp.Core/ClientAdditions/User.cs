@@ -50,7 +50,7 @@ public partial class Client
     /// <returns>Was successful with fetching user</returns>
     public async Task<bool> FetchCurrentUser()
     {
-        Log.WriteLine("Fetching user @me");
+        Log.Verbose("Fetching user @me");
         var user = await GetUser("@me");
         if (user != null)
         {
@@ -67,7 +67,7 @@ public partial class Client
     /// <returns>Null if failed to fetch.</returns>
     public async Task<User?> GetUser(string id, bool forceFetch = true)
     {
-        Log.WriteLine($"Fetching user {id}");
+        Log.Verbose($"Fetching user {id}");
         var inCache = UserCache.ContainsKey(id);
         
         if (inCache && !forceFetch)
@@ -112,7 +112,7 @@ public partial class Client
     
     public Task<bool> ChangeUsername(string username, string currentPassword)
     {
-        Log.WriteLine($"Changing username");
+        Log.Verbose($"Changing username");
         return UserHelper.ChangeUsername(this, username, currentPassword);
     }
 }

@@ -90,7 +90,7 @@ public partial class Client
         {
             throw new Exception("Failed to fetch node details");
         }
-        Log.WriteLine("Attempting Login");
+        Log.Info("Attempting Login");
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
         HttpClient.DefaultRequestHeaders.Remove("x-session-token");
         if (TokenIsBot)
@@ -98,16 +98,16 @@ public partial class Client
         else
             HttpClient.DefaultRequestHeaders.Add("x-session-token", Token);
 
-        Log.WriteLine("Connecting to Bonfire");
+        Log.Info("Connecting to Bonfire");
         await WSClient.Connect();
-        Log.WriteLine("Authenticating with Bonfire");
+        Log.Info("Authenticating with Bonfire");
         await WSClient.Authenticate();
 
         await FetchCurrentUser();
     }
     public async Task DisconnectAsync()
     {
-        Log.WriteLine("Disconnecting from Bonfire");
+        Log.Info("Disconnecting from Bonfire");
         await WSClient.Disconnect();
     }
     #endregion
@@ -119,7 +119,7 @@ public partial class Client
     /// <returns>Is the endpoint valid?</returns>
     public async Task<bool> SetEndpoint(string endpoint)
     {
-        Log.WriteLine("Setting endpoint");
+        Log.Info("Setting endpoint");
         var result = await FetchNodeDetails(endpoint);
         if (result)
             Endpoint = endpoint;
@@ -144,7 +144,7 @@ public partial class Client
             var deserialized = JsonSerializer.Deserialize<RevoltNodeResponse>(stringContent, SerializerOptions);
             if (deserialized != null)
             {
-                Log.WriteLine("Successfully fetched node details");
+                Log.Verbose("Successfully fetched node details");
                 EndpointNodeInfo = deserialized;
                 return true;
             }
