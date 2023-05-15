@@ -56,12 +56,15 @@ internal partial class WebsocketClient
         WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
         WebSocketClient.MessageReceived.Subscribe((message) =>
         {
-            Log.Debug("------ Received Message" + "\n" + JsonSerializer.Serialize(new Dictionary<string, object>
+            if (FeatureFlags.WebsocketDebugLogging)
             {
-                {"type", message.MessageType},
-                {"text", message.Text},
-                {"binary", message.Binary}
-            }, Client.SerializerOptions));
+                Log.Debug("------ Received Message" + "\n" + JsonSerializer.Serialize(new Dictionary<string, object>
+                {
+                    {"type", message.MessageType},
+                    {"text", message.Text},
+                    {"binary", message.Binary}
+                }, Client.SerializerOptions));
+            }
             switch (message.MessageType)
             {
                 case WebSocketMessageType.Text:
@@ -75,20 +78,26 @@ internal partial class WebsocketClient
         WebSocketClient.DisconnectionHappened.Subscribe((info) =>
         {
             Log.Debug($"DisconnectionHappened {info.Type}");
-            Console.WriteLine(JsonSerializer.Serialize(new Dictionary<string, object>()
+            if (FeatureFlags.WebsocketDebugLogging)
             {
-                {"type", info.Type},
-                {"closeStatus", info.CloseStatus},
-                {"closeStatusDesc", info.CloseStatusDescription},
-                {"subProtocol", info.SubProtocol},
-                {"exception", info.Exception},
-                {"cancelReconnection", info.CancelReconnection},
-                {"cancelClosing", info.CancelClosing}
-            }, Client.SerializerOptions));
+                Console.WriteLine(JsonSerializer.Serialize(new Dictionary<string, object>()
+                {
+                    {"type", info.Type},
+                    {"closeStatus", info.CloseStatus},
+                    {"closeStatusDesc", info.CloseStatusDescription},
+                    {"subProtocol", info.SubProtocol},
+                    {"exception", info.Exception},
+                    {"cancelReconnection", info.CancelReconnection},
+                    {"cancelClosing", info.CancelClosing}
+                }, Client.SerializerOptions));   
+            }
         });
         WebSocketClient.ReconnectionHappened.Subscribe((info) =>
         {
-            Log.Debug($"ReconnectionHappened {info.Type}");
+            if (FeatureFlags.WebsocketDebugLogging)
+            {
+                Log.Debug($"ReconnectionHappened {info.Type}");
+            }
         });
         Log.WriteLine("Starting WS Client");
         await WebSocketClient.Start();

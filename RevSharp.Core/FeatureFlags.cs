@@ -35,6 +35,7 @@ internal static class FeatureFlags
         return defaultValue;
     }
 
+    internal static bool WebsocketDebugLogging => ParseBool("REVSHARP_DEBUG_WSLOG", false);
     internal static bool EnableLogColor => ParseBool("REVSHARP_LOG_COLOR", true);
 
 }
