@@ -31,6 +31,12 @@ internal static class Log
             Background = ConsoleColor.Magenta,
             Foreground = ConsoleColor.Black
         };
+
+        private static LogColor VerboseColor = new LogColor()
+        {
+            Background = ConsoleColor.DarkGreen,
+            Foreground = ConsoleColor.White
+        };
         private static LogColor DefaultColor = new LogColor
         {
             Background = ConsoleColor.Black,
@@ -67,18 +73,13 @@ internal static class Log
 
         internal static void SetColor(LogColor? color = null)
         {
-            
-            string? envEnableColor = Environment.GetEnvironmentVariable("REVSHARP_LOG_COLOR");
-            if ((envEnableColor ?? "true") != "true")
+            if (!FeatureFlags.EnableLogColor)
                 return;
             LogColor targetColor = color ?? DefaultColor;
             Console.BackgroundColor = targetColor.Background;
             Console.ForegroundColor = targetColor.Foreground;
         }
 
-        internal static void Warn(string content, [CallerMemberName] string methodname = null,
-            [CallerFilePath] string methodfile = null)
-            => WriteLine(content, WarnColor, WarnPrefix, ShowMethodName, methodname, methodfile);
         private static string CriticalPrefix = "[CRIT]";
         private static string WarnPrefix = "[WARN]";
         private static string ErrorPrefix = "[ERR] ";
@@ -89,27 +90,59 @@ internal static class Log
         private static bool ShowMethodName = true;
         private static bool ShowTimestamp = false;
 
+        private static Dictionary<LogFlag, (LogColor, string)> FlagConfig = new Dictionary<LogFlag, (LogColor, string)>()
+        {
+            {LogFlag.Critical, (ErrorColor, CriticalPrefix)},
+            {LogFlag.Error, (ErrorColor, ErrorPrefix)},
+            {LogFlag.Warning, (WarnColor, WarnPrefix)},
+            {LogFlag.Information, (DefaultColor, LogPrefix)},
+            {LogFlag.Note, (NoteColor, NotePrefix)},
+            {LogFlag.Verbose, (VerboseColor, VerbosePrefix)},
+            {LogFlag.Debug, (DebugColor, DebugPrefix)}
+        };
+        internal static void Critical(string content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content, LogFlag.Critical, ShowMethodName, methodname, methodfile);
         internal static void Error(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content, ErrorColor, ErrorPrefix, ShowMethodName, methodname, methodfile);
-
-        internal static void Debug(string content, [CallerMemberName] string methodname = null,
+            => WriteLine(content, LogFlag.Error, ShowMethodName, methodname, methodfile);
+        internal static void Warn(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content, DebugColor, DebugPrefix, ShowMethodName, methodname, methodfile);
-
+            => WriteLine(content, LogFlag.Warning, ShowMethodName, methodname, methodfile);
+        internal static void Info(string content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content, LogFlag.Information, ShowMethodName, methodfile, methodfile);
         internal static void Note(string content, [CallerMemberName] string methodname = null,
             [CallerFilePath] string methodfile = null)
-            => WriteLine(content, NoteColor, NotePrefix, ShowMethodName, methodfile, methodfile);
-
+            => WriteLine(content, LogFlag.Note, ShowMethodName, methodfile, methodfile);
+        internal static void Verbose(string content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content, LogFlag.Verbose, ShowMethodName, methodname, methodfile);
+        internal static void Debug(string content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content, LogFlag.Debug, ShowMethodName, methodname, methodfile);
         #region Object Overload
-        internal static void Warn(object content, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
-            => Warn(content.ToString(), methodname, methodfile);
-        internal static void Error(object content, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
-            => Error(content.ToString(), methodname, methodfile);
-        internal static void Debug(object content, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
-            => Debug(content.ToString(), methodname, methodfile);
-        internal static void WriteLine(object content, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
-            => WriteLine(content.ToString(), methodname, methodfile);
+        internal static void Critical(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Critical, ShowMethodName, methodname, methodfile);
+        internal static void Error(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Error, ShowMethodName, methodname, methodfile);
+        internal static void Warn(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Warning, ShowMethodName, methodname, methodfile);
+        internal static void Info(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Information, ShowMethodName, methodfile, methodfile);
+        internal static void Note(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Note, ShowMethodName, methodfile, methodfile);
+        internal static void Verbose(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Verbose, ShowMethodName, methodname, methodfile);
+        internal static void Debug(object content, [CallerMemberName] string methodname = null,
+            [CallerFilePath] string methodfile = null)
+            => WriteLine(content.ToString(), LogFlag.Debug, ShowMethodName, methodname, methodfile);
         #endregion
 
         internal static void WriteLine(string content, LogColor? color = null, string prefix = null, bool fetchMethodName = true, [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
@@ -122,6 +155,22 @@ internal static class Log
             Console.WriteLine(pfx + content);
             // linequeue.Add(pfx + content);
             SetColor();
+        }
+
+        internal static void WriteLine(string content, LogFlag flag, bool fetchMethodName = true,
+            [CallerMemberName] string methodname = null, [CallerFilePath] string methodfile = null)
+        {
+            // When flag isn't as important as LogFlag we ignore
+            if (flag >= FeatureFlags.LogFlags)
+                return;
+            (LogColor color, string prefix) = FlagConfig[flag];
+            WriteLine(
+                content,
+                color,
+                prefix,
+                fetchMethodName,
+                methodname,
+                methodfile);
         }
         private static string FormatMethodName(string methodName, string methodFilePath)
         {

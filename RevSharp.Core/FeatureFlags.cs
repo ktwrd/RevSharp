@@ -38,5 +38,23 @@ internal static class FeatureFlags
     internal static bool WebsocketDebugLogging => ParseBool("REVSHARP_DEBUG_WSLOG", false);
     internal static bool EnableLogColor => ParseBool("REVSHARP_LOG_COLOR", true);
 
+    internal static LogFlag LogFlags
+    {
+        get
+        {
+            var item = (LogFlag)ParseInt("REVSHARP_LOGFLAG", 30);
+            return item;
+        }
+    }
 }
 
+public enum LogFlag : int
+{
+    Critical = 0,
+    Error = 10,
+    Warning = 20,
+    Information = 30,
+    Note = 35,
+    Verbose = 40,
+    Debug = 50
+}
