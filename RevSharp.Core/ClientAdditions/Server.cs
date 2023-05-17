@@ -10,6 +10,15 @@ namespace RevSharp.Core;
 public partial class Client
 {
     internal Dictionary<string, Server> ServerCache { get; set; }
+
+    public async Task<LinkedList<Server>?> GetAllServers()
+    {
+        var list = new LinkedList<Server>();
+        foreach (var item in ServerCache)
+            list.AddLast(item.Value);
+        return list;
+    }
+    
     public async Task<Server?> GetServer(string serverId, bool forceFetch = true)
     {
         var inCache = ServerCache.ContainsKey(serverId);
