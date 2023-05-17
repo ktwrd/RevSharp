@@ -163,9 +163,10 @@ internal partial class WebsocketClient
         {
             await ParseMessage_Message(content, deser.Type);
         }
-
-        if (deser.Type.StartsWith("Channel"))
+        else if (deser.Type.StartsWith("Channel"))
             await ParseMessage_Channel(content, deser.Type);
+        else if (deser.Type.StartsWith("Server"))
+            await ParseMessage_Server(content, deser.Type);
         switch (deser.Type)
         {
             case "Authenticated":
@@ -182,6 +183,7 @@ internal partial class WebsocketClient
                 var readyData = JsonSerializer.Deserialize<ReadyMessage>(content, Client.SerializerOptions);
                 if (readyData != null)
                     ReadyReceived?.Invoke(readyData, content);
+                Log.Info("Ready!");
                 break;
         }
         EventReceived?.Invoke(deser.Type, content);

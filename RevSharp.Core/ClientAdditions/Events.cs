@@ -20,6 +20,16 @@ public partial class Client
     public event StringDelegate ErrorReceived;
     public event MessageDeleteDelegate MessageDeleted;
 
+    public event ServerDelegate ServerCreate;
+
+    internal void OnServerCreate(Server server)
+    {
+        AddToCache(server);
+        if (ServerCreate != null)
+        {
+            ServerCreate?.Invoke(server);
+        }
+    }
     internal void OnMessageDeleted(string messageId, string channelId)
     {
         if (MessageDeleted != null)
