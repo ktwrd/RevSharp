@@ -100,7 +100,7 @@ internal partial class WebsocketClient
             }
         });
         Log.Info("Starting WS Client");
-        await WebSocketClient.Start();
+        await WebSocketClient.StartOrFail();
         CreatePingTimer();
     }
 
