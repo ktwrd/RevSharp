@@ -20,7 +20,7 @@ public partial class Client
     public string Endpoint { get; internal set; }
 
     public const string DefaultEndpoint = "https://api.revolt.chat";
-    internal RevoltNodeResponse? EndpointNodeInfo { get; private set; }
+    public RevoltNodeResponse? EndpointNodeInfo { get; private set; }
 
     internal static JsonSerializerOptions SerializerOptions
     {
@@ -45,6 +45,10 @@ public partial class Client
     public BotController Bot { get; private set; }
     
     #region Constructors
+	public Client()
+		: this("", false)
+	{
+	}
     public Client(string token, bool isBot)
     {
         Token = token;
@@ -80,6 +84,11 @@ public partial class Client
                 ErrorReceived?.Invoke(e.Error);
             }
         };
+    }
+    public void SetCredentials(string token, bool isBot)
+    {
+        Token = token;
+        TokenIsBot = isBot;
     }
     #endregion
     
