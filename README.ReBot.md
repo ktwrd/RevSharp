@@ -27,6 +27,7 @@ REBOT_CONFIG_LOCATION=~/Desktop/rebot_config.json \
 ```
 
 ## Environment Variables
+[Extends](README#environment-variables)
 | Name | Type | Default Value | Description |
 | ---- | ---- | ------------- | ----------- |
 | `REVSHARP_LOG_COLOR` | boolean | `true` | Custom color for log output |
