@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using RevSharp.Core;
+using RevSharp.ReBot.Models;
 using RevSharp.ReBot.Reflection;
 
 namespace RevSharp.ReBot;
 
 public static class Program
 {
-    public static RevSharp.Core.Client Client;
     public static void Main(string[] args)
     {
         AsyncMain(args).Wait();
@@ -16,7 +16,7 @@ public static class Program
     public static async Task AsyncMain(string[] args)
     {
         ReadConfig();
-        Client = new Client(Config.Token, Config.IsBot);
+        Client = new Client(ConfigData.Token, ConfigData.IsBot);
         await InitializeModules();
         await Client.LoginAsync();
         await Task.Delay(-1);
@@ -27,10 +27,29 @@ public static class Program
         var i = new ReflectionInclude(Client);
         await i.Search(typeof(Program).Assembly);
     }
-
+    public static void Quit(int exitCode = 0)
+    {
+        BeforeQuit();
+        Environment.Exit(exitCode);
+    }
+    private static void BeforeQuit()
+    {
+        WriteConfig();
+        Client.DisconnectAsync().Wait();
+    }
+    #region Fields
+    public static RevSharp.Core.Client Client;
     public static Random Random => new Random();
-    public static Config Config { get; set; }
-
+    public static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions()
+    {
+        IgnoreReadOnlyFields = true,
+        IgnoreReadOnlyProperties = true,
+        IncludeFields = true,
+        WriteIndented = true
+    };
+    #endregion
+    #region Config
+    public static ConfigData ConfigData { get; set; }
     public static string ConfigLocation
     {
         get
@@ -45,19 +64,13 @@ public static class Program
         }
     }
 
-    public static JsonSerializerOptions SerializerOptions = new JsonSerializerOptions()
-    {
-        IgnoreReadOnlyFields = true,
-        IgnoreReadOnlyProperties = true,
-        IncludeFields = true
-    };
     public static void ReadConfig()
     {
         if (!File.Exists(ConfigLocation))
             WriteConfig();
         var content = File.ReadAllText(ConfigLocation);
-        var deser = JsonSerializer.Deserialize<Config>(content, SerializerOptions);
-        Config = deser;
+        var deser = JsonSerializer.Deserialize<ConfigData>(content, SerializerOptions);
+        ConfigData = deser;
     }
 
     public static void WriteConfig()
@@ -65,25 +78,10 @@ public static class Program
         var parentDir = Path.GetDirectoryName(ConfigLocation);
         if (!Directory.Exists(parentDir))
             Directory.CreateDirectory(parentDir);
-        var ser = JsonSerializer.Serialize(Config, SerializerOptions);
+        var ser = JsonSerializer.Serialize(ConfigData, SerializerOptions);
         File.WriteAllText(ConfigLocation, ser);
     }
+    #endregion
 }
 
-public class Config
-{
-    public string Token { get; set; }
-    public bool IsBot { get; set; }
-    public string Prefix { get; set; }
-    public string MongoConnectionUrl { get; set; }
-    public string MongoDatabaseName { get; set; }
 
-    public Config()
-    {
-        Token = "";
-        IsBot = false;
-        Prefix = "r.";
-        MongoConnectionUrl = "mongodb://user:password@localhost:27021";
-        MongoDatabaseName = "skidbot_revolt";
-    }
-}

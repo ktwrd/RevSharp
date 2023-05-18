@@ -34,6 +34,6 @@ public static class CommandHelper
 
     public static CommandInfo? FetchInfo(Message message)
     {
-        return FetchInfo(Program.Config.Prefix, message.Content ?? "");
+        return FetchInfo(Program.ConfigData.Prefix, message.Content ?? "");
     }
 }

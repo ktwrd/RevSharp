@@ -18,7 +18,7 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
     }
     public override async Task Initialize(ReflectionInclude reflection)
     {
-        ConnectionString = Program.Config.MongoConnectionUrl;
+        ConnectionString = Program.ConfigData.MongoConnectionUrl;
         await DatabaseInit();
     }
 
@@ -30,7 +30,7 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
             Console.WriteLine($"Creating MongoDB Session");
             await _client.StartSessionAsync();
             Console.WriteLine($"Connected to MongoDB Server");
-            Database = _client.GetDatabase(Program.Config.MongoDatabaseName);
+            Database = _client.GetDatabase(Program.ConfigData.MongoDatabaseName);
         }
         catch (Exception e)
         {
