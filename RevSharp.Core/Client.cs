@@ -3,9 +3,12 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using kate.shared.Helpers;
+using Newtonsoft.Json.Linq;
 using RevSharp.Core.Controllers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core;
 
@@ -21,7 +24,6 @@ public partial class Client
 
     public const string DefaultEndpoint = "https://api.revolt.chat";
     public RevoltNodeResponse? EndpointNodeInfo { get; private set; }
-
     internal static JsonSerializerOptions SerializerOptions
     {
         get
@@ -90,8 +92,17 @@ public partial class Client
         Token = token;
         TokenIsBot = isBot;
     }
+    public void SetCredentials(AuthenticateMessage authMessage, bool isBot)
+    {
+        _authMessageContent = authMessage;
+        TokenIsBot = isBot;
+        Token = authMessage.Token;
+        Log.CensorList.Add(authMessage.Token);
+    }
+    private AuthenticateMessage? _authMessageContent;
+
     #endregion
-    
+
     #region Session Management
     public async Task LoginAsync()
     {
