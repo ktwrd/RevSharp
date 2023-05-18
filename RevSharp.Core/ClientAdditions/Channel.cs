@@ -124,7 +124,8 @@ public partial class Client
 
         Log.Verbose($"Adding {channelId} to cache");
         channel.Client = this;
-        ChannelCache.Add(channel.Id, channel);
+        ChannelCache.TryAdd(channel.Id, channel);
+        ChannelCache[channel.Id] = channel;
         
         return channel;
     }
