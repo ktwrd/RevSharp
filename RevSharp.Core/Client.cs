@@ -55,6 +55,7 @@ public partial class Client
     {
         Token = token;
         TokenIsBot = isBot;
+        Log.CensorList.Add(Token);
         Endpoint = DefaultEndpoint;
         WSClient = new WebsocketClient(this);
         HttpClient = new HttpClient();
@@ -91,6 +92,7 @@ public partial class Client
     {
         Token = token;
         TokenIsBot = isBot;
+        Log.CensorList.Add(token);
     }
     public void SetCredentials(AuthenticateMessage authMessage, bool isBot)
     {
