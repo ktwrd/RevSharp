@@ -122,7 +122,10 @@ public partial class Client
             }
         };
 
-        await FetchCurrentUser();
+        WSClient.AuthenticatedEventReceived += () =>
+        {
+            FetchCurrentUser().Wait();
+        };
     }
     public async Task DisconnectAsync()
     {
