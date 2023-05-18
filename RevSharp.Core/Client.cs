@@ -110,7 +110,17 @@ public partial class Client
         Log.Info("Connecting to Bonfire");
         await WSClient.Connect();
         Log.Info("Authenticating with Bonfire");
-        await WSClient.Authenticate();
+        WSClient.WhenConnect += async () =>
+        {
+            if (_authMessageContent != null)
+            {
+                await WSClient.SendMessage(_authMessageContent);
+            }
+            else
+            {
+                await WSClient.Authenticate();
+            }
+        };
 
         await FetchCurrentUser();
     }
