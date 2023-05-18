@@ -99,7 +99,8 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
         return SendMessage(client, data);
     }
 
-    public Task<Message?> SendMessage(
+    public Task<Message?> 
+        SendMessage(
         string? content,
         Reply[]? replies,
         SendableEmbed[]? embeds,
@@ -113,6 +114,23 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     {
         return Message.Send(client, Id, data);
     }
+
+    public Task<Message?> SendMessage(
+        Client client,
+        SendableEmbed embed)
+    {
+        return SendMessage(
+            Client, new DataMessageSend()
+            {
+                Content = "",
+                Embeds = new []
+                {
+                    embed
+                }
+            });
+    }
+
+    public Task<Message?> SendMessage(SendableEmbed embed) => SendMessage(Client, embed);
     public Task<Message?> SendMessage(DataMessageSend data)
         => SendMessage(Client, data);
 
