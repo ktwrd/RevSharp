@@ -9,6 +9,20 @@ public class AnalysisServerConfig : BaseMongoModel
     
     public string ServerId { get; set; }
     public string LogChannelId { get; set; }
+    
+    public bool Enabled { get; set; }
+    public bool AllowAnalysis { get; set; }
+    public bool HasRequested { get; set; }
+    public bool IsBanned { get; set; }
+    public string? BanReason { get; set; }
+
+    public bool ShouldAllowAnalysis()
+    {
+        if (IsBanned)
+            return false;
+
+        return AllowAnalysis && Enabled;
+    }
 
     public static ConfigThreshold DefaultDeleteThreshold =>
         new()
