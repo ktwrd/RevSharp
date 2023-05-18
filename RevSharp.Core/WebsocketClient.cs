@@ -1,11 +1,15 @@
-﻿using System.Net.WebSockets;
+﻿using System.Diagnostics;
+using System.Net.WebSockets;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Runtime.Loader;
 using System.Text.Json;
 using System.Timers;
 using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 using RevSharp.Core.Models.WebSocket;
-using WSClient = Websocket.Client.WebsocketClient;
+using Websocket.Client;
 
 namespace RevSharp.Core;
 
@@ -44,7 +48,8 @@ internal partial class WebsocketClient
     #endregion
     internal TimeSpan ReconnectionTimeout = TimeSpan.FromSeconds(30);
     internal bool Connected { get; private set; }
-    internal WSClient? WebSocketClient { get; private set; }
+    internal Websocket.Client.WebsocketClient? WebSocketClient { get; private set; }
+    internal bool IsClientOpen { get; private set; }
     internal async Task Connect()
     {
         Log.Debug("Connecting to Websocket");
@@ -52,29 +57,41 @@ internal partial class WebsocketClient
             throw new Exception("_client.EndpointNodeInfo.WebSocket is null");
         string url = _client.EndpointNodeInfo?.WebSocket ?? "wss://ws.revolt.chat";
         url += $"?version=1&format=json&token={_client.Token}";
-        WebSocketClient = new WSClient(new Uri(url));
-        WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
-        WebSocketClient.MessageReceived.Subscribe((message) =>
+/*
+        WebSocketClient = new WSClient(url);
+        WebSocketClient.MessageReceived += (sender, ev) =>
         {
             if (FeatureFlags.WebsocketDebugLogging)
             {
-                Log.Debug("------ Received Message" + "\n" + JsonSerializer.Serialize(new Dictionary<string, object>
-                {
-                    {"type", message.MessageType},
-                    {"text", message.Text},
-                    {"binary", message.Binary}
-                }, Client.SerializerOptions));
+                Log.Debug("------ Received Message" + "\n" + ev.Message);
             }
-            switch (message.MessageType)
-            {
-                case WebSocketMessageType.Text:
-                    OnTextMessageReceived(message.Text);
-                    break;
-                case WebSocketMessageType.Binary:
-                    OnBinaryMessageReceived(message.Binary);
-                    break;
-            }
-        });
+            OnTextMessageReceived(ev.Message);
+        };
+        WebSocketClient.Opened += (sender, ev) =>
+        {
+            IsClientOpen = true;
+            Log.Verbose("Opened");
+            WhenConnect?.Invoke();
+        };
+        WebSocketClient.Closed += (sender, ev) =>
+        {
+            Log.Verbose("Closed");
+            IsClientOpen = false;
+        };
+        WebSocketClient.Error += (sender, ev) =>
+        {
+            Log.Critical($"WebSocketClient.Error  =  {ev.Exception}");
+        };
+        WebSocketClient.DataReceived += (sender, ev) =>
+        {
+            Log.Verbose($"DataReceived: length={ev.Data.Length}");
+        };*/
+
+        WebSocketClient = new Websocket.Client.WebsocketClient(new Uri(url));
+        WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
+        WebSocketClient.MessageReceived
+            .ObserveOn(TaskPoolScheduler.Default)
+            .Subscribe(HandleWebSocketMessage);
         WebSocketClient.DisconnectionHappened.Subscribe((info) =>
         {
             Log.Debug($"DisconnectionHappened {info.Type}");
@@ -100,35 +117,26 @@ internal partial class WebsocketClient
             }
         });
         Log.Info("Starting WS Client");
-        await WebSocketClient.StartOrFail();
-        CreatePingTimer();
-    }
+        new Thread(_ => WebSocketClient.StartOrFail()).Start();
 
-    private void CreatePingTimer()
-    {
-        if (_pingTimer != null)
-            return;
-        _pingTimer = new System.Timers.Timer();
-        _pingTimer.Interval = 5000;
-        _pingTimer.Elapsed += _pingTimer_Elapsed;
-        _pingTimer.Enabled = true;
-        _pingTimer.Start();
+        Observable.Interval(TimeSpan.FromSeconds(30))
+            .Subscribe(_ => Ping().Wait());
     }
-    private System.Timers.Timer? _pingTimer = null;
-
-    private void _pingTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+    private void HandleWebSocketMessage(ResponseMessage message)
     {
-        _pingTimer?.Stop();
-        try
+        if (FeatureFlags.WebsocketDebugLogging)
         {
-            if (WebSocketClient?.IsRunning ?? false)
-                Ping().Wait();
+            Log.Debug("------ Received Message" + "\n" + message.Text);
         }
-        catch (Exception exception)
+        switch (message.MessageType)
         {
-            Log.Error(exception);
+            case WebSocketMessageType.Text:
+                OnTextMessageReceived(message.Text);
+                break;
+            case WebSocketMessageType.Binary:
+                OnBinaryMessageReceived(message.Binary);
+                break;
         }
-        _pingTimer?.Start();
     }
 
     private static Dictionary<string, Type> _responseTypeMap = new Dictionary<string, Type>()
@@ -137,7 +145,8 @@ internal partial class WebsocketClient
         { "Error", typeof(BonfireError) },
         { "Pong", typeof(BonfireGenericData<int>) },
         { "Ready", typeof(ReadyMessage) },
-        { "Message", typeof(BonfireMessage) }
+        { "Message", typeof(BonfireMessage) },
+        { "NotFound", typeof(BaseTypedResponse) }
     };
 
     internal event VoidDelegate AuthenticatedEventReceived;
@@ -146,6 +155,7 @@ internal partial class WebsocketClient
     internal event ReadyMessageDelegate ReadyReceived;
     internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
+    internal event VoidDelegate WhenConnect;
     private async Task ParseMessage(string content)
     {
         Log.Verbose("Parsing Message");
@@ -217,10 +227,14 @@ internal partial class WebsocketClient
 
     internal async Task SendMessage<T>(T item)
     {
-        var content = JsonSerializer.Serialize(item, Client.SerializerOptions);
+        var content = JsonSerializer.Serialize(item, Client.SerializerOptions).Replace("\r\n","\n");
         if (WebSocketClient == null)
             return;
-        await WebSocketClient?.SendInstant(content);
+        if (FeatureFlags.WebsocketDebugLogging)
+        {
+            Log.Debug("------ Sent Message" + "\n" + content);
+        }
+        WebSocketClient.Send(content);
     }
 
     internal async Task Disconnect()
@@ -228,7 +242,7 @@ internal partial class WebsocketClient
         if (WebSocketClient != null)
         {
             await WebSocketClient.Stop(WebSocketCloseStatus.NormalClosure, "Connection Closed");
-            WebSocketClient.Dispose();
+            //WebSocketClient.Close();
             return;
         }
 
