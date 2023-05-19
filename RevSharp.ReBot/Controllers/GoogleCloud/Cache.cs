@@ -42,11 +42,6 @@ public partial class GoogleApiController
             FeatureFlags.ImageAnnotatorCacheDirectory,
             "ssht.json");
 
-    private string _safeSearchByteHashCacheLocation =>
-        Path.Join(
-            FeatureFlags.ImageAnnotatorCacheDirectory,
-            "ssbhc.json");
-
     private string _urlContentHashCacheLocation =>
         Path.Join(
             FeatureFlags.ImageAnnotatorCacheDirectory,
@@ -75,7 +70,6 @@ public partial class GoogleApiController
         {
             InnerSaveLogic(_annotationCacheLocation, _annotationCache),
             InnerSaveLogic(_safeSearchHashTypeLocation, _safeSearchHashType),
-            InnerSaveLogic(_safeSearchByteHashCacheLocation, _safeSearchByteHashCache),
             InnerSaveLogic(_urlContentHashCacheLocation, _urlContentHashCache)
         };
 
@@ -107,12 +101,6 @@ public partial class GoogleApiController
         {
             _safeSearchHashType = JsonSerializer.Deserialize<Dictionary<string, string>>(
                 File.ReadAllText(_safeSearchHashTypeLocation), jsonOptions);
-        }
-
-        if (File.Exists(_safeSearchByteHashCacheLocation))
-        {
-            _safeSearchByteHashCache = JsonSerializer.Deserialize<Dictionary<string, byte[]>>(
-                File.ReadAllText(_safeSearchByteHashCacheLocation), jsonOptions);
         }
 
         if (File.Exists(_urlContentHashCacheLocation))
