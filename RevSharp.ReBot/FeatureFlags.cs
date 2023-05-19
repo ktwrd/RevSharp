@@ -32,4 +32,16 @@ internal static class FeatureFlags
     }
 
     internal static bool EnableLogColor => ParseBool("REVSHARP_LOG_COLOR", true);
+
+    internal static string DataDirectory =>
+        ParseString(
+            "REBOT_DIR_DATA", Path.Join(
+                Directory.GetCurrentDirectory(),
+                "data"));
+
+    internal static string ImageAnnotatorCacheDirectory =>
+        ParseString(
+            "REBOT_DIR_IACD", Path.Join(
+                DataDirectory,
+                "iacd"));
 }

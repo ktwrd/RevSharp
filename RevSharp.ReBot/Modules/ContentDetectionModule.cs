@@ -468,7 +468,7 @@ public class ContentDetectionModule : BaseModule
 
     public async Task<AnalysisResult?> AnalyzeMessage(Message message)
     {
-        var googleController = Reflection.FetchModule<GoogleAPIController>();
+        var googleController = Reflection.FetchModule<GoogleApiController>();
 
         var result = new AnalysisResult();
 
