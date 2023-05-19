@@ -16,6 +16,16 @@ public partial class Message
             throw new Exception("Client is null");
         }
         data.Nonce = GeneralHelper.GenerateUID();
+
+        data.Content = data.Content?.Replace("\r\n", "\n").Replace("\r", "\n");
+        if (data.Embeds != null)
+        {
+            for (int i = 0; i < data.Embeds.Length; i++)
+            {
+                data.Embeds[i].Description = data.Embeds[i].Description?.Replace("\r\n", "\n").Replace("\r", "\n");
+            }
+        }
+        
         var content = JsonSerializer.Serialize(data, Client.SerializerOptions);
         var response = await client.PostAsync($"/channels/{channelId}/messages", new StringContent(content));
         if (response.StatusCode != HttpStatusCode.OK)
