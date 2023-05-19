@@ -8,6 +8,8 @@ using RevSharp.ReBot.Helpers;
 using RevSharp.ReBot.Models.ContentDetection;
 using RevSharp.ReBot.Reflection;
 
+using RevoltFile = RevSharp.Core.Models.File;
+
 namespace RevSharp.ReBot.Modules;
 
 [RevSharpModule]
@@ -458,7 +460,18 @@ public class ContentDetectionModule : BaseModule
     public async Task ContentDetectionTask(Message message)
     {
         var server = await message.FetchServer();
-        if (server == null || server?.Id != "01G5XEAEJSEXKXCNTF8E5B004A")
+        if (server == null)
+            return;
+        #if DEBUG
+        if (server?.Id != "01G5XEAEJSEXKXCNTF8E5B004A")
+            return;
+        #endif
+        var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
+        if (controller == null)
+            return;
+
+        var serverconfig = await controller.Get(server.Id);
+        if (serverconfig == null || serverconfig.Enabled == false)
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
@@ -483,16 +496,63 @@ public class ContentDetectionModule : BaseModule
             }
         }
 
+        string ParseRevoltFile(RevoltFile file)
+        {
+            return $"{Client.EndpointNodeInfo.Features.Autumn.Url}/{file.Tag}/{file.Id}/{file.Filename}";
+        }
+        
         var taskList = new List<Task>();
         if (message.Attachments != null)
         {
             foreach (var file in message.Attachments)
             {
-                var url = $"{Client.EndpointNodeInfo.Features.Autumn.Url}/{file.Tag}/{file.Id}/{file.Filename}";
                 taskList.Add(new Task(delegate
                 {
-                    ProcessUrl(url).Wait();
+                    ProcessUrl(ParseRevoltFile(file)).Wait();
                 }));
+            }
+        }
+
+        if (message.Embeds != null)
+        {
+            foreach (var imageItem in message.Embeds.OfType<ImageEmbed>())
+            {
+                taskList.Add(new Task(
+                    delegate
+                    {
+                        ProcessUrl(imageItem.Url).Wait();
+                    }));
+            }
+
+            foreach (var metadataItem in message.Embeds.OfType<MetadataEmbed>())
+            {
+                taskList.Add(new Task(
+                    delegate
+                    {
+                        if (metadataItem.OriginalUrl != null)
+                            ProcessUrl(metadataItem.OriginalUrl).Wait();
+                        if (metadataItem.Url != null)
+                            ProcessUrl(metadataItem.Url).Wait();
+                        if (metadataItem.IconUrl != null)
+                            ProcessUrl(metadataItem.IconUrl).Wait();
+                        if (metadataItem.Image != null)
+                            if (metadataItem.Image.Url != null)
+                                ProcessUrl(metadataItem.Image.Url).Wait();
+                    }));
+            }
+
+            foreach (var textEmbed in message.Embeds.OfType<TextEmbed>())
+            {
+                taskList.Add(new Task(
+                    delegate
+                    {
+                        if (textEmbed.Url != null)
+                            ProcessUrl(textEmbed.Url).Wait();
+                        if (textEmbed.IconUrl != null)
+                            ProcessUrl(textEmbed.IconUrl).Wait();
+                        if (textEmbed.Media != null)
+                            ProcessUrl(ParseRevoltFile(textEmbed.Media)).Wait();
+                    }));
             }
         }
 
