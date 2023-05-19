@@ -50,9 +50,15 @@ public partial class GoogleApiController
     {
         if (!_hasCacheRead)
             await ReadCache();
-        if (_urlContentHashCache.TryGetValue(url, out var urlContentHash))
-            if (_annotationCache.TryGetValue(urlContentHash, out var search))
-                return search;
+        
+        var existingSummary = GetSummary(url: url);
+        if (existingSummary is
+            {
+                Annotation: not null
+            })
+            return existingSummary.Annotation;
+        
+        // when fails, return null
         if (!await DownloadToCache(url))
             return null;
 
@@ -67,7 +73,10 @@ public partial class GoogleApiController
                 {
                     _annotationCache.TryAdd(hash, data);
                     _annotationCache.TryAdd(url, data);
+                    await SaveCache();
                 }
+
+                return data;
             }
         }
 
@@ -85,17 +94,57 @@ public partial class GoogleApiController
     public async Task<SafeSearchAnnotation?> PerformSafeSearch(RevoltClient revoltClient, RevoltFile file)
     {
         var url = $"{revoltClient.EndpointNodeInfo.Features.Autumn.Url}/{file.Tag}/{file.Id}/{file.Filename}";
-        if (!_urlContentHashCache.TryGetValue(url, out var urlHash))
-            return await PerformSafeSearch(url);
-
-        if (_annotationCache.TryGetValue(urlHash, out var cachedData))
-        {
-            return cachedData;
-        }
+        
         return await PerformSafeSearch(url);
     }
     #endregion
+
+    public class SafeSearchCacheSummaryItem
+    {
+        public string? Url { get; set; }
+        public string Hash { get; set; }
+        public string ContentType { get; set; }
+        public SafeSearchAnnotation? Annotation { get; set; }
+        public byte[] Data { get; set; }
+    }
+
+    public SafeSearchCacheSummaryItem? GetSummary(string? url = null, string? hash = null)
+    {
+        if (url != null)
+        {
+            if (_urlContentHashCache.TryGetValue(url, out var h))
+            {
+                hash = h;
+            }
+        }
+
+        if (hash == null || !_safeSearchByteHashCache.ContainsKey(hash))
+            return null;
+
+        _annotationCache.TryGetValue(hash, out var annotation);
+        
+        return new SafeSearchCacheSummaryItem()
+        {
+            Url = url,
+            Hash = hash,
+            ContentType = _safeSearchHashType[hash],
+            Annotation = annotation,
+            Data = _safeSearchByteHashCache[hash]
+        };
+    }
+
+    private void AddToCache(string hash, string url, string contentType, byte[] data)
+    {
+        _safeSearchHashType.TryAdd(hash, contentType);
+        _safeSearchByteHashCache.TryAdd(hash, data);
+        _urlContentHashCache.TryAdd(url, hash);
+    }
     
+    /// <summary>
+    /// Download a url to the local cache.
+    /// </summary>
+    /// <param name="url">Url to attempt cache</param>
+    /// <returns>Was successful</returns>
     private async Task<bool> DownloadToCache(string url)
     {
         if (!_hasCacheRead)
@@ -108,6 +157,7 @@ public partial class GoogleApiController
         var result = await _httpClient.GetAsync(url);
         if (result.StatusCode != HttpStatusCode.OK)
             return false;
+        
         var validContentType = new string[]
         {
             "image/png",
@@ -123,9 +173,8 @@ public partial class GoogleApiController
         var data = await FetchByteArrayFromResponse(result);
 
         var contentHash = ComputeSha256Hash(data);
-        _safeSearchHashType.TryAdd(contentHash, contentType);
-        _safeSearchByteHashCache.TryAdd(contentHash, data);
-        _urlContentHashCache.TryAdd(url, contentHash);
+
+        AddToCache(contentHash, url, contentType, data);
         
         await SaveCache();
         
