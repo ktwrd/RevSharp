@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Google.Cloud.Vision.V1;
+using kate.shared.Helpers;
 using RevSharp.Core.Models;
 using RevSharp.ReBot.Helpers;
 using RevSharp.ReBot.Models.ContentDetection;
@@ -468,6 +469,7 @@ public class ContentDetectionModule : BaseModule
 
     public async Task<AnalysisResult?> AnalyzeMessage(Message message)
     {
+        var startTs = GeneralHelper.GetMicroseconds() / 1000;
         var googleController = Reflection.FetchModule<GoogleApiController>();
 
         var result = new AnalysisResult();
@@ -510,6 +512,8 @@ public class ContentDetectionModule : BaseModule
             Log.Error(ex);
             Debugger.Break();
         }
+
+        Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
 
         return result;
     }
