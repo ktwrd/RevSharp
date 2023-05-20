@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using RevSharp.Core.Models;
 
 namespace RevSharp.ReBot.Helpers;
@@ -35,5 +36,24 @@ public static class CommandHelper
     public static CommandInfo? FetchInfo(Message message)
     {
         return FetchInfo(Program.ConfigData.Prefix, message.Content ?? "");
+    }
+
+    public static string? FindChannelId(string content)
+    {
+        var channelIdRegex = new Regex(@"^([0-9A-Za-z]{26})$");
+        if (channelIdRegex.IsMatch(content))
+            return content;
+
+        var channelMentionRegex = new Regex(@"^<#([0-9A-Za-z]{26})>$");
+        var channelMentionMatch = channelMentionRegex.Match(content);
+        if (channelMentionMatch != null)
+        {
+            if (channelMentionMatch.Groups.Count > 0)
+            {
+                return channelMentionMatch.Groups[0].Value.ToString();
+            }
+        }
+
+        return null;
     }
 }
