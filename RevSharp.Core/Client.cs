@@ -12,17 +12,36 @@ using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core;
 
+/// <summary>
+/// Client used for connecting to the Revolt API. This is where you should start.
+/// </summary>
 public partial class Client
 {
+    /// <summary>
+    /// Token used for authentication
+    /// </summary>
     internal string Token {get; private set; }
+    /// <summary>
+    /// Does the token belong to a bot
+    /// </summary>
     internal bool TokenIsBot { get; private set; }
+    /// <summary>
+    /// WebSocket middleware for communicating with Bonfire
+    /// </summary>
     internal WebsocketClient WSClient { get; set; }
     /// <summary>
-    /// Revolt endpoint to hit, Default: <see cref="DefaultEndpoint"/>
+    /// Base REST API Endpoint for Revolt
+    ///
+    /// Default: <see cref="DefaultEndpoint"/>
     /// </summary>
     public string Endpoint { get; internal set; }
 
     public const string DefaultEndpoint = "https://api.revolt.chat";
+    /// <summary>
+    /// Information about the current API server that we're connected to.
+    ///
+    /// Value is set when <see cref="LoginAsync"/> is called.
+    /// </summary>
     public RevoltNodeResponse? EndpointNodeInfo { get; private set; }
     internal static JsonSerializerOptions SerializerOptions
     {
@@ -47,10 +66,18 @@ public partial class Client
     public BotController Bot { get; private set; }
     
     #region Constructors
-	public Client()
+	/// <summary>
+	/// Create instance of Client without a token set. You can change the token with <see cref="SetCredentials(string,bool)"/>, but only before <see cref="LoginAsync"/> is called.
+	/// </summary>
+    public Client()
 		: this("", false)
 	{
 	}
+    /// <summary>
+    /// Create an instance of the Client
+    /// </summary>
+    /// <param name="token">Token to use for authentication</param>
+    /// <param name="isBot">Does this token belong to a bot. This is important because for bots a different header is sent for HTTP requests.</param>
     public Client(string token, bool isBot)
     {
         Token = token;
@@ -88,12 +115,22 @@ public partial class Client
             }
         };
     }
+    /// <summary>
+    /// Set credentials. Must be called before <see cref="LoginAsync"/>.
+    /// </summary>
+    /// <param name="token">Token to authenticate with.</param>
+    /// <param name="isBot">Does the token belong to a bot.</param>
     public void SetCredentials(string token, bool isBot)
     {
         Token = token;
         TokenIsBot = isBot;
         Log.CensorList.Add(token);
     }
+    /// <summary>
+    /// Set credentials and send a customized version of <see cref="AuthenticateMessage"/> when connecting and authenticating with Bonfire (WebSocket server)
+    /// </summary>
+    /// <param name="authMessage">Customized authenticate message for Bonfire. <see cref="Token"/> will be set from <see cref="AuthenticateMessage.Token"/> field.</param>
+    /// <param name="isBot">Does the token belong to a bot.</param>
     public void SetCredentials(AuthenticateMessage authMessage, bool isBot)
     {
         _authMessageContent = authMessage;
@@ -106,6 +143,10 @@ public partial class Client
     #endregion
 
     #region Session Management
+    private bool IsConnected = false;
+    /// <summary>
+    /// Login with the given credentials. To set custom credentials after <see cref="Client"/> has been initialized, use <see cref="SetCredentials(string,bool)"/>.
+    /// </summary>
     public async Task LoginAsync()
     {
         if (!await FetchNodeDetails(Endpoint))
@@ -133,6 +174,12 @@ public partial class Client
             {
                 await WSClient.Authenticate();
             }
+
+            IsConnected = true;
+        };
+        WSClient.WhenDisconnect += () =>
+        {
+            IsConnected = false;
         };
 
         WSClient.AuthenticatedEventReceived += () =>
@@ -140,6 +187,9 @@ public partial class Client
             FetchCurrentUser().Wait();
         };
     }
+    /// <summary>
+    /// Close the current websocket connection to Bonfire.
+    /// </summary>
     public async Task DisconnectAsync()
     {
         Log.Info("Disconnecting from Bonfire");

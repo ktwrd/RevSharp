@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
+/// <summary>
+/// Bot account type. Used when fetching information about a bot.
+/// </summary>
 public class Bot : ISnowflake
 {
     /// <summary>

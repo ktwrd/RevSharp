@@ -128,7 +128,13 @@ internal partial class WebsocketClient
     internal event ReadyMessageDelegate ReadyReceived;
     internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
+    /// <summary>
+    /// Invoked when the Ready message is received.
+    /// </summary>
     internal event VoidDelegate WhenConnect;
+    /// <summary>
+    /// Invoked when <see cref="WebSocket.Client.WebsocketClient.DisconnectionHappened"/> is invoked.
+    /// </summary>
     internal event VoidDelegate WhenDisconnect;
     private async Task ParseMessage(string content)
     {

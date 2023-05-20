@@ -16,6 +16,10 @@
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\RevSharp.Core.xml</DocumentationFile>
+    </PropertyGroup>
+
     <ItemGroup>
       <None Include="..\LICENSE.txt">
         <Pack>True</Pack>
