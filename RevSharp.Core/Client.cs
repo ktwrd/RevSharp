@@ -147,11 +147,14 @@ public partial class Client
     /// <summary>
     /// Login with the given credentials. To set custom credentials after <see cref="Client"/> has been initialized, use <see cref="SetCredentials(string,bool)"/>.
     /// </summary>
+    /// <exception cref="ClientInitializeException">
+    /// Thrown when <see cref="FetchNodeDetails"/> fails.
+    /// </exception>
     public async Task LoginAsync()
     {
         if (!await FetchNodeDetails(Endpoint))
         {
-            throw new Exception("Failed to fetch node details");
+            throw new ClientInitializeException("Failed to fetch node details");
         }
         Log.Info("Attempting Login");
         HttpClient.DefaultRequestHeaders.Remove("x-bot-token");
