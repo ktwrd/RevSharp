@@ -64,6 +64,8 @@ public class AnalysisServerConfig : BaseMongoModel
             Medical = analysisResult.MedicalAverage >= threshold.Medical,
             Violence = analysisResult.ViolenceAverage >= threshold.Violence,
             Racy = analysisResult.RacyAverage >= threshold.Racy,
+            Analysis = analysisResult,
+            Threshold = threshold
         };
     }
 
@@ -95,24 +97,49 @@ public class ContentAnalysisMessageMatch
             Violence,
             Racy
         }.Select(v => v ? 1 : 0).Sum();
+    public ConfigThreshold Threshold { get; init; }
+    public AnalysisResult Analysis { get; init; }
+    public string? Majority =>
+        MajorityItems.FirstOrDefault();
 
-    public string? Majority
+    public string[] MajorityItems
     {
         get
         {
-            var selfSer = JsonSerializer.Serialize(this, Program.SerializerOptions);
-            var selfDict = JsonSerializer.Deserialize<Dictionary<string, object>>(selfSer, Program.SerializerOptions)
-                           ?? new Dictionary<string, object>();
-            foreach (var pair in selfDict)
-            {
-                if (pair.Key is "Total" or "Majority")
-                    continue;
+            return MajorityPairs
+                .Select(v => (v.Key, v.Value))
+                .OrderBy(v => v.Value)
+                .Select(v => v.Key)
+                .ToArray();
 
-                if (pair.Value.ToString() == "true")
-                    return pair.Key.ToString();
+        }
+    }
+
+    public Dictionary<string, decimal> MajorityPairs
+    {
+        get
+        {
+            var validKeys = new string[]
+            {
+                "Adult", "Spoof", "Medical", "Violence", "Racy"
+            };
+            var analysisDict = JsonSerializer.Deserialize<Dictionary<string, object>>(
+                JsonSerializer.Serialize(Analysis), Program.SerializerOptions);
+            var thresholdDict = JsonSerializer.Deserialize<Dictionary<string, int>>(
+                JsonSerializer.Serialize(Threshold, Program.SerializerOptions), Program.SerializerOptions);
+            
+            
+            var dict = new Dictionary<string, decimal>();
+            
+            foreach (var key in validKeys)
+            {
+                var thresholdValue = thresholdDict[key];
+                var analysisResult = decimal.Parse(analysisDict[key + "Average"].ToString());
+                if (analysisResult >= thresholdValue)
+                    dict.TryAdd(key, analysisResult);
             }
 
-            return null;
+            return dict;
         }
     }
 }
