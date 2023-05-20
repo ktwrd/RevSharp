@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Net.Http.Json;
+using System.Net;
+using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
