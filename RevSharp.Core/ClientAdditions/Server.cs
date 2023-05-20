@@ -11,6 +11,10 @@ public partial class Client
 {
     internal Dictionary<string, Server> ServerCache { get; set; }
 
+    /// <summary>
+    /// Transform the ServerCache into a LinkedList
+    /// </summary>
+    /// <returns></returns>
     public async Task<LinkedList<Server>?> GetAllServers()
     {
         var list = new LinkedList<Server>();
@@ -19,10 +23,16 @@ public partial class Client
         return list;
     }
     
-    public async Task<Server?> GetServer(string serverId, bool forceFetch = true)
+    /// <summary>
+    /// Get a server from the current Revolt server.
+    /// </summary>
+    /// <param name="serverId">Server Id to fetch the data for</param>
+    /// <param name="forceUpdate">When `true`, the cache will be ignored and it will fetch directly from the API, like if it was never in the cache to start with</param>
+    /// <returns>Server specified or null</returns>
+    public async Task<Server?> GetServer(string serverId, bool forceUpdate = true)
     {
         var inCache = ServerCache.ContainsKey(serverId);
-        if (inCache && forceFetch == false)
+        if (inCache && forceUpdate == false)
             return ServerCache[serverId];
         Log.Verbose($"{serverId} is " + (inCache ? "in" : "not in") + " cache");
         // Use server from cache if it exists

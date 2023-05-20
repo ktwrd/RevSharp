@@ -41,7 +41,7 @@ public static class PermissionHelper
                 break;
             case "DirectMessage":
                 var dmChannel = (DirectMessageChannel)channel;
-                var dmChannelRecipient = await dmChannel.FetchRecipient(client, forceFetch: false);
+                var dmChannelRecipient = await dmChannel.FetchRecipient(client, forceUpdate: false);
                 var dmChannelRecipientPermission = dmChannelRecipient?.Permission ?? 0;
 
                 if ((dmChannelRecipientPermission & (long)UserPermission.SendMessage) == 1)
@@ -67,7 +67,7 @@ public static class PermissionHelper
             case "TextChannel":
             case "VoiceChannel":
                 var textChannel = (TextChannel)channel;
-                var server = await client.GetServer(textChannel.ServerId, forceFetch: false);
+                var server = await client.GetServer(textChannel.ServerId, forceUpdate: false);
                 if (server == null)
                     return 0;
                 if (server.OwnerId == user.Id)
@@ -116,7 +116,7 @@ public static class PermissionHelper
         if (member == null)
             return 0;
         var perm = server.DefaultPermissions;
-        var memberRoles = await member.FetchOrderedRoles(client, forceFetch: false);
+        var memberRoles = await member.FetchOrderedRoles(client, forceUpdate: false);
         if (memberRoles is { Count: > 0 } && server.Roles.Count > 0)
         {
             var permissions = memberRoles.Select(v => v.Item2.Permissions ?? new PermissionCompare()

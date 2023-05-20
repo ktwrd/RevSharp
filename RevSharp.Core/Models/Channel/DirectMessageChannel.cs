@@ -36,8 +36,8 @@ public class DirectMessageChannel : BaseChannel, IFetchable
         return true;
     }
 
-    public Task<User?> FetchRecipient(Client client, bool forceFetch = true)
+    public Task<User?> FetchRecipient(Client client, bool forceUpdate = true)
     {
-        return client.GetUser(RecipientIds.First(), forceFetch: forceFetch);
+        return client.GetUser(RecipientIds.First(), forceUpdate: forceUpdate);
     }
 }

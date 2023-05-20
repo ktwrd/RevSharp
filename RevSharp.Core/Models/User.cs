@@ -5,35 +5,84 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
+/// <summary>
+/// User
+/// </summary>
 public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
 {
+    /// <summary>
+    /// Is this user the current used that we are connected to?
+    /// </summary>
     [JsonIgnore]
     public bool IsCurrentUser { get; internal set; }
+    
+    /// <summary>
+    /// Unique Id
+    /// </summary>
     [JsonPropertyName("_id")]
     public string Id { get; set; }
+    /// <summary>
+    /// Username
+    /// </summary>
     [JsonPropertyName("username")]
     public string Username { get; set; }
+    /// <summary>
+    /// Avatar attachment
+    /// </summary>
     [JsonPropertyName("avatar")]
     public File Avatar { get; set; }
+    /// <summary>
+    /// Relationships with other users
+    /// </summary>
     [JsonPropertyName("relations")]
     public UserRelation[]? Relations { get; set; }
+    
+    /// <summary>
+    /// Bitfield of user badges
+    /// </summary>
     [JsonPropertyName("badges")]
     public int? Badges { get; set; }
+    /// <summary>
+    /// User's current status
+    /// </summary>
     [JsonPropertyName("status")]
     public UserStatus Status { get; set; }
+    /// <summary>
+    /// User's profile page
+    /// </summary>
     [JsonPropertyName("profile")]
     public UserProfile Profile { get; set; }
+    
+    /// <summary>
+    /// Enum of user flags
+    /// </summary>
     [JsonPropertyName("flags")]
     public UserFlags Flags { get; set; }
+    /// <summary>
+    /// Whether this user is privileged
+    /// </summary>
     [JsonPropertyName("privileged")]
     public bool IsPrivileged { get; set; }
+    /// <summary>
+    /// Bot information. Only set when this user is actually a bot.
+    /// </summary>
     [JsonPropertyName("bot")]
     public UserBotDetails? Bot { get; set; }
+    
+    /// <summary>
+    /// Current session user's relationship with this user
+    /// </summary>
     [JsonPropertyName("relationship")]
     public UserRelationship Relationship { get; set; }
+    /// <summary>
+    /// Whether this user is currently online
+    /// </summary>
     [JsonPropertyName("online")]
     public bool IsOnline { get; set; }
 
+    /// <summary>
+    /// Calculated permission for DM's
+    /// </summary>
     public long Permission
     {
         get
@@ -110,6 +159,7 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         var data = JsonSerializer.Deserialize<User>(stringContent, Client.SerializerOptions);
         return data;
     }
+    
     /// <summary>
     /// Pull latest data from API
     /// </summary>
@@ -140,9 +190,16 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         return true;
     }
 
+    /// <summary>
+    /// Pull latest data from API
+    /// </summary>
+    /// <returns>Was fetch successful</returns>
     public Task<bool> Fetch()
         => Fetch(Client);
 
+    /// <summary>
+    /// Fetch this user's profile
+    /// </summary>
     public async Task<UserProfile?> FetchProfile(Client client)
     {
         var data = await UserProfile.Fetch(client, Id);
@@ -151,20 +208,37 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         return data == null ? null : Profile;
     }
 
+    /// <summary>
+    /// Fetch this user's profile
+    /// </summary>
     public Task<UserProfile?> FetchProfile()
         => FetchProfile(Client);
     
-    public async Task<DirectMessageChannel?> FetchDMChannel(Client client)
+    /// <summary>
+    /// Fetch the <see cref="DirectMessageChannel"/> for this user. This will be <see cref="SavedMessagesChannel"/> if this is the user that we are logged in as.
+    /// </summary>
+    /// <returns><see cref="SavedMessagesChannel"/> when you are this user, <see cref="DirectMessageChannel"/> when you are not.</returns>
+    public async Task<BaseChannel?> FetchDMChannel(Client client)
     {
         var response = await client.GetAsync($"/users/{Id}/dm");
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
 
         var stringContent = response.Content.ReadAsStringAsync().Result;
-        var data = JsonSerializer.Deserialize<DirectMessageChannel>(stringContent, Client.SerializerOptions);
-        return data;
+        if (Id == client.CurrentUserId)
+        {
+            return JsonSerializer.Deserialize<SavedMessagesChannel>(stringContent, Client.SerializerOptions);
+        }
+        else
+        {
+            return JsonSerializer.Deserialize<DirectMessageChannel>(stringContent, Client.SerializerOptions);
+        }
     }
 
-    public Task<DirectMessageChannel?> FetchDMChannel()
+    /// <summary>
+    /// Fetch the <see cref="DirectMessageChannel"/> for this user. This will be <see cref="SavedMessagesChannel"/> if this is the user that we are logged in as.
+    /// </summary>
+    /// <returns><see cref="SavedMessagesChannel"/> when you are this user, <see cref="DirectMessageChannel"/> when you are not.</returns>
+    public Task<BaseChannel?> FetchDMChannel()
         => FetchDMChannel(Client);
 }

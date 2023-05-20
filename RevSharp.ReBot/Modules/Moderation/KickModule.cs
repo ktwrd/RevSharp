@@ -47,8 +47,8 @@ public class KickModule : BaseModule
 
         try
         {
-            var authorMember = await server.GetMember(message.AuthorId, forceFetch: false);
-            if (!await authorMember.HasPermission(PermissionFlag.KickMembers, forceFetch: false))
+            var authorMember = await server.GetMember(message.AuthorId, forceUpdate: false);
+            if (!await authorMember.HasPermission(PermissionFlag.KickMembers, forceUpdate: false))
             {
                 embed.Description = "You do not have access to this command";
                 embed.Colour = "red";
@@ -56,8 +56,8 @@ public class KickModule : BaseModule
                 return;
             }
 
-            var selfMember = await server.GetMember(Client.CurrentUserId, forceFetch: false);
-            if (!await selfMember.HasPermission(PermissionFlag.KickMembers, forceFetch: false))
+            var selfMember = await server.GetMember(Client.CurrentUserId, forceUpdate: false);
+            if (!await selfMember.HasPermission(PermissionFlag.KickMembers, forceUpdate: false))
             {
                 embed.Description = "I do not have permission to kick this member!";
                 embed.Colour = "red";

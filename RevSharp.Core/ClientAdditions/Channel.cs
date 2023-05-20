@@ -93,6 +93,12 @@ public partial class Client
         ChannelCache.TryAdd(data.Id, data);
     }
 
+    /// <summary>
+    /// Get a channel. Parsed into the unique types of channel as well.
+    /// </summary>
+    /// <param name="channelId">Channel Id to get</param>
+    /// <param name="forceUpdate">When `true`, the cache will be ignored and it will fetch directly from the API, like if it was never in the cache to start with</param>
+    /// <returns></returns>
     public async Task<BaseChannel?> GetChannel(string channelId, bool forceUpdate = false)
     {
         if (ChannelCache.ContainsKey(channelId))

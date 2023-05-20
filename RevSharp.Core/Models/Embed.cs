@@ -3,6 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
+/// <summary>
+/// An embed that can be sent in a message.
+/// </summary>
 public class SendableEmbed
 {
     [JsonPropertyName("description")]
@@ -58,11 +61,17 @@ public class EmbedBuilder : SendableEmbed
     }
 }
 
+/// <summary>
+/// Base type for embeds that are on messages that we get. For sending embeds, use <see cref="SendableEmbed"/>
+/// </summary>
 public class BaseEmbed
 {
     public string Type { get; set; }
 }
 
+/// <summary>
+/// Text embeds. Usually in messages that contain a <see cref="SendableEmbed"/>
+/// </summary>
 public class TextEmbed : BaseEmbed
 {
     [JsonPropertyName("icon_url")]
@@ -77,6 +86,9 @@ public class TextEmbed : BaseEmbed
     public string? Colour { get; set; }
 }
 
+/// <summary>
+/// Used when information about a website is in an embed.
+/// </summary>
 public class MetadataEmbed : BaseEmbed
 {
     [JsonPropertyName("url")]
@@ -101,6 +113,9 @@ public class MetadataEmbed : BaseEmbed
     public string? Colour { get; set; }
 }
 
+/// <summary>
+/// Used when an embedded link from a website like Youtube is received.
+/// </summary>
 public class VideoEmbed : BaseEmbed
 {
     [JsonPropertyName("url")]

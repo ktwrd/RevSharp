@@ -4,20 +4,41 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
+/// <summary>
+/// Representation of an Emoji on Revolt
+/// </summary>
 public class Emoji : IFetchable, ISnowflake
 {
+    /// <summary>
+    /// Unique Id
+    /// </summary>
     [JsonPropertyName("_id")]
     public string Id { get; set; }
+    /// <summary>
+    /// What owns this emoji
+    /// </summary>
     [JsonPropertyName("parent")]
     public EmojiParent Parent { get; set; }
+    /// <summary>
+    /// Uploader user id
+    /// </summary>
     [JsonPropertyName("creator_id")]
     public string CreatorId { get; set; }
     [JsonIgnore]
     public User Creator { get; set; }
+    /// <summary>
+    /// Emoji name
+    /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; set; }
+    /// <summary>
+    /// Whether the emoji is animated
+    /// </summary>
     [JsonPropertyName("animated")]
     public bool IsAnimated { get; set; }
+    /// <summary>
+    /// Whether the emoji is marked as nsfw
+    /// </summary>
     [JsonPropertyName("nsfw")]
     public bool IsNsfw { get; set; }
 

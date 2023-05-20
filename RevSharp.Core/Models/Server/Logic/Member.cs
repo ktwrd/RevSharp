@@ -13,11 +13,11 @@ public partial class Server
         return false;
     }
 
-    public async Task<Member?> GetMember(string id, bool forceFetch = true)
+    public async Task<Member?> GetMember(string id, bool forceUpdate = true)
     {
         if (MemberCache.TryGetValue(id, out var member))
         {
-            if (!forceFetch)
+            if (!forceUpdate)
                 return member;
             
             if (await member.Fetch())

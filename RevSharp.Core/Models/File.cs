@@ -4,40 +4,55 @@ namespace RevSharp.Core.Models;
 
 public class File : IFile<FileMetadata>, ISnowflake
 {
-    /// <inheritdoc />
     [JsonPropertyName("_id")]
     public string Id { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Tag / bucket this file was uploaded to
+    /// </summary>
     [JsonPropertyName("tag")]
     public string Tag { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Original filename
+    /// </summary>
     [JsonPropertyName("filename")]
     public string Filename { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Parsed metadata of this file
+    /// </summary>
     [JsonPropertyName("metadata")]
     public FileMetadata Metadata { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Raw content type of this file
+    /// </summary>
     [JsonPropertyName("content_type")]
     public string ContentType { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Size of this file (in bytes)
+    /// </summary>
     [JsonPropertyName("size")]
     public int Size { get; set; }
-    /// <inheritdoc />
+    
+    /// <summary>
+    /// Wether this file was deleted
+    /// </summary>
     [JsonPropertyName("deleted")]
     public bool? IsDeleted { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Wether this file was reported
+    /// </summary>
     [JsonPropertyName("reported")]
     public bool? IsReported { get; set; }
-    /// <inheritdoc />
+    
     [JsonPropertyName("message_id")]
     public string? MessageId { get; set; }
-    /// <inheritdoc />
     [JsonPropertyName("user_id")]
     public string? UserId { get; set; }
-    /// <inheritdoc />
     [JsonPropertyName("server_id")]
     public string? ServerId { get; set; }
-    /// <inheritdoc />
+    
+    /// <summary>
+    /// Id of the file object this file is associated with
+    /// </summary>
     [JsonPropertyName("object_id")]
     public string? ObjectId { get; set; }
 }

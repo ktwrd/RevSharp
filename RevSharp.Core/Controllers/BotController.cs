@@ -12,10 +12,16 @@ public class BotController : BaseController
     {
     }
 
+    /// <summary>
+    /// Create a bot account
+    /// </summary>
+    /// <param name="name">The username for the bot</param>
+    /// <returns>Bot details when successful.</returns>
+    /// <exception cref="RevoltException">Thrown when the current user that you're logged in as is actually a bot.</exception>
     public async Task<Bot?> Create(string name)
     {
         if (client.CurrentUser.Bot != null)
-            throw new Exception("Can only create bots if logged in as user");
+            throw new RevoltException("Can only create bots if logged in as user");
 
         var response = await client.PostAsync($"/bots/create", new Dictionary<string, object>()
         {

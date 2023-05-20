@@ -47,14 +47,16 @@ internal partial class WebsocketClient
     }
     #endregion
     internal TimeSpan ReconnectionTimeout = TimeSpan.FromSeconds(30);
-    internal bool Connected { get; private set; }
     internal Websocket.Client.WebsocketClient? WebSocketClient { get; private set; }
-    internal bool IsClientOpen { get; private set; }
+    /// <summary>
+    /// Create connection to Bonfire server
+    /// </summary>
+    /// <exception cref="ClientInitializeException">Thrown when <see cref="Client.EndpointNodeInfo.WebSocket"/> is null</exception>
     internal async Task Connect()
     {
         Log.Debug("Connecting to Websocket");
         if (_client.EndpointNodeInfo?.WebSocket == null)
-            throw new Exception("_client.EndpointNodeInfo.WebSocket is null");
+            throw new ClientInitializeException("_client.EndpointNodeInfo.WebSocket is null");
         string url = _client.EndpointNodeInfo?.WebSocket ?? "wss://ws.revolt.chat";
         url += $"?version=1&format=json&token={_client.Token}";
 
