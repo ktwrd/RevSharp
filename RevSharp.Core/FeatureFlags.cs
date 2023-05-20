@@ -24,7 +24,8 @@ internal static class FeatureFlags
     private static int ParseInt(string envKey, int defaultValue)
     {
         var item = Environment.GetEnvironmentVariable(envKey) ?? defaultValue.ToString();
-        var regex = new Regex(@"([0-9]+)");
+        item = item.Trim();
+        var regex = new Regex(@"^([0-9]+)$");
         if (regex.IsMatch(item))
         {
             var match = regex.Match(item);
