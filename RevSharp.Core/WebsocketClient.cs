@@ -57,35 +57,6 @@ internal partial class WebsocketClient
             throw new Exception("_client.EndpointNodeInfo.WebSocket is null");
         string url = _client.EndpointNodeInfo?.WebSocket ?? "wss://ws.revolt.chat";
         url += $"?version=1&format=json&token={_client.Token}";
-/*
-        WebSocketClient = new WSClient(url);
-        WebSocketClient.MessageReceived += (sender, ev) =>
-        {
-            if (FeatureFlags.WebsocketDebugLogging)
-            {
-                Log.Debug("------ Received Message" + "\n" + ev.Message);
-            }
-            OnTextMessageReceived(ev.Message);
-        };
-        WebSocketClient.Opened += (sender, ev) =>
-        {
-            IsClientOpen = true;
-            Log.Verbose("Opened");
-            WhenConnect?.Invoke();
-        };
-        WebSocketClient.Closed += (sender, ev) =>
-        {
-            Log.Verbose("Closed");
-            IsClientOpen = false;
-        };
-        WebSocketClient.Error += (sender, ev) =>
-        {
-            Log.Critical($"WebSocketClient.Error  =  {ev.Exception}");
-        };
-        WebSocketClient.DataReceived += (sender, ev) =>
-        {
-            Log.Verbose($"DataReceived: length={ev.Data.Length}");
-        };*/
 
         WebSocketClient = new Websocket.Client.WebsocketClient(new Uri(url));
         WebSocketClient.ReconnectTimeout = ReconnectionTimeout;
