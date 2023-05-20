@@ -79,6 +79,8 @@ internal partial class WebsocketClient
                     {"cancelClosing", info.CancelClosing}
                 }, Client.SerializerOptions));   
             }
+
+            WhenDisconnect?.Invoke();
         });
         WebSocketClient.ReconnectionHappened.Subscribe((info) =>
         {
@@ -127,6 +129,7 @@ internal partial class WebsocketClient
     internal event MessageDelegate MessageReceived;
     internal event EventReceivedDelegate EventReceived;
     internal event VoidDelegate WhenConnect;
+    internal event VoidDelegate WhenDisconnect;
     private async Task ParseMessage(string content)
     {
         Log.Verbose("Parsing Message");
