@@ -100,20 +100,20 @@ public partial class ContentDetectionModule : BaseModule
         if (controller == null)
             return;
 
-        var serverconfig = await controller.Get(server.Id);
-        if (serverconfig == null || serverconfig.Enabled == false)
+        var serverConfig = await controller.Get(server.Id);
+        if (serverConfig == null || serverConfig.Enabled == false)
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
 
         var analysis = await AnalyzeMessage(message);
-        var deleteMatch = serverconfig.GetMessageThresholdMatch(analysis, serverconfig.DeleteThreshold);
-        var flagMatch = serverconfig.GetMessageThresholdMatch(analysis, serverconfig.FlagThreshold);
+        var deleteMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.DeleteThreshold);
+        var flagMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.FlagThreshold);
         if (deleteMatch.Majority != null)
         {
             message.Delete();
             WriteLogThreshold(
-                serverconfig,
+                serverConfig,
                 LogDetailReason.DeleteThresholdMet,
                 deleteMatch,
                 message);
@@ -121,7 +121,7 @@ public partial class ContentDetectionModule : BaseModule
         else if (flagMatch.Majority != null)
         {
             WriteLogThreshold(
-                serverconfig,
+                serverConfig,
                 LogDetailReason.FlagThresholdMet,
                 flagMatch,
                 message);
