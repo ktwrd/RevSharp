@@ -17,6 +17,13 @@ public partial class Message
         }
         data.Nonce = GeneralHelper.GenerateUID();
 
+        if (data.Attachments?.Length > 128)
+            throw new Exception(
+                $"Field \"Attachments\" must have less than 129 items. Has {data.Attachments?.Length} items");
+        if (data.Embeds?.Length > 10)
+            throw new Exception($"Field \"Embeds\" must have less than 11 items. Has {data.Embeds?.Length} items");
+        
+        // Replace weird line endings with unix line endings
         data.Content = data.Content?.Replace("\r\n", "\n").Replace("\r", "\n");
         if (data.Embeds != null)
         {
