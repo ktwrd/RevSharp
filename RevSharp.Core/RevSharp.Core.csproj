@@ -4,7 +4,28 @@
         <TargetFrameworks>net7.0;net6.0;net6.0-windows</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <Title>RevSharp.Core</Title>
+        <Authors>Kate Ward</Authors>
+        <Description>C# Library for the Open-Source chat platform, Revolt.</Description>
+        <PackageProjectUrl>https://github.com/ktwrd/revsharp</PackageProjectUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/ktwrd/revsharp</RepositoryUrl>
+        <PackageTags>revolt</PackageTags>
+        <NeutralLanguage>en</NeutralLanguage>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="..\LICENSE.txt">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="kate.shared" Version="1.0.4" />
