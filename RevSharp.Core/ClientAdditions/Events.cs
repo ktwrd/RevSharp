@@ -6,35 +6,24 @@ namespace RevSharp.Core;
 
 public partial class Client
 {
-    public event ChannelDelegate ChannelCreated;
-
-    internal void OnChannelCreated(BaseChannel channel)
+    
+    
+    public event VoidDelegate Ready;
+    internal void OnReady()
     {
-        if (ChannelCreated != null)
-            ChannelCreated?.Invoke(channel);
+        Ready?.Invoke();
     }
     
-    public event MessageDelegate MessageReceived;
-    public event VoidDelegate Ready;
     public event VoidDelegate ClientAuthenticated;
+    internal void OnClientAuthenticated()
+    {
+        ClientAuthenticated?.Invoke();
+    }
+    
     public event StringDelegate ErrorReceived;
-    public event MessageDeleteDelegate MessageDeleted;
-
-    public event ServerDelegate ServerCreate;
-
-    internal void OnServerCreate(Server server)
+    internal void OnErrorReceived(string error)
     {
-        AddToCache(server);
-        if (ServerCreate != null)
-        {
-            ServerCreate?.Invoke(server);
-        }
+        ErrorReceived?.Invoke(error);
     }
-    internal void OnMessageDeleted(string messageId, string channelId)
-    {
-        if (MessageDeleted != null)
-        {
-            MessageDeleted?.Invoke(messageId, channelId);
-        }
-    }
+
 }

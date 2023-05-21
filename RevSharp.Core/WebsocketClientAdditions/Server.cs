@@ -14,7 +14,7 @@ internal partial class WebsocketClient
                 serverCreateData.Client = _client;
                 await serverCreateData.Fetch();
                 _client.AddToCache(serverCreateData);
-                _client.OnServerCreate(_client.ServerCache[serverCreateData.Id]);
+                _client.OnServerCreated(_client.ServerCache[serverCreateData.Id]);
                 break;
         }
     }

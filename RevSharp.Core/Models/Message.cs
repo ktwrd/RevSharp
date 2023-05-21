@@ -197,4 +197,13 @@ public partial class Message : Clientable, ISnowflake
             Reactions[react] = Reactions[react].Where(v => v != userId).ToArray();
         ReactRemove?.Invoke(userId, react, Id);
     }
+
+    /// <summary>
+    /// Invoked when the MessageDelete event is received on the WebSocket client.
+    /// </summary>
+    public event VoidDelegate Deleted;
+    internal void OnDeleted()
+    {
+        Deleted?.Invoke();
+    }
 }

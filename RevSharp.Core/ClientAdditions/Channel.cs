@@ -168,6 +168,4 @@ public partial class Client
         ChannelDeleted?.Invoke(data.Id);
     }
 
-    public event GenericDelegate<string> ChannelDeleted;
-    public event ChannelUpdateDelegate ChannelUpdated;
 }
