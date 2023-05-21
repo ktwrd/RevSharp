@@ -5,15 +5,19 @@ namespace RevSharp.Core.Models;
 
 public partial class Server
 {
-    public event VoidDelegate ServerDeleted;
-
-    internal void OnServerDeleted()
+    public event VoidDelegate Deleted;
+    /// <summary>
+    /// Invoke <see cref="Deleted"/>
+    /// </summary>
+    internal void OnDeleted()
     {
-        ServerDeleted?.Invoke();
+        Deleted?.Invoke();
     }
 
     public event UserIdDelegate MemberJoined;
-
+    /// <summary>
+    /// Invoke <see cref="MemberJoined"/>
+    /// </summary>
     internal void OnMemberJoined(string userId)
     {
         MemberJoined?.Invoke(userId);

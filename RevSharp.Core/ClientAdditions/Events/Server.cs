@@ -1,3 +1,4 @@
+using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
@@ -34,5 +35,19 @@ public partial class Client
         if (ServerCache.TryGetValue(serverId, out var value))
             value.OnMemberJoined(userId);
         ServerMemberJoined?.Invoke(serverId, userId);
+    }
+
+    public event ServerIdDelegate ServerDeleted;
+
+    /// <summary>
+    /// - When Server exists in cache
+    ///     - Invoke <see cref="Server.Deleted"/>
+    /// - Invoke <see cref="ServerDeleted"/>
+    /// </summary>
+    internal void OnServerDeleted(string serverId)
+    {
+        if (ServerCache.ContainsKey(serverId))
+            ServerCache[serverId].OnDeleted();
+        ServerDeleted?.Invoke(serverId);
     }
 }
