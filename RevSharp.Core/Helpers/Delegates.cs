@@ -44,3 +44,5 @@ public delegate void ChannelTypingDelegate(
 
 public delegate void ServerDelegate(
     Server server);
+public delegate void ServerIdDelegate(
+    string serverId);
