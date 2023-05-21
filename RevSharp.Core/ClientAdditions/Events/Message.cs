@@ -30,4 +30,6 @@ public partial class Client
         if (ChannelCache.ContainsKey(channelId))
             ChannelCache[channelId].OnMessageDeleted(messageId);
     }
+    
+    
 }
