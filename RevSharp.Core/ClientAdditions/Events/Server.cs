@@ -8,6 +8,9 @@ public partial class Client
     public event ServerDelegate ServerCreated;
 
     /// <summary>
+    /// - Set Client property
+    /// - Add to cache
+    /// - Invoke <see cref="ServerCreated"/>
     /// Add to cache then invoke <see cref="ServerCreated"/>
     /// </summary>
     internal void OnServerCreated(Server server)
@@ -18,5 +21,18 @@ public partial class Client
         {
             ServerCreated?.Invoke(server);
         }
+    }
+
+    public event MemberIdDelegate ServerMemberJoined;
+    /// <summary>
+    /// - When Server exists in cache
+    ///     - Invoke <see cref="Server.MemberJoined"/>
+    /// - Invoke <see cref="ServerMemberJoined"/>
+    /// </summary>
+    internal void OnServerMemberJoined(string serverId, string userId)
+    {
+        if (ServerCache.TryGetValue(serverId, out var value))
+            value.OnMemberJoined(userId);
+        ServerMemberJoined?.Invoke(serverId, userId);
     }
 }

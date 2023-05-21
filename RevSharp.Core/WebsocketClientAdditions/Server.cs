@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using RevSharp.Core.Models;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core;
 
@@ -11,10 +12,17 @@ internal partial class WebsocketClient
         {
             case "ServerCreate":
                 var serverCreateData = JsonSerializer.Deserialize<Server>(content, Client.SerializerOptions);
-                serverCreateData.Client = _client;
-                await serverCreateData.Fetch();
-                _client.AddToCache(serverCreateData);
-                _client.OnServerCreated(_client.ServerCache[serverCreateData.Id]);
+                if (serverCreateData != null)
+                {
+                    _client.OnServerCreated(_client.ServerCache[serverCreateData.Id]);
+                }
+                break;
+            case "ServerMemberJoin":
+                var serverMemberJoinData = JsonSerializer.Deserialize<UserIdEvent>(content, Client.SerializerOptions);
+                if (serverMemberJoinData != null)
+                {
+                    _client.OnServerMemberJoined(serverMemberJoinData.Id, serverMemberJoinData.UserId);
+                }
                 break;
         }
     }
