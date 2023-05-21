@@ -82,16 +82,6 @@ public partial class Client
 
         return list.ToArray();
     }
-    
-    private void WSHandle_ChannelCreate(string json)
-    {
-        var data = ChannelHelper.ParseChannel(json);
-        if (data == null)
-            return;
-        Log.Verbose($"{data.Id} Adding to cache");
-        data.Client = this;
-        ChannelCache.TryAdd(data.Id, data);
-    }
 
     /// <summary>
     /// Get a channel. Parsed into the unique types of channel as well.
@@ -135,37 +125,4 @@ public partial class Client
         
         return channel;
     }
-
-    private async void WSHandle_ChannelUpdated(string json)
-    {
-        var data = ChannelHelper.ParseChannel(json);
-        if (data == null)
-            return;
-
-        Log.Verbose($"{data.Id}");
-        if (!ChannelCache.TryGetValue(data.Id, out var value))
-        {
-            Log.Verbose($"Doesn't exist in cache, fetching");
-            await GetChannel(data.Id);
-        }
-        
-        Log.Verbose($"Updating channel from cache");
-        if (await value.Fetch(this))
-        {
-            Log.Verbose($"Invoking ChannelUpdated");
-            ChannelUpdated?.Invoke(data, ChannelCache[data.Id]);   
-        }
-
-    }
-
-    private void WSHandle_ChannelDelete(string json)
-    {
-        var data = ChannelHelper.ParseChannel(json);
-        if (data == null)
-            return;
-        Log.Verbose($"{data.Id} Invoking ChannelDeleted");
-        ChannelCache.Remove(data.Id);
-        ChannelDeleted?.Invoke(data.Id);
-    }
-
 }
