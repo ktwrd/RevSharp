@@ -19,6 +19,15 @@ internal partial class WebsocketClient
                     _client.OnServerCreated(_client.ServerCache[serverCreateData.Id]);
                 }
                 break;
+            case "ServerDelete":
+                var serverDeleteData = JsonSerializer.Deserialize<IdEvent>(
+                    content,
+                    Client.SerializerOptions);
+                if (serverDeleteData != null)
+                {
+                    _client.OnServerDeleted(serverDeleteData.Id);
+                }
+                break;
             case "ServerMemberJoin":
                 var serverMemberJoinData = JsonSerializer.Deserialize<UserIdEvent>(
                     content,
@@ -28,13 +37,13 @@ internal partial class WebsocketClient
                     _client.OnServerMemberJoined(serverMemberJoinData.Id, serverMemberJoinData.UserId);
                 }
                 break;
-            case "ServerDelete":
-                var serverDeleteData = JsonSerializer.Deserialize<IdEvent>(
+            case "ServerMemberLeave":
+                var serverMemberLeaveData = JsonSerializer.Deserialize<UserIdEvent>(
                     content,
                     Client.SerializerOptions);
-                if (serverDeleteData != null)
+                if (serverMemberLeaveData != null)
                 {
-                    _client.OnServerDeleted(serverDeleteData.Id);
+                    _client.OnServerMemberLeft(serverMemberLeaveData.Id, serverMemberLeaveData.UserId);
                 }
                 break;
         }

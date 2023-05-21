@@ -23,6 +23,20 @@ public partial class Client
             ServerCreated?.Invoke(server);
         }
     }
+    
+    public event ServerIdDelegate ServerDeleted;
+
+    /// <summary>
+    /// - When Server exists in cache
+    ///     - Invoke <see cref="Server.Deleted"/>
+    /// - Invoke <see cref="ServerDeleted"/>
+    /// </summary>
+    internal void OnServerDeleted(string serverId)
+    {
+        if (ServerCache.ContainsKey(serverId))
+            ServerCache[serverId].OnDeleted();
+        ServerDeleted?.Invoke(serverId);
+    }
 
     public event MemberIdDelegate ServerMemberJoined;
     /// <summary>
@@ -36,18 +50,19 @@ public partial class Client
             value.OnMemberJoined(userId);
         ServerMemberJoined?.Invoke(serverId, userId);
     }
-
-    public event ServerIdDelegate ServerDeleted;
-
+    
+    public event MemberIdDelegate ServerMemberLeft;
     /// <summary>
     /// - When Server exists in cache
-    ///     - Invoke <see cref="Server.Deleted"/>
-    /// - Invoke <see cref="ServerDeleted"/>
+    ///     - Invoke <see cref="Server.OnMemberLeft(string)"/>
+    /// - Invoke <see cref="ServerMemberLeft"/>
     /// </summary>
-    internal void OnServerDeleted(string serverId)
+    /// <param name="serverId"></param>
+    /// <param name="userId"></param>
+    internal void OnServerMemberLeft(string serverId, string userId)
     {
         if (ServerCache.ContainsKey(serverId))
-            ServerCache[serverId].OnDeleted();
-        ServerDeleted?.Invoke(serverId);
+            ServerCache[serverId].OnMemberLeft(userId);
+        ServerMemberLeft?.Invoke(serverId, userId);
     }
 }

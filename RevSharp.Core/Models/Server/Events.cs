@@ -22,4 +22,20 @@ public partial class Server
     {
         MemberJoined?.Invoke(userId);
     }
+
+    public event UserIdDelegate MemberLeft;
+    /// <summary>
+    /// - If exists in <see cref="MemberCache"/>
+    ///     - Invoke <see cref="Member.OnLeft()"/>
+    /// - Remove userId from <see cref="MemberCache"/>
+    /// - Invoke <see cref="MemberLeft"/>
+    /// </summary>
+    /// <param name="userId"></param>
+    internal void OnMemberLeft(string userId)
+    {
+        if (MemberCache.TryGetValue(userId, out var value))
+            value.OnLeft();
+        MemberCache.Remove(userId);
+        MemberLeft?.Invoke(userId);
+    }
 }

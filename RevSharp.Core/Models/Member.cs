@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
@@ -139,6 +140,13 @@ public class Member : Clientable
     /// </summary>
     public Task<bool> HasPermission(PermissionFlag flag, bool forceUpdate = true)
         => HasPermission(Client, flag, forceUpdate);
+
+    public event VoidDelegate Left;
+
+    internal void OnLeft()
+    {
+        Left?.Invoke();
+    }
 
 }
 
