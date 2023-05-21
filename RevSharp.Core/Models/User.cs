@@ -254,4 +254,16 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     {
         StartTyping?.Invoke(channelId);
     }
+
+    /// <summary>
+    /// Emitted when this user stops typing in the channel specified.
+    /// </summary>
+    public event ChannelIdDelegate StopTyping;
+    /// <summary>
+    /// Invoke <see cref="StopTyping"/>
+    /// </summary>
+    internal void OnStopTyping(string channelId)
+    {
+        StopTyping?.Invoke(channelId);
+    }
 }

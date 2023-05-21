@@ -50,7 +50,7 @@ public partial class Client
 
     public event ChannelTypingDelegate ChannelStartTyping;
     /// <summary>
-    /// Invoke <see cref="BaseChannel.OnStartTyping(string)"/>, <see cref="User.OnStartTyping(string)"/>
+    /// Invoke <see cref="ChannelStartTyping"/>, <see cref="BaseChannel.OnStartTyping(string)"/>, <see cref="User.OnStartTyping(string)"/>
     /// </summary>
     internal void OnChannelStartTyping(string channelId, string userId)
     {
@@ -65,5 +65,26 @@ public partial class Client
         }
         
         ChannelStartTyping?.Invoke(channelId, userId);
+    }
+
+    public event ChannelTypingDelegate ChannelStopTyping;
+    /// <summary>
+    /// Invoke <see cref="ChannelStopTyping"/>, <see cref="BaseChannel.OnStopTyping(string)"/>, <see cref="User.OnStopTyping(string)"/>
+    /// </summary>
+    /// <param name="channelId"></param>
+    /// <param name="userId"></param>
+    internal void OnChannelStopTyping(string channelId, string userId)
+    {
+        if (ChannelCache.ContainsKey(channelId))
+        {
+            ChannelCache[channelId].OnStopTyping(userId);
+        }
+
+        if (UserCache.ContainsKey(userId))
+        {
+            UserCache[userId].OnStopTyping(channelId);
+        }
+        
+        ChannelStopTyping?.Invoke(channelId, userId);
     }
 }

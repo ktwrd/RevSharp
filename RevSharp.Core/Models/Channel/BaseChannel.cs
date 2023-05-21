@@ -57,6 +57,17 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     {
         StartTyping?.Invoke(userId);
     }
+    /// <summary>
+    /// Invoked when a user stops typing in this channel.
+    /// </summary>
+    public event ChannelIdDelegate StopTyping;
+    /// <summary>
+    /// Invoke <see cref="StopTyping"/>
+    /// </summary>
+    internal void OnStopTyping(string userId)
+    {
+        StopTyping?.Invoke(userId);
+    }
 
     public event VoidDelegate Deleted;
     /// <summary>

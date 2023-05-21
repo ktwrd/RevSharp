@@ -42,6 +42,19 @@ internal partial class WebsocketClient
                         channelStartTypingData.UserId);
                 }
                 break;
+            case "ChannelStopTyping":
+                var channelStopTypingData =
+                    JsonSerializer.Deserialize<ChannelTypingEvent>(
+                        content,
+                        Client.SerializerOptions);
+
+                if (channelStopTypingData != null)
+                {
+                    _client.OnChannelStopTyping(
+                        channelStopTypingData.ChannelId,
+                        channelStopTypingData.UserId);
+                }
+                break;
         }
     }
 }
