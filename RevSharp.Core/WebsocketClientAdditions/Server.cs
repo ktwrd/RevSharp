@@ -11,14 +11,18 @@ internal partial class WebsocketClient
         switch (type)
         {
             case "ServerCreate":
-                var serverCreateData = JsonSerializer.Deserialize<Server>(content, Client.SerializerOptions);
+                var serverCreateData = JsonSerializer.Deserialize<Server>(
+                    content,
+                    Client.SerializerOptions);
                 if (serverCreateData != null)
                 {
                     _client.OnServerCreated(_client.ServerCache[serverCreateData.Id]);
                 }
                 break;
             case "ServerMemberJoin":
-                var serverMemberJoinData = JsonSerializer.Deserialize<UserIdEvent>(content, Client.SerializerOptions);
+                var serverMemberJoinData = JsonSerializer.Deserialize<UserIdEvent>(
+                    content,
+                    Client.SerializerOptions);
                 if (serverMemberJoinData != null)
                 {
                     _client.OnServerMemberJoined(serverMemberJoinData.Id, serverMemberJoinData.UserId);
