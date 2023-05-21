@@ -46,3 +46,8 @@ public delegate void ServerDelegate(
     Server server);
 public delegate void ServerIdDelegate(
     string serverId);
+public delegate void ServerRoleIdDelegate(
+    string serverId,
+    string roleId);
+public delegate void RoleIdDelegate(
+    string roleId);
