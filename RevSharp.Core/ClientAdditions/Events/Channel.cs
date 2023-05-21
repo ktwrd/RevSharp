@@ -24,6 +24,8 @@ public partial class Client
     /// </summary>
     internal void OnChannelDeleted(string channelId)
     {
+        if (ChannelCache.ContainsKey(channelId))
+            ChannelCache[channelId].OnDeleted();
         ChannelDeleted?.Invoke(channelId);
     }
     

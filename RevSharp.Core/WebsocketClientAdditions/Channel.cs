@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using RevSharp.Core.Helpers;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core;
 
@@ -17,6 +18,15 @@ internal partial class WebsocketClient
                     if (_client.AddToCache(channelData))
                         await _client.ChannelCache[channelData.Id].Fetch();
                     _client.OnChannelCreated(_client.ChannelCache[channelData.Id]);
+                }
+                break;
+            case "ChannelDelete":
+                var channelDeleteData = JsonSerializer.Deserialize<IdEvent>(
+                    content,
+                    Client.SerializerOptions);
+                if (channelDeleteData != null)
+                {
+                    _client.OnChannelDeleted(channelDeleteData.Id);
                 }
                 break;
         }

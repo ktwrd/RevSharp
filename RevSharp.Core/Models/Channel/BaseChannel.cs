@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models.WebSocket;
 
@@ -43,6 +44,15 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     {
         if (MessageDeleted != null)
             MessageDeleted?.Invoke(messageId);
+    }
+
+    public event VoidDelegate Deleted;
+    /// <summary>
+    /// Invoke <see cref="Deleted"/>
+    /// </summary>
+    internal void OnDeleted()
+    {
+        Deleted?.Invoke();
     }
 
     protected Task<T?> GetGeneric<T>(string id) where T : BaseChannel
