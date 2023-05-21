@@ -13,7 +13,7 @@ public partial class Client
     {
         message.Client = this;
         AddToCache(message);
-        
+
         MessageReceived.Invoke(MessageCache[message.Id]);
     }
     

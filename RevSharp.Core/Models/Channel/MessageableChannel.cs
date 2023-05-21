@@ -31,6 +31,15 @@ public class MessageableChannel : NamedChannel, IMessageableChannel
     }
     #endregion
 
+    protected override void ClientInit()
+    {
+        base.ClientInit();
+        if (Client == null)
+            return;
+
+        MessageReceived += MessageReceivedHandle;
+    }
+
     private void MessageReceivedHandle(Message message)
     {
         if (MessageCache.ContainsKey(message.Id))

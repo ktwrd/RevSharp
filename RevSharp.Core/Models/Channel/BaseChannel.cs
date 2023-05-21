@@ -214,10 +214,9 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable, IBaseChannel
     {
         Id = id;
         ChannelType = "Unknown";
-        InitializeClientEvents();
     }
 
-    private void InitializeClientEvents()
+    protected override void ClientInit()
     {
         if (Client == null)
             return;
@@ -228,10 +227,7 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable, IBaseChannel
 
     private void OnMessageReceived(Message message)
     {
-        if (MessageReceived != null)
-        {
-            MessageReceived?.Invoke(message);
-        }
+        MessageReceived?.Invoke(message);
     }
 }
 
