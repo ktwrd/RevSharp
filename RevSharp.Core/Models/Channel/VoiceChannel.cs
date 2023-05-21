@@ -4,30 +4,14 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class VoiceChannel : BaseChannel, IFetchable
+public class VoiceChannel : NamedChannel, IFetchable
 {
     /// <summary>
     /// Id of the server this channel belongs to
     /// </summary>
     [JsonPropertyName("server")]
     public string ServerId { get; set; }
-    
-    /// <summary>
-    /// Display name of the channel
-    /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-    /// <summary>
-    /// Channel description
-    /// </summary>
-    [JsonPropertyName("description")]
-    public string? Description { get; set; }
-    /// <summary>
-    /// Custom icon attachment
-    /// </summary>
-    [JsonPropertyName("icon")]
-    public File? Icon { get; set; }
-    
+
     /// <summary>
     /// Whether this channel is marked as not safe for work
     /// </summary>

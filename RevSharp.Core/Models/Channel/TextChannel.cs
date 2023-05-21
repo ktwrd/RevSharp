@@ -7,36 +7,14 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// Text channel belonging to a server
 /// </summary>
-public class TextChannel : BaseChannel, IFetchable
+public class TextChannel : MessageableChannel, IFetchable
 {
     /// <summary>
     /// Id of the server this channel belongs to
     /// </summary>
     [JsonPropertyName("server")]
     public string ServerId { get; set; }
-    
-    /// <summary>
-    /// Display name of the channel
-    /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
-    /// <summary>
-    /// Channel description
-    /// </summary>
-    [JsonPropertyName("description")]
-    public string? Description { get; set; }
-    
-    /// <summary>
-    /// Custom icon attachment
-    /// </summary>
-    [JsonPropertyName("icon")]
-    public File? Icon { get; set; }
-    /// <summary>
-    /// Id of the last message sent in this channel
-    /// </summary>
-    [JsonPropertyName("last_message_id")]
-    public string LastMessageId { get; set; }
-    
+
     /// <summary>
     /// Whether this channel is marked as not safe for work
     /// </summary>

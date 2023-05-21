@@ -5,8 +5,15 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// A channel that can have messages in it
 /// </summary>
-public class MessageableChannel : BaseChannel
+public class MessageableChannel : NamedChannel, IMessageableChannel
 {
+    /// <summary>
+    /// Id of the last message sent in this channel
+    /// </summary>
+    [JsonPropertyName("last_message_id")]
+    public string LastMessageId { get; set; }
+    
+    
     internal Dictionary<string, Message> MessageCache { get; private set; }
     
     #region Constructors

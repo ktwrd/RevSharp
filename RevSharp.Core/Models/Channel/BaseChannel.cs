@@ -7,7 +7,7 @@ using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core.Models;
 
-public class BaseChannel : Clientable, ISnowflake, IFetchable
+public class BaseChannel : Clientable, ISnowflake, IFetchable, IBaseChannel
 {
     /// <summary>
     /// Unique Id
@@ -233,4 +233,10 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
             MessageReceived?.Invoke(message);
         }
     }
+}
+
+public interface IBaseChannel
+{
+    public string Id { get; set; }
+    public string ChannelType { get; set; }
 }
