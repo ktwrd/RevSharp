@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using kate.shared.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -26,4 +27,11 @@ public class ServerRole
     public long Rank { get; set; }
     [JsonPropertyName("permissions")]
     public PermissionCompare Permissions { get; set; }
+
+    public event VoidDelegate Deleted;
+
+    internal void OnDeleted()
+    {
+        Deleted?.Invoke();
+    }
 }

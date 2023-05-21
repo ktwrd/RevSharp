@@ -8,6 +8,11 @@ internal partial class WebsocketClient
 {
     private async Task ParseMessage_Server(string content, string type)
     {
+        if (type.StartsWith("ServerRole"))
+        {
+            await ParseMessage_ServerRole(content, type);
+            return;
+        }
         switch (type)
         {
             case "ServerCreate":

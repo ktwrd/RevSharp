@@ -38,4 +38,42 @@ public partial class Server
         MemberCache.Remove(userId);
         MemberLeft?.Invoke(userId);
     }
+
+    public event RoleIdDelegate RoleDeleted;
+
+    /// <summary>
+    /// - If exists in <see cref="Roles"/>
+    ///     - Invoke <see cref="ServerRole.Deleted"/>
+    ///     - Remove from <see cref="Roles"/>
+    /// - For ever member
+    ///     - If has roleId force update calculated permissions
+    ///     - If has roleId then remove it from that member
+    /// - Invoke <see cref="RoleDeleted"/>
+    /// </summary>
+    internal void OnRoleDeleted(string roleId)
+    {
+        if (Roles.ContainsKey(roleId))
+        {
+            Roles[roleId].OnDeleted();
+            Roles.Remove(roleId);
+        }
+
+        foreach (var item in Members)
+        {
+            if (item.RoleIds.Contains(roleId))
+            {
+                // Remove roleId from member
+                item.RoleIds = item.RoleIds
+                    .Where(v => v != roleId)
+                    .ToArray();
+                
+                // Force update permission for this member
+                item.HasPermission(
+                    PermissionFlag.ManageChannel,
+                    forceUpdate: true);
+            }
+        }
+
+        RoleDeleted?.Invoke(roleId);
+    }
 }
