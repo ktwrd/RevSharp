@@ -9,6 +9,13 @@ public delegate void ReadyMessageDelegate(
     ReadyMessage message,
     string json);
 
+public delegate void UserIdDelegate(
+    string userId);
+
+public delegate void MemberIdDelegate(
+    string serverId,
+    string userId);
+
 #region Message
 public delegate void MessageDelegate(
     Message message);
@@ -34,5 +41,6 @@ public delegate void ChannelTypingDelegate(
     string channelId,
     string userId);
 #endregion
+
 public delegate void ServerDelegate(
     Server server);
