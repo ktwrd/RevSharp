@@ -244,9 +244,9 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         => FetchDMChannel(Client);
 
     /// <summary>
-    /// Parameter is the Channel Id where this user started typing in.
+    /// Emitted when this user starts typing in the channel specified.
     /// </summary>
-    public event GenericDelegate<string> StartTyping;
+    public event ChannelIdDelegate StartTyping;
     /// <summary>
     /// Invoke <see cref="StartTyping"/>
     /// </summary>

@@ -27,6 +27,9 @@ public delegate void ChannelUpdateDelegate(
     BaseChannel current);
 public delegate void ChannelDelegate(
     BaseChannel channel);
+
+public delegate void ChannelIdDelegate(
+    string channelId);
 public delegate void ChannelTypingDelegate(
     string channelId,
     string userId);

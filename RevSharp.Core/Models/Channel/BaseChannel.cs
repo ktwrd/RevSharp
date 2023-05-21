@@ -47,9 +47,9 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
     }
 
     /// <summary>
-    /// Parameter is the User Id for who started typing
+    /// Invoked when a user starts typing in this channel.
     /// </summary>
-    public event GenericDelegate<string> StartTyping;
+    public event ChannelIdDelegate StartTyping;
     /// <summary>
     /// Invoke <see cref="StartTyping"/>
     /// </summary>
