@@ -162,6 +162,8 @@ internal static class Log
         var targetContent = pfx + content;
         foreach (var item in CensorList)
         {
+            if (item == null)
+                continue;
             if (item.Length < 1)
                 continue;
             targetContent = targetContent.Replace(item, new String('x', item.Length));
