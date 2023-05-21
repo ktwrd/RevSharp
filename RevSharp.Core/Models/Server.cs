@@ -100,7 +100,8 @@ public partial class Server : Clientable, ISnowflake, IFetchable
     /// <summary>
     /// List of parsed members
     /// </summary>
-    public List<Member> Members { get; set; }
+    public LinkedList<Member> Members { get; set; }
+    
     internal static async Task<Server?> Get(string id, Client client, bool fetchOwner = true)
     {
         var response = await client.GetAsync($"/servers/{id}");
@@ -132,7 +133,8 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         var members = await FetchMembers(client);
         if (members == null)
             return false;
-        data.Members = members.ToList();
+
+        data.Members = members;
         Inject(data, this);
 
         return true;
@@ -142,17 +144,23 @@ public partial class Server : Clientable, ISnowflake, IFetchable
     /// Fetch members from the API
     /// </summary>
     /// <returns>Array of members</returns>
-    public async Task<Member[]?> FetchMembers(Client client)
+    public async Task<LinkedList<Member>?> FetchMembers(Client client)
     {
         var response = await client.GetAsync($"/servers/{Id}/members");
         if (response.StatusCode != HttpStatusCode.OK)
             return null;
         var stringContent = response.Content.ReadAsStringAsync().Result;
         var data = JsonSerializer.Deserialize<ServerMemberResult>(stringContent, Client.SerializerOptions);
-        foreach (var i in data.Members)
-            i.Client = Client;
-        Members = data.Members.ToList();
-        return data.Members;
+
+        var list = new LinkedList<Member>();
+        foreach (var item in data.Members)
+        {
+            item.Client = Client;
+            list.AddLast(item);
+        }
+        Members = list;
+        
+        return list;
     }
 
     internal static void Inject(Server source, Server target)
@@ -194,7 +202,7 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         : base(client)
     {
         Id = id;
-        Members = new List<Member>();
+        Members = new LinkedList<Member>();
     }
 }
 
