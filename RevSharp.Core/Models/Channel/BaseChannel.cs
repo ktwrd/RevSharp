@@ -46,6 +46,18 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable
             MessageDeleted?.Invoke(messageId);
     }
 
+    /// <summary>
+    /// Parameter is the User Id for who started typing
+    /// </summary>
+    public event GenericDelegate<string> StartTyping;
+    /// <summary>
+    /// Invoke <see cref="StartTyping"/>
+    /// </summary>
+    internal void OnStartTyping(string userId)
+    {
+        StartTyping?.Invoke(userId);
+    }
+
     public event VoidDelegate Deleted;
     /// <summary>
     /// Invoke <see cref="Deleted"/>

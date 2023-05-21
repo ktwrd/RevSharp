@@ -47,4 +47,23 @@ public partial class Client
         
         ChannelUpdated?.Invoke(previous, current);
     }
+
+    public event ChannelTypingDelegate ChannelStartTyping;
+    /// <summary>
+    /// Invoke <see cref="BaseChannel.OnStartTyping(string)"/>, <see cref="User.OnStartTyping(string)"/>
+    /// </summary>
+    internal void OnChannelStartTyping(string channelId, string userId)
+    {
+        if (ChannelCache.ContainsKey(channelId))
+        {
+            ChannelCache[channelId].OnStartTyping(userId);
+        }
+
+        if (UserCache.ContainsKey(userId))
+        {
+            UserCache[userId].OnStartTyping(channelId);
+        }
+        
+        ChannelStartTyping?.Invoke(channelId, userId);
+    }
 }

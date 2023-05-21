@@ -2,6 +2,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -241,4 +242,16 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     /// <returns><see cref="SavedMessagesChannel"/> when you are this user, <see cref="DirectMessageChannel"/> when you are not.</returns>
     public Task<BaseChannel?> FetchDMChannel()
         => FetchDMChannel(Client);
+
+    /// <summary>
+    /// Parameter is the Channel Id where this user started typing in.
+    /// </summary>
+    public event GenericDelegate<string> StartTyping;
+    /// <summary>
+    /// Invoke <see cref="StartTyping"/>
+    /// </summary>
+    internal void OnStartTyping(string channelId)
+    {
+        StartTyping?.Invoke(channelId);
+    }
 }

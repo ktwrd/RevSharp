@@ -29,6 +29,19 @@ internal partial class WebsocketClient
                     _client.OnChannelDeleted(channelDeleteData.Id);
                 }
                 break;
+            case "ChannelStartTyping":
+                var channelStartTypingData =
+                    JsonSerializer.Deserialize<ChannelTypingEvent>(
+                        content,
+                        Client.SerializerOptions);
+
+                if (channelStartTypingData != null)
+                {
+                    _client.OnChannelStartTyping(
+                        channelStartTypingData.ChannelId,
+                        channelStartTypingData.UserId);
+                }
+                break;
         }
     }
 }
