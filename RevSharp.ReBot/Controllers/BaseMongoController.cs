@@ -27,15 +27,13 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
         try
         {
             _client = new MongoClient(ConnectionString);
-            Console.WriteLine($"Creating MongoDB Session");
             await _client.StartSessionAsync();
-            Console.WriteLine($"Connected to MongoDB Server");
             Database = _client.GetDatabase(Program.ConfigData.MongoDatabaseName);
         }
         catch (Exception e)
         {
-            Console.Error.WriteLine("Failed to initialize MongoDB connection");
-            Console.Error.WriteLine(e);
+            Log.Error("Failed to initialize MongoDB connection");
+            Log.Error(e);
             Environment.Exit(1);
             throw;
         }

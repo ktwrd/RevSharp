@@ -16,7 +16,7 @@ public class ReflectionInclude
     private List<BaseModule> Modules { get; set; }
     public async Task Search(Assembly assembly)
     {
-        Console.WriteLine($"[ReflectionInclude] Searching");
+        Log.Debug($"[ReflectionInclude] Searching");
         IEnumerable<Type> typesWithAttr = from type in assembly.GetTypes()
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
                   && type.IsSubclassOf(typeof(BaseModule)) && type != null
@@ -31,7 +31,7 @@ public class ReflectionInclude
 
         foreach (var i in Modules)
             await InitializeEvents(i, i.GetType());
-        Console.WriteLine($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
+        Log.Debug($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
     }
 
     public T? FetchModule<T>() where T : BaseModule
@@ -74,6 +74,6 @@ public class ReflectionInclude
         };
         
         await item.Initialize(this);
-        Console.WriteLine($"[ReflectionInclude] Init {type.Name}");
+        Log.Debug($"[ReflectionInclude] Init {type.Name}");
     }
 }
