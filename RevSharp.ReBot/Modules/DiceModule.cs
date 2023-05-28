@@ -15,12 +15,13 @@ public class DiceModule : BaseModule
 
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join("\n", new string[]
         {
             "```",
-            "r.dice <min> <max>     - generate random number (x-y)",
-            "r.dice <max>           - generate random number (0-x)",
-            "r.dice help            - display this message",
+            $"{p}dice <min> <max>     - generate random number (x-y)",
+            $"{p}dice <max>           - generate random number (0-x)",
+            $"{p}dice help            - display this message",
             "",
             "max: Maximum number for dice roll",
             "min: Minimum number for dice roll (default: 0)",

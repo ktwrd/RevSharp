@@ -22,30 +22,31 @@ public partial class ContentDetectionModule : BaseModule
 
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join("\n", new string[]
         {
             "```",
             " ------ server status --------",
-            "r.condetect status        - Get content detection",
+            $"{p}condetect status        - Get content detection",
             "                          - status for this server",
-            "r.condetect request       - Request content detection",
+            $"{p}condetect request       - Request content detection",
             "                          - to be enabled for this server",
             " ------- toggle server -------",
-            "r.condetect disable       - Disable content detection",
+            $"{p}condetect disable       - Disable content detection",
             "                          - for this server",
-            "r.condetect enable        - Enable content detection",
+            $"{p}condetect enable        - Enable content detection",
             "                          - for this server",
             "",
             " ---------- config -----------",
-            "r.condetect setlogchannel  - Set current channel to",
+            $"{p}condetect setlogchannel  - Set current channel to",
             "                           - logging channel",
-            "r.condetect thresholdset <type> <threshold> <action>",
+            $"{p}condetect thresholdset <type> <threshold> <action>",
             "                           - Set detection threshold",
-            "r.condetect thresholdget   - Get thresholds",
+            $"{p}condetect thresholdget   - Get thresholds",
             "",
             " ----------- help ------------",
-            "r.condetect help          - Display this message",
-            "r.condetect               - Display this message",
+            $"{p}condetect help          - Display this message",
+            $"{p}condetect               - Display this message",
             "```"
         });
     }

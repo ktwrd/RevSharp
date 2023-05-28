@@ -13,11 +13,12 @@ public class PermissionCloneModule : BaseModule
 
     public override string HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join(
             "\n", new string[]
             {
                 "```",
-                "r.permissionclone channel <source channel> ...<target channels>"
+                $"{p}permissionclone channel <source channel> ...<target channels>"
             });
     }
 

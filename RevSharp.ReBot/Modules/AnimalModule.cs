@@ -122,13 +122,14 @@ public class AnimalModule : BaseModule
     
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         var lines = new List<string>()
         {
             "```",
-            "r.animal <animal_type>     - get random image of animal",
-            "r.animal help              - display this message",
-            "r.help animal              - display this message",
-            "r.animal                   - list available animals",
+            $"{p}animal <animal_type>     - get random image of animal",
+            $"{p}animal help              - display this message",
+            $"{p}help animal              - display this message",
+            $"{p}animal                   - list available animals",
             "```"
         };
 

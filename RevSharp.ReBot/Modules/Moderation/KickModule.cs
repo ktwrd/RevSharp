@@ -169,13 +169,14 @@ public class KickModule : BaseModule
 
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join("\n", new string[]
         {
             "```",
-            "r.kick <user id>      - Kick member via user ID",
-            "r.kick <mention>      - Kick member via mention",
+            $"{p}kick <user id>      - Kick member via user ID",
+            $"{p}kick <mention>      - Kick member via mention",
             " ---- Example ----",
-            "r.kick <@01GZD4F61RBPJ5HWD08XB8F78N>",
+            $"{p}kick <@01GZD4F61RBPJ5HWD08XB8F78N>",
             "```"
         });
     }

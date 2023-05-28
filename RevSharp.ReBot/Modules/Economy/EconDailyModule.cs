@@ -72,11 +72,12 @@ public class EconDailyModule : BaseModule
 
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join("\n", new string[]
         {
             "Get daily rewards for this server. Can only be called every 24hr",
             "```",
-            "r.daily      - Get daily rewards",
+            $"{p}daily      - Get daily rewards",
             "```"
         });
     }

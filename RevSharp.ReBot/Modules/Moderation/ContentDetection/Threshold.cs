@@ -61,12 +61,13 @@ public partial class ContentDetectionModule
         
         if (info.Arguments.Count < 4)
         {
+            var p = Program.ConfigData.Prefix;
             embed.Description = string.Join(
             "\n", new string[]
             {
                 "### Command Usage",
                 "```",
-                "r.condetect thresholdset <type> <threshold> <action>",
+                $"{p}condetect thresholdset <type> <threshold> <action>",
                 "",
                 "   type        [adult, spoof, medical, violence, racy]",
                 "   threshold   range from 0-5 (-1 to disable)",

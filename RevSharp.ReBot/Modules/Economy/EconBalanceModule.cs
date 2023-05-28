@@ -37,12 +37,13 @@ public class EconBalanceModule : BaseModule
     
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         return string.Join("\n", new string[]
         {
             "View your balance for this server",
             "```",
-            "r.bal        - View balance",
-            "r.balance    - View Balance",
+            $"{p}bal        - View balance",
+            $"{p}balance    - View Balance",
             "```"
         });
     }

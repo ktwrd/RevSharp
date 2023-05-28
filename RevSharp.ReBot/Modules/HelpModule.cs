@@ -44,7 +44,7 @@ public class HelpModule : BaseModule
     }
     public override async Task MessageReceived(Message message)
     {
-        var info = CommandHelper.FetchInfo("r.", message.Content);
+        var info = CommandHelper.FetchInfo(message);
         if (info is not { Command: "help" })
             return;
 
@@ -80,10 +80,11 @@ public class HelpModule : BaseModule
 
     public override string? HelpContent()
     {
+        var p = Program.ConfigData.Prefix;
         var text = new List<string>()
         {
-            "To see the usage of a command. Run `r.help <module>` and replace `<module>` with the name of the module you'd like to use.",
-            "For example, you can do `r.help dice` to see the usage for the dice command.",
+            $"To see the usage of a command. Run `{p}help <module>` and replace `<module>` with the name of the module you'd like to use.",
+            $"For example, you can do `{p}help dice` to see the usage for the dice command.",
             "",
         };
         foreach (var categoryPair in HelpCategoryDictionary)
