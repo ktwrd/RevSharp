@@ -18,10 +18,10 @@ public class MessageableChannel : NamedChannel, IMessageableChannel
     
     #region Constructors
     public MessageableChannel()
-        : base(null, "")
+        : this(null, "")
     {}
     public MessageableChannel(string id)
-        : base(null, id)
+        : this(null, id)
     {}
     internal MessageableChannel(Client? client, string id)
         : base(client, id)
@@ -42,6 +42,8 @@ public class MessageableChannel : NamedChannel, IMessageableChannel
 
     private void MessageReceivedHandle(Message message)
     {
+        if (message == null)
+            return;
         if (MessageCache.ContainsKey(message.Id))
         {
             MessageCache[message.Id] = message;
