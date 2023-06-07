@@ -18,7 +18,8 @@ public class PermissionCloneModule : BaseModule
             "\n", new string[]
             {
                 "```",
-                $"{p}permissionclone channel <source channel> ...<target channels>"
+                $"{p}permissionclone channel <source channel> ...<target channels>",
+                "```"
             });
     }
 
