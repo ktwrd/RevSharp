@@ -48,9 +48,9 @@ public static class CommandHelper
         var channelMentionMatch = channelMentionRegex.Match(content);
         if (channelMentionMatch != null)
         {
-            if (channelMentionMatch.Groups.Count > 0)
+            if (channelMentionMatch.Groups.Count > 1)
             {
-                return channelMentionMatch.Groups[0].Value.ToString();
+                return channelMentionMatch.Groups[1].Value.ToString();
             }
         }
 

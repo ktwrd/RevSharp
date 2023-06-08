@@ -53,7 +53,7 @@ public partial class Client
                 IgnoreReadOnlyProperties = true,
                 IncludeFields = true,
                 #if DEBUG
-                WriteIndented = true
+                // WriteIndented = true
                 #endif
             };
 

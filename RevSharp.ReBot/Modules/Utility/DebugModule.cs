@@ -14,12 +14,12 @@ public class DebugModule : BaseModule
 
     public override string HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Program.ConfigData.Prefix + InternalName;
         return string.Join("\n", new string[]
         {
             "```",
-            $"{p}debug help     - display this command",
-            $"{p}debug snowflake- get debug info about a ulid or snowflake",
+            $"{p} help     - display this command",
+            $"{p} snowflake- get debug info about a ulid or snowflake",
             "```"
         });
     }
@@ -34,15 +34,14 @@ public class DebugModule : BaseModule
         {
             var decoded = Ulid.Parse(arg);
             var tsSmall = Math.Round(decoded.Time.ToUnixTimeMilliseconds() / 1000f);
-            await message.Reply(
-                new SendableEmbed()
+            await message.Reply(new SendableEmbed()
+            {
+                Description = string.Join("\n", new string[]
                 {
-                    Description = string.Join(
-                        "\n", new string[]
-                        {
-                            $"`ULID: {arg}`", $"`Timestamp: {decoded.Time}` (<t:{tsSmall}:F> / <t:{tsSmall}:R>)"
-                        })
-                });
+                    $"`ULID: {arg}`",
+                    $"`Timestamp: {decoded.Time}` (<t:{tsSmall}:F> / <t:{tsSmall}:R>)"
+                })
+            });
             return;
         }
 

@@ -13,21 +13,98 @@ public class PermissionCloneModule : BaseModule
 
     public override string HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Program.ConfigData.Prefix + InternalName;
         return string.Join(
             "\n", new string[]
             {
                 "```",
-                $"{p}permissionclone channel <source channel> ...<target channels>",
+                $"{p} channel <source channel> ...<target channels>",
+                $"{p} role <source role id> ...<target role ids>",
                 "```"
             });
     }
 
+    public class ArgumentParseResult
+    {
+        public int[] InvalidIndexes { get; set; }
+        public string[] Result { get; set; }
+        public string[] ParsedArguments { get; set; }
+    }
+    private ArgumentParseResult ParseSnowflakeIds(
+        CommandInfo info,
+        Func<string, bool> validateFunc,
+        string defaultValue = "",
+        int argumentOffset = 1,
+        string[]? defaultAlias = null)
+    {
+        defaultAlias ??= Array.Empty<string>();
+
+        var resultList = new List<string>();
+        var invalidIndexes = new List<int>();
+        
+        for (int i = argumentOffset; i < info.Arguments.Count; i++)
+        {
+            var arg = info.Arguments[i].ToLower();
+            if (defaultAlias.Contains(arg))
+            {
+                resultList.Add(defaultValue);
+            }
+            else
+            {
+                var res = validateFunc(arg);
+                if (res)
+                    resultList.Add(arg);
+                else
+                    invalidIndexes.Add(i);
+            }
+        }
+
+        return new ArgumentParseResult()
+        {
+            InvalidIndexes = invalidIndexes.ToArray(),
+            Result = resultList.ToArray(),
+            ParsedArguments = info.Arguments.ToArray()
+        };
+    }
+    
     private async Task Command_PermissionCloneChannel(CommandInfo info, Message message)
     {
+        var embed = new SendableEmbed()
+        {
+            Title = "Permission Cloning"
+        };
+        
+        string validValueHelp = string.Join("\n", new string[]
+        {
+            "Valid Values;",
+            "```",
+            "[current|this|default] - Current channel",
+            "<#XXXXX>               - Mentioned channel",
+            "XXXXXX                 - Channel Id",
+            "```"
+        });
+        
         string sourceChannelId = "";
-        var targetChannelIds = new List<string>();
-        for (int i = 0; i < info.Arguments.Count; i++)
+        var parsedArgs = ParseSnowflakeIds(
+            info, (v) =>
+            {
+                return CommandHelper.FindChannelId(v.ToUpper()) != null;
+            }, message.ChannelId, defaultAlias: new string[]
+            {
+                "current", "this", "default"
+            });
+
+        if (parsedArgs.Result.Length < 1)
+        {
+            embed.Description = string.Join(
+                "\n", new string[]
+                {
+                    "No valid arguments found!", "", validValueHelp
+                });
+            await message.Reply(embed);
+            return;
+        }
+        /*for (int i = 0; i < info.Arguments.Count; i++)
         {
             var arg = info.Arguments[i].ToLower();
             if (i == 1)
@@ -50,12 +127,16 @@ public class PermissionCloneModule : BaseModule
                 if (found != null)
                     targetChannelIds.Add(found);
             }
+        }*/
+        for (int i = 0; i < parsedArgs.Result.Length; i++)
+            parsedArgs.Result[i] = CommandHelper.FindChannelId(parsedArgs.Result[i].ToUpper()) ?? "";
+
+        // set sourceChannelId if the index isn't in InvalidIndexes
+        if (!parsedArgs.InvalidIndexes.Contains(1))
+        {
+            sourceChannelId = parsedArgs.Result[0];
         }
 
-        var embed = new SendableEmbed()
-        {
-            Title = "Permission Cloning"
-        };
         if (sourceChannelId.Length < 1)
         {
             embed.Description = string.Join(
@@ -63,17 +144,13 @@ public class PermissionCloneModule : BaseModule
                 {
                     "Invalid/Missing source channel.",
                     "",
-                    "Valid Values;",
-                    "```",
-                    "current      - Current channel",
-                    "this         - Current channel",
-                    "<#XXXXX>     - Mentioned channel",
-                    "XXXXXX       - Channel Id",
-                    "```"
-                });
+                }) + validValueHelp;
             await message.Reply(embed);
             return;
         }
+        
+        // set to everything but the sourceChannelId
+        var targetChannelIds = parsedArgs.Result.ToList().GetRange(1, parsedArgs.Result.Length - 1);
 
         if (targetChannelIds.Count < 1)
         {
@@ -87,17 +164,31 @@ public class PermissionCloneModule : BaseModule
             return;
         }
 
-        var sourceChannel = await Client.GetChannel(sourceChannelId) as VoiceChannel;
+        var sourceChannel_raw = await Client.GetChannel(sourceChannelId, true);
+        var sourceChannel = sourceChannel_raw as TextChannel;
+        if (sourceChannel == null)
+        {
+            embed.Description = string.Join(
+                "\n", new string[]
+                {
+                    "Failed to fetch the Source Channel! Please make sure that I have access to it."
+                });
+            await message.Reply(embed);
+            return;
+        }
         int failCount = 0;
         int totalCount = 0;
         foreach (var channelId in targetChannelIds)
         {
-            var targetChannel = await Client.GetChannel(channelId) as VoiceChannel;
+            totalCount++;
+            var targetChannel = await Client.GetChannel(channelId, true) as TextChannel;
             if (targetChannel == null)
             {
                 failCount++;
                 continue;
             }
+
+            await targetChannel.Fetch();
 
             foreach (var sourcePair in sourceChannel.RolePermissions)
             {
@@ -108,7 +199,6 @@ public class PermissionCloneModule : BaseModule
                     failCount += await targetChannel.SetRolePermission(sourcePair.Key, sourcePair.Value.Allow, sourcePair.Value.Deny) ?
                         0 :
                         1;
-                    totalCount++;
                 }
             }
 
@@ -122,7 +212,6 @@ public class PermissionCloneModule : BaseModule
                     sourceChannel.DefaultPermissions.Deny) ?
                     0 :
                     1;
-                totalCount++;
             }
         }
 
@@ -134,6 +223,11 @@ public class PermissionCloneModule : BaseModule
         await message.Reply(embed);
     }
 
+    private async Task Command_Role(CommandInfo info, Message message)
+    {
+        
+    }
+    
     private async Task Command_Help(CommandInfo info, Message message)
     {
         var embed = new SendableEmbed()

@@ -23,6 +23,8 @@ public partial class Client
             var stringContent = response.Content.ReadAsStringAsync().Result;
             if (code == 429)
                 throw new RevoltException("TooManyRequests");
+            else if (code == 422)
+                throw new RevoltException("UnprocessableEntity");
             ResponseHelper.ThrowException(stringContent);
         }
     }

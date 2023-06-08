@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using System.Net;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
@@ -30,6 +31,14 @@ public class TextChannel : MessageableChannel, IFetchable
     /// </summary>
     [JsonPropertyName("role_permissions")]
     public Dictionary<string, PermissionCompare> RolePermissions { get; set; }
+    public TextChannel()
+        : this(null, "")
+    {}
+    internal TextChannel(Client? client, string id)
+        : base(client, id)
+    {
+        RolePermissions = new Dictionary<string, PermissionCompare>();
+    }
     public override async Task<bool> Fetch(Client client)
     {
         var data = await GetGeneric<TextChannel>(client);
@@ -45,19 +54,33 @@ public class TextChannel : MessageableChannel, IFetchable
         return true;
     }
 
+    public class SetRolePermissionRequest
+    {
+        [JsonPropertyName("permission")]
+        public SetRolePermissionRequestPermission Permission { get; set; }
+    }
+
+    public class SetRolePermissionRequestPermission
+    {
+        [JsonPropertyName("allow")]
+        public long Allow { get; set; }
+        [JsonPropertyName("deny")]
+        public long Deny { get; set; }
+    }
     public async Task<bool> SetRolePermission(Client client, string roleId, long allow, long deny)
     {
-        var pushData = new
+        var pushData = new SetRolePermissionRequest()
         {
-            permission = new
+            Permission = new SetRolePermissionRequestPermission
             {
-                allow = allow,
-                deny = deny
+                Allow = allow,
+                Deny = deny
             }
         };
+        var stringContent = JsonSerializer.Serialize(pushData, Client.SerializerOptions);
         var response = await client.PutAsync(
             $"/channels/{Id}/permissions/{roleId}",
-            JsonContent.Create(pushData, options: Client.SerializerOptions));
+            new StringContent(stringContent, null, "application/json"));
         if (response.StatusCode != HttpStatusCode.OK)
             return false;
 
