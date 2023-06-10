@@ -21,10 +21,16 @@ public partial class Client
         if (code is >= 400 and < 500)
         {
             var stringContent = response.Content.ReadAsStringAsync().Result;
+            int[] descriptive = new int[]
+            {
+                422
+            };
+            if (descriptive.Contains(code))
+            {
+                throw new RevoltDescriptiveException(stringContent);
+            }
             if (code == 429)
                 throw new RevoltException("TooManyRequests");
-            else if (code == 422)
-                throw new RevoltException("UnprocessableEntity");
             ResponseHelper.ThrowException(stringContent);
         }
     }
