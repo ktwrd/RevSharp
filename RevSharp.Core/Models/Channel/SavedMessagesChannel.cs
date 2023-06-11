@@ -23,6 +23,6 @@ public class SavedMessagesChannel : MessageableChannel, IFetchable
         return true;
     }
 
-    public Task<bool> Fetch()
+    public new Task<bool> Fetch()
         => Fetch(Client);
 }
