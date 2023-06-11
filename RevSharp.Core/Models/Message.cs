@@ -82,6 +82,8 @@ public partial class Message : Clientable, ISnowflake
     /// </summary>
     [JsonPropertyName("Masquerade")]
     public Masquerade? Masquerade { get; set; }
+    [JsonIgnore]
+    public bool IsDeleted { get; internal set; }
 
     public Message()
         : this(null, "", "")
@@ -96,7 +98,7 @@ public partial class Message : Clientable, ISnowflake
         Client = client;
         Id = id;
         ChannelId = channelId;
-        
+        IsDeleted = false;
         Reactions = new Dictionary<string, string[]>();
     }
 
@@ -204,6 +206,7 @@ public partial class Message : Clientable, ISnowflake
     public event VoidDelegate Deleted;
     internal void OnDeleted()
     {
+        IsDeleted = true;
         Deleted?.Invoke();
     }
 }
