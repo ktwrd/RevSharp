@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class NamedChannel : BaseChannel
+public class NamedChannel : BaseChannel, INamedChannel
 {
     /// <summary>
     /// Display name of the channel

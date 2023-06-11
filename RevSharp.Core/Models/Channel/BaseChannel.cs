@@ -7,7 +7,7 @@ using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core.Models;
 
-public class BaseChannel : Clientable, ISnowflake, IFetchable, IBaseChannel
+public class BaseChannel : Clientable, IBaseChannel
 {
     /// <summary>
     /// Unique Id

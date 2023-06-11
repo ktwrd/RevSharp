@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
-public class VoiceChannel : NamedChannel, IFetchable
+public class VoiceChannel : NamedChannel, IServerChannel
 {
     /// <summary>
     /// Id of the server this channel belongs to

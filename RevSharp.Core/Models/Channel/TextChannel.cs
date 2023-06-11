@@ -8,7 +8,7 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// Text channel belonging to a server
 /// </summary>
-public class TextChannel : MessageableChannel, IFetchable
+public class TextChannel : MessageableChannel, IServerChannel
 {
     /// <summary>
     /// Id of the server this channel belongs to
