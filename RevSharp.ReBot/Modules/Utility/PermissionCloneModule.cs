@@ -1,3 +1,4 @@
+using System.Text.Json;
 using RevSharp.Core.Models;
 using RevSharp.ReBot.Helpers;
 using RevSharp.ReBot.Reflection;
@@ -176,6 +177,10 @@ public class PermissionCloneModule : BaseModule
             await message.Reply(embed);
             return;
         }
+        
+        var server = await Client.GetServer(sourceChannel.ServerId);
+        var highestBotRole = await server.GetHighestMemberRole(Client.CurrentUserId);
+
         int failCount = 0;
         int totalCount = 0;
         foreach (var channelId in targetChannelIds)
@@ -184,32 +189,58 @@ public class PermissionCloneModule : BaseModule
             var targetChannel = await Client.GetChannel(channelId, true) as IServerChannel;
             if (targetChannel == null)
             {
+                totalCount++;
                 failCount++;
                 continue;
             }
 
             await targetChannel.Fetch();
-
+        
             foreach (var sourcePair in sourceChannel.RolePermissions)
             {
+                var canAccess = await server.CanMemberAccessRole(Client.CurrentUserId, sourcePair.Key);
+                if (canAccess == null || canAccess == false)
+                {
+                    Log.Debug($"Ignoring {sourcePair.Key}");
+                    continue;
+                }
                 if (!targetChannel.RolePermissions.ContainsKey(sourcePair.Key) ||
                     (targetChannel.RolePermissions.TryGetValue(sourcePair.Key, out PermissionCompare value) &&
                      value != sourcePair.Value))
                 {
-                    failCount += await targetChannel.SetRolePermission(sourcePair.Key, sourcePair.Value.Allow, sourcePair.Value.Deny) ?
+                    bool res = false;
+                    try
+                    {
+                        res = await targetChannel.SetRolePermission(
+                            sourcePair.Key, sourcePair.Value.Allow, sourcePair.Value.Deny);
+                    }
+                    catch (Exception ex)
+                    {
+                        embed.Description = string.Join(
+                            "\n", new string[]
+                            {
+                                $"Failed to set permissions for <#{targetChannel.Id}>", $"```", ex.Message, "```"
+                            });
+                        await message.Reply(embed);
+                        return;
+                    }
+                    totalCount++;
+                    failCount +=  res ?
                         0 :
                         1;
                 }
             }
 
-            if (sourceChannel.DefaultPermissions != null &&
-                targetChannel.DefaultPermissions != null &&
-                targetChannel.DefaultPermissions.Allow != sourceChannel.DefaultPermissions.Allow &&
-                targetChannel.DefaultPermissions.Deny != sourceChannel.DefaultPermissions.Deny)
+            var sourceDefault = sourceChannel.DefaultPermissions ?? new PermissionCompare();
+            var targetDefault = targetChannel.DefaultPermissions ?? new PermissionCompare();
+
+            if (targetDefault.Allow != sourceDefault.Allow ||
+                targetDefault.Deny != sourceDefault.Deny)
             {
+                totalCount++;
                 failCount += await targetChannel.SetDefaultPermission(
-                    sourceChannel.DefaultPermissions.Allow,
-                    sourceChannel.DefaultPermissions.Deny) ?
+                    sourceDefault.Allow,
+                    sourceDefault.Deny) ?
                     0 :
                     1;
             }

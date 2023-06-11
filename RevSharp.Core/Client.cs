@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -86,6 +87,8 @@ public partial class Client
         Endpoint = DefaultEndpoint;
         WSClient = new WebsocketClient(this);
         HttpClient = new HttpClient();
+        HttpClient.DefaultRequestHeaders.Accept.Clear();
+        HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         Bot = new BotController(this);
         ServerCache = new Dictionary<string, Server>();
         UserCache = new Dictionary<string, User>();

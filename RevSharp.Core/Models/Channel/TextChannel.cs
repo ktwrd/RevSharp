@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -56,8 +57,8 @@ public class TextChannel : MessageableChannel, IServerChannel
 
     public class SetRolePermissionRequest
     {
-        [JsonPropertyName("permission")]
-        public SetRolePermissionRequestPermission Permission { get; set; }
+        [JsonPropertyName("permissions")]
+        public SetRolePermissionRequestPermission Permissions { get; set; }
     }
 
     public class SetRolePermissionRequestPermission
@@ -71,7 +72,7 @@ public class TextChannel : MessageableChannel, IServerChannel
     {
         var pushData = new SetRolePermissionRequest()
         {
-            Permission = new SetRolePermissionRequestPermission
+            Permissions = new SetRolePermissionRequestPermission
             {
                 Allow = allow,
                 Deny = deny

@@ -8,4 +8,10 @@ public class PermissionCompare
     public long Allow { get; set; }
     [JsonPropertyName("d")]
     public long Deny { get; set; }
+
+    public PermissionCompare()
+    {
+        Allow = 0;
+        Deny = 0;
+    }
 }
