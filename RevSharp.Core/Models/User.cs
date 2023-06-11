@@ -214,6 +214,11 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     /// </summary>
     public Task<UserProfile?> FetchProfile()
         => FetchProfile(Client);
+
+    public string? GetProfileBackgroundUrl()
+    {
+        return Profile.Background.GetURL(Client);
+    }
     
     /// <summary>
     /// Fetch the <see cref="DirectMessageChannel"/> for this user. This will be <see cref="SavedMessagesChannel"/> if this is the user that we are logged in as.
