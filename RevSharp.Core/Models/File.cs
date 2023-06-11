@@ -55,4 +55,13 @@ public class File : IFile<FileMetadata>, ISnowflake
     /// </summary>
     [JsonPropertyName("object_id")]
     public string? ObjectId { get; set; }
+
+    public string? GetURL(Client? client)
+    {
+        if (client?.EndpointNodeInfo == null)
+            return null;
+
+        var b = client.EndpointNodeInfo.Features.Autumn.Url;
+        return $"{b}/{Tag}/{Id}/{Filename}";
+    }
 }
