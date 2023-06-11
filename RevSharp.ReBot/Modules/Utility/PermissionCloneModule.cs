@@ -165,7 +165,7 @@ public class PermissionCloneModule : BaseModule
         }
 
         var sourceChannel_raw = await Client.GetChannel(sourceChannelId, true);
-        var sourceChannel = sourceChannel_raw as TextChannel;
+        var sourceChannel = sourceChannel_raw as IServerChannel;
         if (sourceChannel == null)
         {
             embed.Description = string.Join(
@@ -181,7 +181,7 @@ public class PermissionCloneModule : BaseModule
         foreach (var channelId in targetChannelIds)
         {
             totalCount++;
-            var targetChannel = await Client.GetChannel(channelId, true) as TextChannel;
+            var targetChannel = await Client.GetChannel(channelId, true) as IServerChannel;
             if (targetChannel == null)
             {
                 failCount++;
