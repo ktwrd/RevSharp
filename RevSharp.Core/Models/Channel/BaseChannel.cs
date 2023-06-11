@@ -230,9 +230,3 @@ public class BaseChannel : Clientable, ISnowflake, IFetchable, IBaseChannel
         MessageReceived?.Invoke(message);
     }
 }
-
-public interface IBaseChannel
-{
-    public string Id { get; set; }
-    public string ChannelType { get; set; }
-}
