@@ -65,6 +65,8 @@ public partial class Client
     }
     
     public BotController Bot { get; private set; }
+    internal EndpointFactory EndpointFactory { get; private set; }
+    internal static EndpointFactory SEndpoint => new EndpointFactory("");
     
     #region Constructors
 	/// <summary>
@@ -85,6 +87,7 @@ public partial class Client
         TokenIsBot = isBot;
         Log.CensorList.Add(Token);
         Endpoint = DefaultEndpoint;
+        EndpointFactory = new EndpointFactory(this);
         WSClient = new WebsocketClient(this);
         HttpClient = new HttpClient();
         HttpClient.DefaultRequestHeaders.Accept.Clear();
