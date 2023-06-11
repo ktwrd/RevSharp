@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
 
@@ -45,22 +46,7 @@ public class VoiceChannel : NamedChannel, IServerChannel
 
     public async Task<bool> SetRolePermission(Client client, string roleId, long allow, long deny)
     {
-        var pushData = new
-        {
-            permission = new
-            {
-                allow = allow,
-                deny = deny
-            }
-        };
-        var response = await client.PutAsync(
-            $"/channels/{Id}/permissions/{roleId}",
-            JsonContent.Create(pushData, options: Client.SerializerOptions));
-        if (response.StatusCode != HttpStatusCode.OK)
-            return false;
-
-        await Fetch(client);
-        return true;
+        return await ChannelPermissionHelper.SetRolePermission(client, this, roleId, allow, deny);
     }
 
     public Task<bool> SetRolePermission(string roleId, long allow, long deny) =>
