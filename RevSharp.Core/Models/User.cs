@@ -33,6 +33,11 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     [JsonPropertyName("discriminator")]
     public string Discriminator { get; set; }
     /// <summary>
+    /// Display Name
+    /// </summary>
+    [JsonPropertyName("display_name")]
+    public string DisplayName { get; set; }
+    /// <summary>
     /// Avatar attachment
     /// </summary>
     [JsonPropertyName("avatar")]
