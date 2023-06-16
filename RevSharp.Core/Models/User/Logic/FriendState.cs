@@ -33,9 +33,9 @@ public partial class User
         => SetFriendState(client, false);
     public async Task<bool> SendFriendRequest(Client client)
     {
-        var response = await client.PostAsync("/users/friend", JsonContent.Create(new Dictionary<string, string>()
+        var response = await client.PostAsync("/users/friend", JsonContent.Create(new AddFriendRequestData()
         {
-            {"username", Username}
+            Username = $"{Username}#{Discriminator}"
         }));
         if (response.StatusCode == HttpStatusCode.OK)
         {
