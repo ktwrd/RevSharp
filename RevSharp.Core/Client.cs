@@ -52,14 +52,27 @@ public partial class Client
             {
                 IgnoreReadOnlyFields = true,
                 IgnoreReadOnlyProperties = true,
-                IncludeFields = true,
-                #if DEBUG
-                // WriteIndented = true
-                #endif
+                IncludeFields = true
             };
 
             options.Converters.Add(new JsonStringEnumConverter());
             
+            return options;
+        }
+    }
+
+    internal static JsonSerializerOptions PutSerializerOptions
+    {
+        get
+        {
+            var options = new JsonSerializerOptions()
+            {
+                IgnoreReadOnlyFields = true,
+                IgnoreReadOnlyProperties = true,
+                IncludeFields = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+            options.Converters.Add(new JsonStringEnumConverter());
             return options;
         }
     }
@@ -97,6 +110,7 @@ public partial class Client
         UserCache = new Dictionary<string, User>();
         ChannelCache = new Dictionary<string, BaseChannel>();
         MessageCache = new Dictionary<string, Message>();
+        MemberCache = new Dictionary<string, Member>();
 
         WSClient.MessageReceived += (msg) =>
         {
