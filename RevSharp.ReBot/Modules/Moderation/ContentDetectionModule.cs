@@ -16,7 +16,7 @@ namespace RevSharp.ReBot.Modules;
 [RevSharpModule]
 public partial class ContentDetectionModule : BaseModule
 {
-    public override bool HasHelpContent => true;
+    public override bool HasHelpContent => FeatureFlags.EnableContentDetection;
     public override string? InternalName => "condetect";
     public override string? HelpCategory => "moderation";
 
@@ -53,6 +53,9 @@ public partial class ContentDetectionModule : BaseModule
 
     public override async Task MessageReceived(Message message)
     {
+        // Ignore when ContentDetection is disabled
+        if (!FeatureFlags.EnableContentDetection)
+            return;
         ContentDetectionTask(message);
 
         var info = CommandHelper.FetchInfo(message);

@@ -93,4 +93,12 @@ internal static class FeatureFlags
             "REBOT_DIR_IACD", Path.Join(
                 DataDirectory,
                 "iacd"));
+
+    /// <summary>
+    /// Key: REBOT_CONDETECT
+    /// Default: false
+    ///
+    /// Enable the Content Detection Module.
+    /// </summary>
+    internal static bool EnableContentDetection => ParseBool("REBOT_CONDETECT", false);
 }
