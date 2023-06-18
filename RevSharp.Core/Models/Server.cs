@@ -119,6 +119,41 @@ public partial class Server : Clientable, ISnowflake, IFetchable
         }
         return data;
     }
+
+    public class ServerMembersResponse
+    {
+        [JsonPropertyName("members")]
+        public Member[] Members { get; set; }
+    }
+    public async Task<LinkedList<Member>?> FetchMembers(Client client, bool excludeOffline = false)
+    {
+        var url = Client.SEndpoint.ServerMembers(Id, excludeOffline);
+        var res = await client.GetAsync(url);
+        var stringContent = res.Content.ReadAsStringAsync().Result;
+        if (res.StatusCode != HttpStatusCode.OK)
+            return null;
+
+        var deser = JsonSerializer.Deserialize<ServerMembersResponse>(stringContent, Client.SerializerOptions);
+        if (deser == null)
+            return null;
+
+        var list = new LinkedList<Member>();
+        foreach (var i in deser.Members)
+        {
+            client.AddToCache(i);
+            var m = await client.GetMember(Id, i.Id.UserId, false);
+            if (m != null)
+            {
+                list.AddLast(m);
+                if (!Members.Select(v => v.Id.UserId == i.Id.UserId).Any())
+                    Members.AddLast(m);
+            }
+        }
+
+        return list;
+    }
+
+    public Task<LinkedList<Member>?> FetchMembers(bool excludeOffline = false) => FetchMembers(Client, excludeOffline);
     
     /// <summary>
     /// Fetch latest data about this server from the API and insert into this instance
