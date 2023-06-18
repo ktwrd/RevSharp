@@ -9,6 +9,42 @@ namespace RevSharp.Core;
 
 public partial class Client
 {
+    internal Dictionary<string, Member> MemberCache { get; set; }
+
+    public async Task<LinkedList<Member>?> GetAllMembers()
+    {
+        var list = new LinkedList<Member>();
+        foreach (var item in MemberCache)
+            list.AddLast(item.Value);
+        return list;
+    }
+
+    internal bool AddToCache(Member member)
+    {
+        var key = member.Id.UserId + member.Id.ServerId;
+        if (MemberCache.ContainsKey(key))
+            return true;
+        MemberCache.Add(key, member);
+        member.Client = this;
+        return false;
+    }
+
+    public async Task<Member?> GetMember(string serverId, string userId, bool forceUpdate = true)
+    {
+        var key = userId + serverId;
+        var inCache = MemberCache.ContainsKey(key);
+        if (inCache && !forceUpdate)
+            return MemberCache[key];
+
+        var server = await GetServer(serverId, forceUpdate);
+        var member = inCache ? MemberCache[key] : new Member(this, serverId, userId);
+        if (!await member.Fetch())
+            return null;
+        
+        if (!inCache)
+            MemberCache.Add(key, member);
+        return MemberCache[key];
+    }
     internal Dictionary<string, Server> ServerCache { get; set; }
 
     /// <summary>
@@ -19,7 +55,14 @@ public partial class Client
     {
         var list = new LinkedList<Server>();
         foreach (var item in ServerCache)
+        {
+            if (item.Value.Client == null)
+            {
+                ServerCache[item.Key].Client = this;
+                item.Value.Client = this;
+            }
             list.AddLast(item.Value);
+        }
         return list;
     }
     
