@@ -89,6 +89,17 @@ public class Member : Clientable
         RoleIds = Array.Empty<string>();
     }
 
+    internal Member(Client client, string serverId, string userId)
+        : this()
+    {
+        Id = new MemberId()
+        {
+            UserId = userId,
+            ServerId = serverId
+        };
+        Client = client;
+    }
+
     /// <summary>
     /// Fetch fresh info from the API and inject it into this instance.
     /// </summary>
