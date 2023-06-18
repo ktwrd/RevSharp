@@ -33,4 +33,24 @@ public partial class User
     }
 
     public Task<bool> UpdatePresence(string text, UserPresence status) => UpdatePresence(Client, text, status);
+
+    /// <param name="content">Profile Content, can be formatted in markdown and katex</param>
+    /// <param name="background">Attachment Id for the Background</param>
+    public Task<bool> UpdateProfile(Client client, string? content = null, string? background = null)
+    {
+        return Edit(
+            Client, new UserUpdateData()
+            {
+                Profile = new UserUpdateProfileData()
+                {
+                    Content = content,
+                    Background = background
+                }
+            });
+    }
+
+    /// <param name="content">Profile Content, can be formatted in markdown and katex</param>
+    /// <param name="background">Attachment Id for the Background</param>
+    public Task<bool> UpdateProfile(string? content = null, string? background = null) =>
+        UpdateProfile(Client, content, background);
 }
