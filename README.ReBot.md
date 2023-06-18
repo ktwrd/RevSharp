@@ -22,7 +22,7 @@ dotnet run --project RevSharp.ReBot
 export REVSHARP_LOG_COLOR="false"
 
 # Set config location
-REBOT_CONFIG_LOCATION=~/Desktop/rebot_config.json \
+SB_CONFIG_LOCATION=~/some/location/SB_config.json \
     dotnet run --project RevSharp.ReBot
 ```
 
@@ -31,10 +31,10 @@ REBOT_CONFIG_LOCATION=~/Desktop/rebot_config.json \
 | Name | Type | Default Value | Description |
 | ---- | ---- | ------------- | ----------- |
 | `REVSHARP_LOG_COLOR` | boolean | `true` | Custom color for log output |
-| `REBOT_CONFIG_LOCATION` | string | `./{REBOT_DATA_DIR}/config.json` | Custom location for config |
-| `REBOT_DATA_DIR` | string | `./data/` | Data directory |
-| `REBOT_DIR_IACD` | string | `./{REBOT_DATA_DIR}/icad` | Content Detection Cache |
-| `REBOT_CONDETECT` | bool | `false` | Enable ContentDetection module |
+| `SB_CONFIG_LOCATION` | string | `./{SB_DATA_DIR}/config.json` | Custom location for config |
+| `SB_DATA_DIR` | string | `./data/` | Data directory |
+| `SB_DIR_IACD` | string | `./{SB_DATA_DIR}/icad` | Content Detection Cache |
+| `SB_CONDETECT` | bool | `false` | Enable ContentDetection module |
 
 ## Example Config
 ```json

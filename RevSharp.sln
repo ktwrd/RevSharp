@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevSharp.Core", "RevSharp.Core\RevSharp.Core.csproj", "{BB7CFA79-5A32-497A-865B-6D62658B91E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevSharp.ReBot", "RevSharp.ReBot\RevSharp.ReBot.csproj", "{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevSharp.Skidbot", "RevSharp.Skidbot\RevSharp.Skidbot.csproj", "{ACDAE119-83CF-452C-AAE4-5FD58E0AF685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
