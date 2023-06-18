@@ -240,6 +240,32 @@ public class BaseChannel : Clientable, IBaseChannel
         string? nearby = null,
         bool? includeUsers = null) =>
         FetchMessages(Client, limit, before, after, sort, nearby, includeUsers);
+
+    public class BulkMessageDeleteData
+    {
+        [JsonPropertyName("ids")]
+        public string[] IdArray { get; set; }
+    }
+    public async Task<bool> DeleteMultipleMessages(Client client, string[] ids)
+    {
+        var content = new BulkMessageDeleteData()
+        {
+            IdArray = ids
+        };
+        var body = JsonSerializer.Serialize(content, Client.SerializerOptions);
+        var bodyContent = new StringContent(body, null, "application/json");
+        var url = Client.SEndpoint.ChannelMessagesBulk(Id);
+        var res = await client.PostAsync(url, bodyContent);
+        if (res.StatusCode == HttpStatusCode.OK)
+        {
+            foreach (var i in ids)
+                client.OnMessageDeleted(i);
+        }
+
+        return res.StatusCode == HttpStatusCode.OK;
+    }
+
+    public Task<bool> DeleteMultipleMessages(string[] ids) => DeleteMultipleMessages(Client, ids);
     
     public Task<Message?> SendMessage(
         Client client,
@@ -329,6 +355,19 @@ public class BaseChannel : Clientable, IBaseChannel
             throw new Exception("Failed to deserialize invite");
         return data;
     }
+
+    public async Task<bool> Delete(Client client, bool? silently = null)
+    {
+        var url = Client.SEndpoint.Channel(Id);
+        if (silently != null)
+            url += $"?leave_silently={silently}";
+        var res = await client.DeleteAsync(url);
+        if (res.StatusCode == HttpStatusCode.OK && await client.GetChannel(Id, false) != null)
+            client.OnChannelDeleted(Id);
+        return res.StatusCode == HttpStatusCode.OK;
+    }
+
+    public Task<bool> Delete(bool? silently = null) => Delete(Client, silently);
     
     public BaseChannel()
         : this(null, "")
