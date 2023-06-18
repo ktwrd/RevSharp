@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using kate.shared.Helpers;
+using Newtonsoft.Json.Linq;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models.WebSocket;
 
@@ -110,6 +111,135 @@ public class BaseChannel : Clientable, IBaseChannel
             return message;
         return null;
     }
+
+    public enum MessageSortDirection
+    {
+        Relevance,
+        Latest,
+        Oldest
+    }
+
+    public class BulkMessagesResponse
+    {
+        public LinkedList<Message> Messages { get; set; }
+        public LinkedList<User>? Users { get; set; }
+        public LinkedList<Member>? Members { get; set; }
+
+        public static async Task<BulkMessagesResponse> Parse(Client client, string content)
+        {
+            var instance = new BulkMessagesResponse();
+            var messagesJson = "[]";
+            var usersJson = "[]";
+            var membersJson = "[]";
+            bool isJustMessages = false;
+            if (content.StartsWith("["))
+            {
+                messagesJson = content;
+                isJustMessages = true;
+            }
+            else if (content.StartsWith("{"))
+            {
+                var jojb = JObject.Parse(content);
+                messagesJson = jojb["messages"].ToString();
+                usersJson = jojb["users"].ToString();
+                membersJson = jojb["members"].ToString();
+            }
+        
+        
+            var msgs = Message.ParseMultiple(messagesJson);
+            var lmsgs = new LinkedList<Message>();
+            foreach (var m in msgs)
+            {
+                client.AddToCache(m);
+                var cm = await client.GetMessage(m.ChannelId, m.Id);
+                lmsgs.AddLast(cm);
+            }
+            instance.Messages = lmsgs;
+
+            if (!isJustMessages)
+            {
+                return instance;
+            }
+
+            var usrs = JsonSerializer.Deserialize<User[]>(usersJson, Client.SerializerOptions);
+            var usrsL = new LinkedList<User>();
+            foreach (var u in usrs)
+            {
+                client.AddToCache(u);
+                var ur = await client.GetUser(u.Id, false);
+                if (ur != null)
+                    usrsL.AddLast(ur);
+            }
+
+            instance.Users = usrsL;
+
+            var mbrs = JsonSerializer.Deserialize<Member[]>(membersJson, Client.SerializerOptions);
+            var mbrsL = new LinkedList<Member>();
+            foreach (var m in mbrs)
+            {
+                client.AddToCache(m);
+                var mr = await client.GetMember(m.Id.ServerId, m.Id.UserId, false);
+                if (mr != null)
+                    mbrsL.AddLast(mr);
+            }
+
+            instance.Members = mbrsL;
+        
+        
+            return instance;
+        }
+    }
+    public async Task<BulkMessagesResponse> FetchMessages(
+        Client client,
+        ulong? limit=null,
+        string? before=null,
+        string?after=null,
+        MessageSortDirection? sort = null,
+        string?nearby = null,
+        bool?includeUsers = null)
+    {
+        var paramDict = new Dictionary<string, object>()
+        {
+            {"limit", limit},
+            {"before", before},
+            {"after", after},
+            {"sort", sort},
+            {"nearby", nearby},
+            {"include_users", includeUsers}
+        };
+        var paramList = new List<string>();
+        foreach (var pair in paramDict)
+        {
+            if (pair.Value != null)
+            {
+                paramList.Add($"{pair.Key}={WebUtility.UrlEncode(pair.Value.ToString())}");
+            }
+        }
+
+        var url = Client.SEndpoint.ChannelMessages(Id);
+        if (paramList.Count > 0)
+        {
+            url += "?" + string.Join("&", paramList);
+        }
+
+        var res = await client.GetAsync(url);
+        if (res.StatusCode != HttpStatusCode.OK)
+            return null;
+
+        var stringContent = res.Content.ReadAsStringAsync().Result;
+        var instance = await BulkMessagesResponse.Parse(client, stringContent);
+
+        return instance;
+    }
+
+    public Task<BulkMessagesResponse> FetchMessages(
+        ulong? limit = null,
+        string? before = null,
+        string? after = null,
+        MessageSortDirection? sort = null,
+        string? nearby = null,
+        bool? includeUsers = null) =>
+        FetchMessages(Client, limit, before, after, sort, nearby, includeUsers);
     
     public Task<Message?> SendMessage(
         Client client,
