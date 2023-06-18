@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using kate.shared.Helpers;
+using Newtonsoft.Json.Linq;
 using RevSharp.Core.Helpers;
 
 namespace RevSharp.Core.Models;
@@ -148,6 +149,24 @@ public partial class Message : Clientable, ISnowflake
         data.Embeds = MessageHelper.ParseMessageEmbeds(content);
         data.SystemMessage = MessageHelper.ParseSystemMessage(content);
         return data;
+    }
+
+    public static Message[]? ParseMultiple(string content)
+    {
+        var data = JsonSerializer.Deserialize<Message[]>(content, Core.Client.SerializerOptions);
+        if (data == null)
+            return null;
+
+        var res = new List<Message>();
+        var items = JArray.Parse(content);
+        foreach (var i in items)
+        {
+            var m = Parse(i.ToString());
+            if (m != null)
+                res.Add(m);
+        }
+
+        return res.ToArray();
     }
 
     internal static void Inject(Message source, Message target)
