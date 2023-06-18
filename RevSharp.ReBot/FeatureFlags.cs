@@ -72,6 +72,17 @@ internal static class FeatureFlags
                 "data"));
 
     /// <summary>
+    /// Key: REBO_CONFIG_LOCATION
+    /// Default: ./data/config.json
+    ///
+    /// File location where the config is stored.
+    /// </summary>
+    internal static string ConfigLocation =>
+        ParseString(
+            "REBOT_CONFIG_LOCATION", Path.Join(
+                DataDirectory, "config.json"));
+
+    /// <summary>
     /// Key: REBOT_DIR_IACD
     /// Default: ./data/iacd/
     /// 

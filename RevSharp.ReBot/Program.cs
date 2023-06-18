@@ -50,19 +50,7 @@ public static class Program
     #endregion
     #region Config
     public static ConfigData ConfigData { get; set; }
-    public static string ConfigLocation
-    {
-        get
-        {
-            var env = Environment.GetEnvironmentVariable("REBOT_CONFIG_LOCATION");
-            if (env != null)
-                return env;
-            
-            return Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "config.json");
-        }
-    }
+    public static string ConfigLocation => FeatureFlags.ConfigLocation;
 
     public static void ReadConfig()
     {
