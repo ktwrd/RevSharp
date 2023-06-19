@@ -70,12 +70,12 @@ namespace RevSharp.Skidbot.Controllers
 
         private KestrelMetricServer MetricServer;
 
-        public int ServerCount = 0;
+        public int ServerCount { get; private set; } = 0;
         /// <summary>
         /// Key: Server Id
         /// Value: Member Count
         /// </summary>
-        public Dictionary<string, int> MemberCount = new Dictionary<string, int>();
+        public Dictionary<string, int> MemberCount { get; private set; } = new Dictionary<string, int>();
 
         public Gauge ServerMemberGauge;
         public Gauge ServerGauge;
