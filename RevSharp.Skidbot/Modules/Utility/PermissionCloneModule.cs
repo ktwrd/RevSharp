@@ -10,6 +10,7 @@ public class PermissionCloneModule : BaseModule
 {
     public override string? HelpCategory => "utility";
     public override string? InternalName => "permissionclone";
+    public override string? BaseCommandName => "permissionclone";
     public override bool HasHelpContent => true;
 
     public override string HelpContent()

@@ -84,5 +84,6 @@ public class EconDailyModule : BaseModule
 
     public override bool HasHelpContent => true;
     public override string? InternalName => "daily";
+    public override string? BaseCommandName => "daily";
     public override string? HelpCategory => "economy";
 }

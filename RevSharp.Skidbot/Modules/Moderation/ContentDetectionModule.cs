@@ -19,6 +19,7 @@ public partial class ContentDetectionModule : BaseModule
     public override bool HasHelpContent => FeatureFlags.EnableContentDetection;
     public override string? InternalName => "condetect";
     public override string? HelpCategory => "moderation";
+    public override string? BaseCommandName => "condetect";
 
     public override string? HelpContent()
     {

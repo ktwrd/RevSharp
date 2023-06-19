@@ -10,6 +10,7 @@ public class DebugModule : BaseModule
 {
     public override string? HelpCategory => "utility";
     public override string? InternalName => "debug";
+    public override string? BaseCommandName => "debug";
     public override bool HasHelpContent => true;
 
     public override string HelpContent()
@@ -51,7 +52,7 @@ public class DebugModule : BaseModule
     {
         var embed = new SendableEmbed()
         {
-            Title = "Permission Cloning - Help"
+            Title = "Id Debugger - Help"
         };
         embed.Description = HelpContent();
         await message.Reply(embed);

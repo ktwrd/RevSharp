@@ -138,4 +138,5 @@ public class AnimalModule : BaseModule
     public override bool HasHelpContent => true;
     public override string? InternalName => "animal";
     public override string? HelpCategory => "fun";
+    public override string? BaseCommandName => "animal";
 }

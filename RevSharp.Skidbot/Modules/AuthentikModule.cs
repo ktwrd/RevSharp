@@ -41,6 +41,7 @@ public class AuthentikModule : BaseModule
     public override bool HasHelpContent => true;
     public override string? InternalName => "auth";
     public override string? HelpCategory => "admin";
+    public override string? BaseCommandName => "auth";
 
     public override async Task MessageReceived(Message message)
     {

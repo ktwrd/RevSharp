@@ -189,4 +189,5 @@ public class KickModule : BaseModule
     #endif
     public override string? InternalName => "kick";
     public override string? HelpCategory => "moderation";
+    public override string? BaseCommandName => "kick";
 }

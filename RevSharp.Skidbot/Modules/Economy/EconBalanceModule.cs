@@ -50,5 +50,6 @@ public class EconBalanceModule : BaseModule
 
     public override bool HasHelpContent => true;
     public override string? InternalName => "balance";
+    public override string? BaseCommandName => "balance";
     public override string? HelpCategory => "economy";
 }

@@ -9,6 +9,7 @@ public class HelpModule : BaseModule
 {
     public override bool HasHelpContent => false;
     public override string? InternalName => "help";
+    public override string? BaseCommandName => "help";
     public Dictionary<string, string> HelpDict = new();
 
     public Dictionary<string, Dictionary<string, string>> HelpCategoryDictionary = new()

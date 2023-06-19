@@ -12,6 +12,7 @@ public class DiceModule : BaseModule
 {
     public override bool HasHelpContent => true;
     public override string? InternalName => "dice";
+    public override string? BaseCommandName => "dice";
 
     public override string? HelpContent()
     {
