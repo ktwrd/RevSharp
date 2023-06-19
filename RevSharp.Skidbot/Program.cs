@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text.Json;
 using RevSharp.Core;
 using RevSharp.Skidbot.Models;
@@ -10,6 +11,7 @@ public static class Program
 {
     public static void Main(string[] args)
     {
+        StartTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         AsyncMain(args).Wait();
     }
 
@@ -36,6 +38,21 @@ public static class Program
     {
         WriteConfig();
         Client.DisconnectAsync().Wait();
+    }
+    public static long StartTimestamp { get; private set; }
+    public static string GetUptimeString()
+    {
+        var current = DateTimeOffset.UtcNow;
+        var start = DateTimeOffset.FromUnixTimeSeconds(StartTimestamp);
+        var diff = current - start;
+        var data = new List<string>();
+        if (Math.Floor(diff.TotalHours) > 0)
+            data.Add($"{Math.Floor(diff.TotalHours)}hr");
+        if (diff.Minutes > 0)
+            data.Add($"{diff.Minutes}m");
+        if (diff.Seconds > 0)
+            data.Add($"{diff.Seconds}s");
+        return string.Join(" ", data);
     }
     #region Fields
     public static RevSharp.Core.Client Client;
