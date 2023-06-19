@@ -106,7 +106,7 @@ public class ReflectionInclude
                     {
                     $"Uncaught exception while running `{type.Name}.CommandReceived()`",
                     "```",
-                    e.ToString(),
+                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
                     "```"
                     }));
                     Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
@@ -121,7 +121,7 @@ public class ReflectionInclude
                     {
                     $"Uncaught exception while running `{type.Name}.MessageReceived()`",
                     "```",
-                    e.ToString(),
+                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
                     "```"
                     }));
                     Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
