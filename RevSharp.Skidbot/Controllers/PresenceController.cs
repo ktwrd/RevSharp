@@ -30,7 +30,6 @@ public class PresenceController : BaseModule
     private int ServerCount = 0;
     private async Task<int> GetUserCount()
     {
-        Log.Debug("Fetching user count");
         int count = 0;
         var s = await Client.GetAllServers();
         foreach (var i in s)
@@ -53,7 +52,6 @@ public class PresenceController : BaseModule
             var count = await GetUserCount();
             var res = await Client.CurrentUser.UpdatePresence(
                 $"{Program.ConfigData.Prefix}help | {count} users, {ServerCount} servers", UserPresence.Online);
-            Log.Debug(res);
         }
         catch (Exception ex)
         {
