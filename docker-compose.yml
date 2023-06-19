@@ -18,3 +18,5 @@ services:
       - ./data:/app/data
     ports:
       - "8771:8771"
+    depends_on:
+      - mongo
