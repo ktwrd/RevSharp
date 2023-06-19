@@ -405,3 +405,4 @@ config.json
 .idea/.idea.RevSharp/.idea/.name
 data
 .idea/.idea.RevSharp/.idea/statistic.xml
+RevSharp.Skidbot/Properties/launchSettings.json
