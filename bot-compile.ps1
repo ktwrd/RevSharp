@@ -8,6 +8,10 @@ param(
 )
 $targetTag="$($TargetName):$($TargetTag)"
 docker build -t skidbot-revolt:latest .
+
+docker tag skidbot-revolt:latest $targetTag
+docker push $targetTag
+
 if ($IncludeTimeTag -eq $True)
 {
 	$currentTimeTag=@(Get-Date -UFormat %s -Millisecond 0)
@@ -15,5 +19,3 @@ if ($IncludeTimeTag -eq $True)
 	docker tag skidbot-revolt:latest $timeTag
 	docker push $timeTag
 }
-docker tag skidbot-revolt:latest $targetTag
-docker push $targetTag
