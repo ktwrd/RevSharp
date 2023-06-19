@@ -61,27 +61,29 @@ public class ReflectionInclude
         {
             try
             {
-                var author = await _client.GetUser(m.AuthorId);
-                if (item.BaseCommandName != null && author != null && author.Bot == null && m.SystemMessage == null)
+                if (item.BaseCommandName != null && m.AuthorId != _client.CurrentUserId && m.SystemMessage == null && m.Content?.Length > 2)
                 {
                     var commandInfo = CommandHelper.FetchInfo(m);
                     if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                     {
-                        await item.CommandReceived(commandInfo, m);
-
-                        var statControl = FetchModule<StatisticController>();
-                        var server = await m.FetchServer();
-                        var authorName = "<None>";
-                        if (author != null)
-                            authorName = $"{author.Username}#{author.Discriminator}";
-                        
-                        var bch = await _client.GetChannel(m.ChannelId);
-                        INamedChannel? channel = null;
-                        if (bch is INamedChannel)
-                            channel = (INamedChannel)bch;
-                        
-                        statControl.CommandCounter.WithLabels(new string[]
+                        var author = await _client.GetUser(m.AuthorId);
+                        if (author != null && author.Bot == null)
                         {
+                            await item.CommandReceived(commandInfo, m);
+
+                            var statControl = FetchModule<StatisticController>();
+                            var server = await m.FetchServer();
+                            var authorName = "<None>";
+                            if (author != null)
+                                authorName = $"{author.Username}#{author.Discriminator}";
+
+                            var bch = await _client.GetChannel(m.ChannelId);
+                            INamedChannel? channel = null;
+                            if (bch is INamedChannel)
+                                channel = (INamedChannel)bch;
+
+                            statControl.CommandCounter.WithLabels(new string[]
+                            {
                             server?.Name ?? "<None>",
                             server?.Id ?? "<None>",
                             authorName,
@@ -91,7 +93,8 @@ public class ReflectionInclude
                             commandInfo.Command,
                             string.Join(" ", commandInfo.Arguments),
                             item.HelpCategory ?? "<None>"
-                        }).Inc();
+                            }).Inc();
+                        }
                     }
                 }
             }
