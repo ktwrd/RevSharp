@@ -62,7 +62,7 @@ public class ReflectionInclude
             try
             {
                 var author = await _client.GetUser(m.AuthorId);
-                if (item.BaseCommandName != null && author != null && author.Bot == null)
+                if (item.BaseCommandName != null && author != null && author.Bot == null && m.SystemMessage == null)
                 {
                     var commandInfo = CommandHelper.FetchInfo(m);
                     if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
