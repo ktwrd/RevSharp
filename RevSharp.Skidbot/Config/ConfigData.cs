@@ -41,6 +41,14 @@ public class ConfigData
     /// Token for <see cref="Modules.AuthentikModule"/>
     /// </summary>
     public string AuthentikToken { get; set; }
+    /// <summary>
+    /// Port for Prometheus exporter to listen on
+    /// </summary>
+    public int PrometheusPort { get; set; }
+    /// <summary>
+    /// Enable <see cref="Controllers.StatisticController"/>
+    /// </summary>
+    public bool PrometheusEnable { get; set; }
 
     public ConfigData()
     {
@@ -53,5 +61,7 @@ public class ConfigData
         OwnerUserIds = Array.Empty<string>();
         AuthentikUrl = "";
         AuthentikToken = "";
+        PrometheusPort = 8771;
+        PrometheusEnable = true;
     }
 }
