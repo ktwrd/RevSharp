@@ -29,6 +29,11 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
             _client = new MongoClient(ConnectionString);
             await _client.StartSessionAsync();
             Database = _client.GetDatabase(Program.ConfigData.MongoDatabaseName);
+            var collectionNames = await Database.ListCollectionNamesAsync();
+            if (!collectionNames.ToList().Contains(CollectionName))
+            {
+                await Database.CreateCollectionAsync(CollectionName);
+            }
         }
         catch (Exception e)
         {
