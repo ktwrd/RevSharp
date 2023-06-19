@@ -61,7 +61,8 @@ public class ReflectionInclude
         {
             try
             {
-                if (item.BaseCommandName != null)
+                var author = await _client.GetUser(m.AuthorId);
+                if (item.BaseCommandName != null && author != null && author.Bot == null)
                 {
                     var commandInfo = CommandHelper.FetchInfo(m);
                     if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
@@ -69,7 +70,6 @@ public class ReflectionInclude
                         await item.CommandReceived(commandInfo, m);
                         var statControl = FetchModule<StatisticController>();
                         var server = await m.FetchServer();
-                        var author = await _client.GetUser(m.AuthorId);
                         var authorName = "<None>";
                         if (author != null)
                             authorName = $"{author.Username}#{author.Discriminator}";
