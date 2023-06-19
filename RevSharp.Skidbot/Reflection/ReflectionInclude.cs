@@ -68,15 +68,18 @@ public class ReflectionInclude
                     if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                     {
                         await item.CommandReceived(commandInfo, m);
+
                         var statControl = FetchModule<StatisticController>();
                         var server = await m.FetchServer();
                         var authorName = "<None>";
                         if (author != null)
                             authorName = $"{author.Username}#{author.Discriminator}";
+                        
                         var bch = await _client.GetChannel(m.ChannelId);
                         INamedChannel? channel = null;
                         if (bch is INamedChannel)
                             channel = (INamedChannel)bch;
+                        
                         statControl.CommandCounter.WithLabels(new string[]
                         {
                             server?.Name ?? "<None>",
