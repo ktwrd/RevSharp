@@ -59,31 +59,33 @@ public class ReflectionInclude
         item.Client = _client;
         _client.MessageReceived += async (m) =>
         {
-            try
+            if (m.AuthorId != _client.CurrentUserId)
             {
-                if (item.BaseCommandName != null && m.AuthorId != _client.CurrentUserId && m.SystemMessage == null && m.Content?.Length > 2)
+                try
                 {
-                    var commandInfo = CommandHelper.FetchInfo(m);
-                    if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
+                    if (item.BaseCommandName != null && m.AuthorId != _client.CurrentUserId && m.SystemMessage == null && m.Content?.Length > 2)
                     {
-                        var author = await _client.GetUser(m.AuthorId);
-                        if (author != null && author.Bot == null)
+                        var commandInfo = CommandHelper.FetchInfo(m);
+                        if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                         {
-                            await item.CommandReceived(commandInfo, m);
-
-                            var statControl = FetchModule<StatisticController>();
-                            var server = await m.FetchServer();
-                            var authorName = "<None>";
-                            if (author != null)
-                                authorName = $"{author.Username}#{author.Discriminator}";
-
-                            var bch = await _client.GetChannel(m.ChannelId);
-                            INamedChannel? channel = null;
-                            if (bch is INamedChannel)
-                                channel = (INamedChannel)bch;
-
-                            statControl.CommandCounter.WithLabels(new string[]
+                            var author = await _client.GetUser(m.AuthorId);
+                            if (author != null && author.Bot == null)
                             {
+                                await item.CommandReceived(commandInfo, m);
+
+                                var statControl = FetchModule<StatisticController>();
+                                var server = await m.FetchServer();
+                                var authorName = "<None>";
+                                if (author != null)
+                                    authorName = $"{author.Username}#{author.Discriminator}";
+
+                                var bch = await _client.GetChannel(m.ChannelId);
+                                INamedChannel? channel = null;
+                                if (bch is INamedChannel)
+                                    channel = (INamedChannel)bch;
+
+                                statControl.CommandCounter.WithLabels(new string[]
+                                {
                             server?.Name ?? "<None>",
                             server?.Id ?? "<None>",
                             authorName,
@@ -93,36 +95,37 @@ public class ReflectionInclude
                             commandInfo.Command,
                             string.Join(" ", commandInfo.Arguments),
                             item.HelpCategory ?? "<None>"
-                            }).Inc();
+                                }).Inc();
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                await m.Reply(string.Join("\n", new string[]
+                catch (Exception e)
                 {
+                    await m.Reply(string.Join("\n", new string[]
+                    {
                     $"Uncaught exception while running `{type.Name}.CommandReceived()`",
                     "```",
                     e.ToString(),
                     "```"
-                }));
-                Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
-            }
-            try
-            {
-                await item.MessageReceived(m);
-            }
-            catch (Exception e)
-            {
-                await m.Reply(string.Join("\n", new string[]
+                    }));
+                    Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
+                }
+                try
                 {
+                    await item.MessageReceived(m);
+                }
+                catch (Exception e)
+                {
+                    await m.Reply(string.Join("\n", new string[]
+                    {
                     $"Uncaught exception while running `{type.Name}.MessageReceived()`",
                     "```",
                     e.ToString(),
                     "```"
-                }));
-                Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
+                    }));
+                    Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
+                }
             }
         };
         try
