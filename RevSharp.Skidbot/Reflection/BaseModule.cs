@@ -1,5 +1,6 @@
 using RevSharp.Core;
 using RevSharp.Core.Models;
+using RevSharp.Skidbot.Helpers;
 
 namespace RevSharp.Skidbot.Reflection;
 
@@ -27,6 +28,11 @@ public class BaseModule
         return Task.CompletedTask;
     }
 
+    public virtual Task CommandReceived(CommandInfo command, Message message)
+    {
+        return Task.CompletedTask;
+    }
+
     /// <summary>
     /// Content that is displayed in the Help command
     /// </summary>
@@ -48,4 +54,5 @@ public class BaseModule
     /// What category does this module belong to? Defaults to `null` which is the `other` category.
     /// </summary>
     public virtual string? HelpCategory => null;
+    public virtual string? BaseCommandName => null;
 }
