@@ -16,3 +16,5 @@ services:
     restart: always
     volumes:
       - ./data:/app/data
+    ports:
+      - "8771:8771"
