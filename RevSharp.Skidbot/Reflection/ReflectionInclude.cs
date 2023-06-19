@@ -1,6 +1,9 @@
 using System.ComponentModel.Design.Serialization;
 using System.Reflection;
 using RevSharp.Core;
+using RevSharp.Core.Models;
+using RevSharp.Skidbot.Controllers;
+using RevSharp.Skidbot.Helpers;
 
 namespace RevSharp.Skidbot.Reflection;
 
@@ -58,6 +61,50 @@ public class ReflectionInclude
         {
             try
             {
+                if (item.BaseCommandName != null)
+                {
+                    var commandInfo = CommandHelper.FetchInfo(m);
+                    if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
+                    {
+                        await item.CommandReceived(commandInfo, m);
+                        var statControl = FetchModule<StatisticController>();
+                        var server = await m.FetchServer();
+                        var author = await _client.GetUser(m.AuthorId);
+                        var authorName = "<None>";
+                        if (author != null)
+                            authorName = $"{author.Username}#{author.Discriminator}";
+                        var bch = await _client.GetChannel(m.ChannelId);
+                        INamedChannel? channel = null;
+                        if (bch is INamedChannel)
+                            channel = (INamedChannel)bch;
+                        statControl.CommandCounter.WithLabels(new string[]
+                        {
+                            server?.Name ?? "<None>",
+                            server?.Id ?? "<None>",
+                            authorName,
+                            author?.Id ?? "<None>",
+                            channel?.Name ?? "<None>",
+                            bch?.Id ?? "<None>",
+                            commandInfo.Command,
+                            string.Join(" ", commandInfo.Arguments),
+                            item.HelpCategory ?? "<None>"
+                        }).Inc();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                await m.Reply(string.Join("\n", new string[]
+                {
+                    $"Uncaught exception while running `{type.Name}.CommandReceived()`",
+                    "```",
+                    e.ToString(),
+                    "```"
+                }));
+                Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
+            }
+            try
+            {
                 await item.MessageReceived(m);
             }
             catch (Exception e)
@@ -69,11 +116,17 @@ public class ReflectionInclude
                     e.ToString(),
                     "```"
                 }));
-                Console.Error.WriteLine(e);
+                Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
             }
         };
-        
-        await item.Initialize(this);
+        try
+        {
+            await item.Initialize(this);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to initialize {type.Name}\n{ex}");
+        }
         Log.Debug($"[ReflectionInclude] Init {type.Name}");
     }
 }
