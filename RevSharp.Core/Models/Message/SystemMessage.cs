@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
 
@@ -75,14 +76,22 @@ public class SystemChannelOwnershipChangedMessage : SystemMessage
 }
 public enum SystemMessageType
 {
-    text,
-    user_added,
-    user_remove,
-    user_joined,
-    user_left,
-    user_kicked,
-    channel_renamed,
-    channel_description_changed,
-    channel_icon_changed,
-    channel_ownership_changed
+    [EnumMember(Value = "text")]
+    Text,
+    [EnumMember(Value = "user_added")]
+    UserAdded,
+    [EnumMember(Value = "user_joined")]
+    UserJoined,
+    [EnumMember(Value = "user_left")]
+    UserLeft,
+    [EnumMember(Value = "user_kicked")]
+    UserKicked,
+    [EnumMember(Value = "channel_renamed")]
+    ChannelRenamed,
+    [EnumMember(Value = "channel_description_changed")]
+    ChannelDescriptionChanged,
+    [EnumMember(Value = "channel_icon_changed")]
+    ChannelIconChanged,
+    [EnumMember(Value = "channel_ownership_changed")]
+    ChannelOwnershipChanged,
 }
