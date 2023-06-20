@@ -4,17 +4,17 @@ using System.Text.RegularExpressions;
 namespace RevSharp.Core;
 
 /// <summary>
-/// Used to centralize usage of <see cref="Environment.GetEnvironmentVariable"/> so it's not scattered around the codebase.
+/// Used to centralize usage of <see cref="Environment.GetEnvironmentVariable()"/> so it's not scattered around the codebase.
 /// </summary>
 internal static class FeatureFlags
 {
     /// <summary>
-    /// Parses an environment variable as a boolean. When trimmed&lowercased to `true` it will return true, but anything else will return `false`.
+    /// Parses an environment variable as a boolean. When has been trimmed and made lowercase and it equals `true` it will return true, but anything else will return `false`.
     /// When the environment variable isn't found, it wil default to <see cref="defaultValue"/>
     /// </summary>
     /// <param name="environmentKey"></param>
     /// <param name="defaultValue">Used when environment variable is not set.</param>
-    /// <returns>`true` when envar is true, `false` when not true, <see cref="defaultValue"/> when not found.</returns>
+    /// <returns>`true` when the environment variable is true, `false` when not true, <paramref name="defaultValue"/> when not found.</returns>
     private static bool ParseBool(string environmentKey, bool defaultValue)
     {
         var item = Environment.GetEnvironmentVariable(environmentKey)
@@ -24,7 +24,7 @@ internal static class FeatureFlags
     }
 
     /// <summary>
-    /// Just <see cref="Environment.GetEnvironmentVariable(string variable)"/> but when null it's <see cref="defaultValue"/>
+    /// Just <see cref="Environment.GetEnvironmentVariable(string)"/> but when null it's <see cref="defaultValue"/>
     /// </summary>
     private static string ParseString(string environmentKey, string defaultValue)
     {
