@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using System.Text.Json.Serialization;
 
 namespace RevSharp.Core.Models;
@@ -6,7 +7,7 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// Bot account type. Used when fetching information about a bot.
 /// </summary>
-public class Bot : ISnowflake
+public class Bot : IBot
 {
     /// <summary>
     /// Bot Id
@@ -15,55 +16,37 @@ public class Bot : ISnowflake
     /// </summary>
     [JsonPropertyName("_id")]
     public string Id { get; set; }
-    /// <summary>
-    /// User Id of the bot owner
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("owner")]
     public string OwnerId { get; set; }
-    /// <summary>
-    /// Token used to authenticate requests for this bot
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("token")]
     public string Token { get; set; }
-    /// <summary>
-    /// Whether the bot is public
-    /// (may be invited by anyone)
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("public")]
     public bool IsPublic { get; set; }
 
-    /// <summary>
-    /// Whether to enable analytics
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("analytics")]
     public bool EnableAnalytics { get; set; }
-    /// <summary>
-    /// Whether this bot should be publicly discoverable
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("discoverable")]
     public bool IsDiscoverable { get; set; }
-    /// <summary>
-    /// Reserved; URL for handling interactions
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("interactions_url")]
     public string? InteractionsUrl { get; set; }
-    /// <summary>
-    /// URL for terms of service
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("terms_of_service_url")]
     public string? TermsOfServiceUrl { get; set; }
-    /// <summary>
-    /// URL for privacy policy
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("privacy_policy_url")]
     public string? PrivacyPolicyUrl { get; set; }
     
-    /// <summary>
-    /// Enum of bot flags
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("flags")]
     public BotFlags? Flags { get; set; }
 
+    /// <inheritdoc />
     public async Task<bool> Delete(Client client)
     {
         var response = await client.DeleteAsync($"/bots/{Id}");
@@ -71,8 +54,22 @@ public class Bot : ISnowflake
     }
 }
 
-public enum BotFlags : int
+/// <summary>
+/// Flags for <see cref="IBot"/>
+/// </summary>
+[DefaultValue(BotFlags.Unknown)]
+public enum BotFlags
 {
+    /// <summary>
+    /// Failed to deserialize flag (default value)
+    /// </summary>
+    Unknown,
+    /// <summary>
+    /// Bot is verified by Revolt
+    /// </summary>
     Verified = 1,
+    /// <summary>
+    /// 1st Party Revolt Bot
+    /// </summary>
     Official = 2
 }
