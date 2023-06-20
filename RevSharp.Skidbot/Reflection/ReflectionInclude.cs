@@ -103,13 +103,16 @@ public class ReflectionInclude
                 catch (Exception e)
                 {
                     Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
-                    await m.Reply(string.Join("\n", new string[]
+                    try
                     {
-                    $"Uncaught exception while running `{type.Name}.CommandReceived()`",
-                    "```",
-                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
-                    "```"
-                    }));
+                        await m.Reply(
+                            string.Join(
+                                "\n", new string[]
+                                {
+                                    $"Uncaught exception while running `{type.Name}.CommandReceived()`", "```",
+                                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)), "```"
+                                }));
+                    } catch{}
                 }
                 try
                 {
@@ -118,13 +121,19 @@ public class ReflectionInclude
                 catch (Exception e)
                 {
                     Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
-                    await m.Reply(string.Join("\n", new string[]
+                    try
                     {
-                    $"Uncaught exception while running `{type.Name}.MessageReceived()`",
-                    "```",
-                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
-                    "```"
-                    }));
+                        await m.Reply(string.Join("\n", new string[]
+                        {
+                            $"Uncaught exception while running `{type.Name}.MessageReceived()`",
+                            "```",
+                            e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
+                            "```"
+                        }));
+                    }
+                    catch
+                    { }
+
                 }
             }
         };
