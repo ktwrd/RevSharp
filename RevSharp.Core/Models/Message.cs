@@ -43,6 +43,21 @@ public partial class Message : Clientable, ISnowflake
     /// </summary>
     [JsonPropertyName("system")]
     public SystemMessage? SystemMessage { get; set; }
+
+    /// <summary>
+    /// Is this a System Message? 
+    /// </summary>
+    [JsonIgnore]
+    public bool IsSystemMessage
+    {
+        get
+        {
+            if (SystemMessage == null)
+                return false;
+
+            return SystemMessage?.Type.Length > 3;
+        }
+    }
     /// <summary>
     /// Array of attachments
     /// </summary>
