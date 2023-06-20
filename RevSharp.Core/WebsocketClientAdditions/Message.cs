@@ -23,11 +23,11 @@ internal partial class WebsocketClient
                 var messageAppendData = MessageAppendEvent.Parse(content);
                 if (messageAppendData != null)
                 {
-                    if (_client.MessageCache.ContainsKey(messageAppendData.MessageId))
+                    if (_client.MessageCache.TryGetValue(messageAppendData.MessageId, out var value))
                     {
                         if (messageAppendData.Append.Embeds != null)
                         {
-                            _client.MessageCache[messageAppendData.MessageId].Embeds = messageAppendData.Append.Embeds;
+                            value.Embeds = messageAppendData.Append.Embeds;
                         }
                     }
                     else
@@ -40,9 +40,9 @@ internal partial class WebsocketClient
                 var deleteData = JsonSerializer.Deserialize<MessageDeletedEvent>(content, Client.SerializerOptions);
                 if (deleteData != null)
                 {
-                    if (_client.ChannelCache.ContainsKey(deleteData.ChannelId))
+                    if (_client.ChannelCache.TryGetValue(deleteData.ChannelId, out var value))
                     {
-                        _client.ChannelCache[deleteData.ChannelId].OnMessageDeleted(deleteData.MessageId);
+                        value.OnMessageDeleted(deleteData.MessageId);
                     }
                     _client.OnMessageDeleted(deleteData.MessageId, deleteData.ChannelId);
                     _client.MessageCache.Remove(deleteData.MessageId);

@@ -19,6 +19,11 @@ public partial class Client
         return list;
     }
 
+    /// <summary>
+    /// Add server member to cache
+    /// </summary>
+    /// <param name="member">Target member to attempt to add to the cache</param>
+    /// <returns>Is this member in the cache already?</returns>
     internal bool AddToCache(Member member)
     {
         var key = member.Id.UserId + member.Id.ServerId;
@@ -29,6 +34,13 @@ public partial class Client
         return false;
     }
 
+    /// <summary>
+    /// Get server member
+    /// </summary>
+    /// <param name="serverId">Server Id the member belongs to</param>
+    /// <param name="userId">User Id to fetch</param>
+    /// <param name="forceUpdate">Force an update from the API</param>
+    /// <returns>Returns `null` when failed to fetch or something else bad happens.</returns>
     public async Task<Member?> GetMember(string serverId, string userId, bool forceUpdate = true)
     {
         var key = userId + serverId;
@@ -50,7 +62,7 @@ public partial class Client
     /// <summary>
     /// Transform the ServerCache into a LinkedList
     /// </summary>
-    /// <returns></returns>
+    /// <returns>LinkedList of Servers.</returns>
     public async Task<LinkedList<Server>?> GetAllServers()
     {
         var list = new LinkedList<Server>();
@@ -114,8 +126,18 @@ public partial class Client
         return list.ToArray();
     }
 
+    /// <summary>
+    /// Create a server. This can only be accessed if you are not a bot.
+    /// </summary>
+    /// <param name="name">Name of the server</param>
+    /// <param name="description">Server description</param>
+    /// <param name="nsfw">Is this an NSFW server</param>
+    /// <returns>`null` when failed to create server.</returns>
+    /// <exception cref="Exception">When parameter validation fails or you're logged in as a bot</exception>
     public Task<Server?> CreateServer(string name, string? description = null, bool nsfw = false)
     {
+        if (CurrentUser?.Bot != null)
+            throw new Exception("Only users can create servers");
         if (name.Length is < 1 or > 32)
             throw new Exception("name must be less than 32 and greater than 1");
         if (description != null && description.Length is < 0 or > 1024)
@@ -128,8 +150,16 @@ public partial class Client
         });
     }
 
+    /// <summary>
+    /// Create a server with <see cref="CreateServerData"/>
+    /// </summary>
+    /// <param name="data">Data to create the server with</param>
+    /// <returns>`null` when failed to create the server.</returns>
+    /// <exception cref="Exception">Thrown when you're logged in as a bot.</exception>
     public async Task<Server?> CreateServer(CreateServerData data)
     {
+        if (CurrentUser?.Bot != null)
+            throw new Exception("Only users can create servers");
         var response = await PostAsync(
             $"/servers/create",
             JsonContent.Create(data, options: SerializerOptions));

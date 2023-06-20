@@ -7,14 +7,15 @@ namespace RevSharp.Core.Models;
 /// </summary>
 public class BaseTypedResponse : IBaseTypedResponse
 {
-    /// <summary>
-    /// Type of the event
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("type")]
     public string Type { get; set; }
 }
 
 public interface IBaseTypedResponse
 {
+    /// <summary>
+    /// Type of the event
+    /// </summary>
     public string Type { get; set; }
 }

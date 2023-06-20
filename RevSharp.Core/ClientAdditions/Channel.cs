@@ -17,6 +17,10 @@ public partial class Client
             ? (SavedMessagesChannel)channel
             : null;
 
+    /// <summary>
+    /// Get the SavedMessagesChannel for the current user you're logged in as.
+    /// </summary>
+    /// <returns>Will return null if you're not logged in or it failed to fetch.</returns>
     public async Task<SavedMessagesChannel?> GetSavedMessagesChannel()
     {
         if (CurrentUser == null)

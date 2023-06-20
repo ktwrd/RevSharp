@@ -26,6 +26,12 @@ public partial class Client
         return list.ToArray();
     }
 
+    /// <summary>
+    /// Get a Message from the cache or directly from the API
+    /// </summary>
+    /// <param name="channelId">Channel Id the message belongs to</param>
+    /// <param name="messageId">Message Id to fetch</param>
+    /// <returns>Will return `null` if it failed to fetch or something else happened.</returns>
     internal async Task<Message?> GetMessage(string channelId, string messageId)
     {
         if (MessageCache.ContainsKey(messageId))
