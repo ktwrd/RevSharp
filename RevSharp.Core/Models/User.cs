@@ -16,6 +16,21 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     /// </summary>
     [JsonIgnore]
     public bool IsCurrentUser { get; internal set; }
+
+    /// <summary>
+    /// Does <see cref="Client.CurrentUserId"/> match <see cref="Bot.OwnerId"/>. When either are `null`, this will be `false`
+    /// </summary>
+    [JsonIgnore]
+    public bool IsCurrentUserOwner
+    {
+        get
+        {
+            if (Client == null || Bot == null)
+                return false;
+
+            return Client.CurrentUserId == Bot.OwnerId;
+        }
+    }
     
     /// <summary>
     /// Unique Id
