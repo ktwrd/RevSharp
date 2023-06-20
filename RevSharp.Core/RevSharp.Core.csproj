@@ -15,6 +15,9 @@
         <NeutralLanguage>en</NeutralLanguage>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
         <Version>1.0.1</Version>
+
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <DocumentationFile>RevSharp.xml</DocumentationFile>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

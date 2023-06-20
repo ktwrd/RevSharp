@@ -1,0 +1,1733 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>RevSharp.Core</name>
+    </assembly>
+    <members>
+        <member name="T:RevSharp.Core.Client">
+            <summary>
+            Client used for connecting to the Revolt API. This is where you should start.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.Token">
+            <summary>
+            Token used for authentication
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.TokenIsBot">
+            <summary>
+            Does the token belong to a bot
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.WSClient">
+            <summary>
+            WebSocket middleware for communicating with Bonfire
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.Endpoint">
+             <summary>
+             Base REST API Endpoint for Revolt
+            
+             Default: <see cref="F:RevSharp.Core.Client.DefaultEndpoint"/>
+             </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.EndpointNodeInfo">
+             <summary>
+             Information about the current API server that we're connected to.
+            
+             Value is set when <see cref="M:RevSharp.Core.Client.LoginAsync"/> is called.
+             </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.#ctor">
+            <summary>
+            Create instance of Client without a token set. You can change the token with <see cref="M:RevSharp.Core.Client.SetCredentials(System.String,System.Boolean)"/>, but only before <see cref="M:RevSharp.Core.Client.LoginAsync"/> is called.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.#ctor(System.String,System.Boolean)">
+            <summary>
+            Create an instance of the Client
+            </summary>
+            <param name="token">Token to use for authentication</param>
+            <param name="isBot">Does this token belong to a bot. This is important because for bots a different header is sent for HTTP requests.</param>
+        </member>
+        <member name="M:RevSharp.Core.Client.SetCredentials(System.String,System.Boolean)">
+            <summary>
+            Set credentials. Must be called before <see cref="M:RevSharp.Core.Client.LoginAsync"/>.
+            </summary>
+            <param name="token">Token to authenticate with.</param>
+            <param name="isBot">Does the token belong to a bot.</param>
+        </member>
+        <member name="M:RevSharp.Core.Client.SetCredentials(RevSharp.Core.Models.WebSocket.AuthenticateMessage,System.Boolean)">
+            <summary>
+            Set credentials and send a customized version of <see cref="T:RevSharp.Core.Models.WebSocket.AuthenticateMessage"/> when connecting and authenticating with Bonfire (WebSocket server)
+            </summary>
+            <param name="authMessage">Customized authenticate message for Bonfire. <see cref="P:RevSharp.Core.Client.Token"/> will be set from <see cref="P:RevSharp.Core.Models.WebSocket.AuthenticateMessage.Token"/> field.</param>
+            <param name="isBot">Does the token belong to a bot.</param>
+        </member>
+        <member name="M:RevSharp.Core.Client.LoginAsync">
+            <summary>
+            Login with the given credentials. To set custom credentials after <see cref="T:RevSharp.Core.Client"/> has been initialized, use <see cref="M:RevSharp.Core.Client.SetCredentials(System.String,System.Boolean)"/>.
+            </summary>
+            <exception cref="T:RevSharp.Core.ClientInitializeException">
+            Thrown when <see cref="M:RevSharp.Core.Client.FetchNodeDetails(System.String)"/> fails.
+            </exception>
+        </member>
+        <member name="M:RevSharp.Core.Client.DisconnectAsync">
+            <summary>
+            Close the current websocket connection to Bonfire.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.SetEndpoint(System.String)">
+            <summary>
+            Set endpoint to custom one
+            </summary>
+            <param name="endpoint">Valid Url for Revolt endpoint</param>
+            <returns>Is the endpoint valid?</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.FetchNodeDetails(System.String)">
+            <summary>
+            Fetch details from provided endpoint
+            </summary>
+            <param name="endpoint">When null, uses <see cref="P:RevSharp.Core.Client.Endpoint"/></param>
+            <returns>Was successful with fetching node details. When true, <see cref="P:RevSharp.Core.Client.EndpointNodeInfo"/> is set.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.BaseChannel)">
+            <returns>Was this channel in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.BaseChannel[])">
+            <returns>Channel Ids that were in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetChannel(System.String,System.Boolean)">
+            <summary>
+            Get a channel. Parsed into the unique types of channel as well.
+            </summary>
+            <param name="channelId">Channel Id to get</param>
+            <param name="forceUpdate">When `true`, the cache will be ignored and it will fetch directly from the API, like if it was never in the cache to start with</param>
+            <returns></returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnChannelCreated(RevSharp.Core.Models.BaseChannel)">
+            <summary>
+            Add to cache then invoke <see cref="E:RevSharp.Core.Client.ChannelCreated"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnChannelDeleted(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Client.ChannelDeleted"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnChannelUpdated(RevSharp.Core.Models.BaseChannel,RevSharp.Core.Models.BaseChannel)">
+            <summary>
+            If in cache, fetch, if not then add to cache. Then invoke <see cref="E:RevSharp.Core.Client.ChannelUpdated"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnChannelStartTyping(System.String,System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Client.ChannelStartTyping"/>, <see cref="M:RevSharp.Core.Models.BaseChannel.OnStartTyping(System.String)"/>, <see cref="M:RevSharp.Core.Models.User.OnStartTyping(System.String)"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnChannelStopTyping(System.String,System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Client.ChannelStopTyping"/>, <see cref="M:RevSharp.Core.Models.BaseChannel.OnStopTyping(System.String)"/>, <see cref="M:RevSharp.Core.Models.User.OnStopTyping(System.String)"/>
+            </summary>
+            <param name="channelId"></param>
+            <param name="userId"></param>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnMessageReceived(RevSharp.Core.Models.Message)">
+            <summary>
+            Add to cache then invoke <see cref="E:RevSharp.Core.Client.MessageReceived"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnMessageDeleted(System.String,System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Client.MessageDeleted"/>, <see cref="E:RevSharp.Core.Models.Message.Deleted"/>, <see cref="E:RevSharp.Core.Models.BaseChannel.MessageDeleted"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerCreated(RevSharp.Core.Models.Server)">
+            <summary>
+            - Set Client property
+            - Add to cache
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerCreated"/>
+            Add to cache then invoke <see cref="E:RevSharp.Core.Client.ServerCreated"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerDeleted(System.String)">
+            <summary>
+            - When Server exists in cache
+                - Invoke <see cref="E:RevSharp.Core.Models.Server.Deleted"/>
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerDeleted"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerMemberJoined(System.String,System.String)">
+            <summary>
+            - When Server exists in cache
+                - Invoke <see cref="E:RevSharp.Core.Models.Server.MemberJoined"/>
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerMemberJoined"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerMemberLeft(System.String,System.String)">
+            <summary>
+            - When Server exists in cache
+                - Invoke <see cref="M:RevSharp.Core.Models.Server.OnMemberLeft(System.String)"/>
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerMemberLeft"/>
+            </summary>
+            <param name="serverId"></param>
+            <param name="userId"></param>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerRoleDeleted(System.String,System.String)">
+            <summary>
+            - When Server exists in cache
+                - Invoke <see cref="M:RevSharp.Core.Models.Server.OnRoleDeleted(System.String)"/>
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerRoleDeleted"/>
+            </summary>
+            <param name="serverId"></param>
+            <param name="roleId"></param>
+        </member>
+        <member name="M:RevSharp.Core.Client.CheckResponseError(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Savely throw exception if response is 400. Type should always <see cref="T:RevSharp.Core.Models.BaseTypedResponse"/>
+            </summary>
+            <param name="response">Response from Http request</param>
+            <exception cref="T:System.Exception">Value of <see cref="P:RevSharp.Core.Models.BaseTypedResponse.Type"/> when Status Code is 400 and the body deserialized successfully</exception>
+        </member>
+        <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.Message)">
+            <returns>Was this message in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.Message[])">
+            <returns>Message Ids that were in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetMessageOrCache(System.String,System.String)">
+            <summary>
+            Return message from cache if it exists there. Otherwise return <see cref="M:RevSharp.Core.Client.GetMessage(System.String,System.String)"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetAllServers">
+            <summary>
+            Transform the ServerCache into a LinkedList
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetServer(System.String,System.Boolean)">
+            <summary>
+            Get a server from the current Revolt server.
+            </summary>
+            <param name="serverId">Server Id to fetch the data for</param>
+            <param name="forceUpdate">When `true`, the cache will be ignored and it will fetch directly from the API, like if it was never in the cache to start with</param>
+            <returns>Server specified or null</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.Server)">
+            <returns>Was this server in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.Server[])">
+            <returns>Sever Ids that were in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.SessionLogin(System.String,System.String,System.String)">
+            <summary>
+            Fetch login response for a user. Can be used for C# GUI/CLI clients.
+            </summary>
+            <param name="username">Username/Email to login as</param>
+            <param name="password">Password to use</param>
+            <param name="friendlyName">What should this client identify itself as?</param>
+            <returns><see cref="T:RevSharp.Core.Models.LoginSuccessResponse"/> or <see cref="T:RevSharp.Core.Models.LoginMFAResponse"/> or <see cref="T:RevSharp.Core.Models.LoginDisabledResponse"/></returns>
+        </member>
+        <member name="P:RevSharp.Core.Client.UserCache">
+            <summary>
+            Key: User Id
+            Value: Instance of User
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Client.CachedPermission_Channel">
+             <summary>
+             Cached permissions per-channel and per-user
+            
+             Key: User Id
+             Value.Key: Channel Id
+             Value.Value: Bitwise permissions that the user has in that channel
+             </summary>
+        </member>
+        <member name="F:RevSharp.Core.Client.CachedPermission_Server">
+             <summary>
+             Cached permissions per-server and per-user
+            
+             Key: User Id
+             Value.Key: Server Id
+             Value.Value: Bitwise permissions that the user has in that server
+             </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.CalculatePermissions(RevSharp.Core.Models.User,RevSharp.Core.Models.Server)">
+            <summary>
+            Calculate permissions for specific user in a specific server.
+            </summary>
+            <param name="user">Target user for permission calculation</param>
+            <param name="server">Target server to calculate permissions for</param>
+            <returns>Bitwise permissions for what the specified user has in the specified server.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.CalculatePermissions(RevSharp.Core.Models.Server)">
+            <summary>
+            Calculate permissions for the current user in the server specified.
+            </summary>
+            <param name="server">Server to calculate the permissions for</param>
+            <returns>Bitwise permissions for what the current user has for the server specified</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.CalculatePermissions(RevSharp.Core.Models.User,RevSharp.Core.Models.BaseChannel)">
+            <summary>
+            Calculate permissions for a specific user in a channel
+            </summary>
+            <returns>Bitwise permissions for what the user has.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.CalculatePermissions(RevSharp.Core.Models.BaseChannel)">
+            <summary>
+            Calculate permissions for the current user in the specified channel
+            </summary>
+            <param name="channel">Channel to calculate the permissions for.</param>
+            <returns>Bitwise permissions that the current user has in the channel specified.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.FetchCurrentUser">
+            <summary>
+            Update <see cref="P:RevSharp.Core.Client.CurrentUser"/> with latest details
+            </summary>
+            <returns>Was successful with fetching user</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetUser(System.String,System.Boolean)">
+            <summary>
+            Fetch user from Revolt and add to cache if it's not there already
+            </summary>
+            <param name="id">User Id</param>
+            <param name="forceUpdate">When `true`, the cache will be ignored and it will fetch directly from the API, like if it was never in the cache to start with</param>
+            <returns>Null if failed to fetch.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.User)">
+            <returns>Was this user in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.User[])">
+            <returns>User Ids that were in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.ChangeUsername(System.String,System.String)">
+            <summary>
+            Change the username for the current user.
+            </summary>
+            <param name="username">New username</param>
+            <param name="currentPassword">Current password for this account</param>
+            <returns>Did it successfully change the username for the current account</returns>
+        </member>
+        <member name="M:RevSharp.Core.Controllers.BotController.Create(System.String)">
+            <summary>
+            Create a bot account
+            </summary>
+            <param name="name">The username for the bot</param>
+            <returns>Bot details when successful.</returns>
+            <exception cref="T:RevSharp.Core.RevoltException">Thrown when the current user that you're logged in as is actually a bot.</exception>
+        </member>
+        <member name="T:RevSharp.Core.FeatureFlags">
+            <summary>
+            Used to centralize usage of <see cref="M:System.Environment.GetEnvironmentVariable(System.String)"/> so it's not scattered around the codebase.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.FeatureFlags.ParseBool(System.String,System.Boolean)">
+            <summary>
+            Parses an environment variable as a boolean. When has been trimmed and made lowercase and it equals `true` it will return true, but anything else will return `false`.
+            When the environment variable isn't found, it wil default to <see cref="!:defaultValue"/>
+            </summary>
+            <param name="environmentKey"></param>
+            <param name="defaultValue">Used when environment variable is not set.</param>
+            <returns>`true` when envar is true, `false` when not true, <see cref="!:defaultValue"/> when not found.</returns>
+        </member>
+        <member name="M:RevSharp.Core.FeatureFlags.ParseString(System.String,System.String)">
+            <summary>
+            Just <see cref="M:System.Environment.GetEnvironmentVariable(System.String)"/> but when null it's <see cref="!:defaultValue"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.FeatureFlags.ParseInt(System.String,System.Int32)">
+            <summary>
+            Parse an environment variable as <see cref="T:System.Int32"/>.
+            
+            - Fetch Environment variable (when null, set to <see cref="!:defaultValue"/> as string)
+            - Do regex match ^([0-9]+)$
+            - When success, parse item as integer then return
+            - When fail, return default value
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:RevSharp.Core.FeatureFlags.WebsocketDebugLogging">
+            <summary>
+            Key: REVSHARP_DEBUG_WSLOG
+            Default: false
+            
+            Print to console all websocket messages sent/received.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.FeatureFlags.EnableLogColor">
+            <summary>
+            Key: REVSHARP_LOG_COLOR
+            Default: true
+            
+            Change console text/background color on logging.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.FeatureFlags.LogFlags">
+             <summary>
+             Key: REVSHARP_LOGFLAG
+             Default: 30
+             
+             What log level to use. Any log level with a value equal or lower than this will be printed.
+            
+             Note:
+             The value will be parsed as an integer then type casted to <see cref="T:RevSharp.Core.LogFlag"/>.
+             </summary>
+        </member>
+        <member name="T:RevSharp.Core.Helpers.PermissionHelper">
+            <summary>
+            all of this is ported from revolt.js/src/permissions/calculator.ts
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.AddFriendRequestData.Username">
+            <summary>
+            Username and discriminator combo separated by #
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.BaseTypedResponse">
+            <summary>
+            Base type for all Bonfire messages that are received.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.BaseTypedResponse.Type">
+            <summary>
+            Type of the event
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Bot">
+            <summary>
+            Bot account type. Used when fetching information about a bot.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.Id">
+             <summary>
+             Bot Id
+            
+             This equals the associated bot user's id.
+             </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.OwnerId">
+            <summary>
+            User Id of the bot owner
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.Token">
+            <summary>
+            Token used to authenticate requests for this bot
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.IsPublic">
+            <summary>
+            Whether the bot is public
+            (may be invited by anyone)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.EnableAnalytics">
+            <summary>
+            Whether to enable analytics
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.IsDiscoverable">
+            <summary>
+            Whether this bot should be publicly discoverable
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.InteractionsUrl">
+            <summary>
+            Reserved; URL for handling interactions
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.TermsOfServiceUrl">
+            <summary>
+            URL for terms of service
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.PrivacyPolicyUrl">
+            <summary>
+            URL for privacy policy
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Bot.Flags">
+            <summary>
+            Enum of bot flags
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.BaseChannel.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.BaseChannel.ChannelType">
+            <summary>
+            Id of the user this channel belongs to
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Models.BaseChannel.StartTyping">
+            <summary>
+            Invoked when a user starts typing in this channel.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.BaseChannel.OnStartTyping(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.BaseChannel.StartTyping"/>
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Models.BaseChannel.StopTyping">
+            <summary>
+            Invoked when a user stops typing in this channel.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.BaseChannel.OnStopTyping(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.BaseChannel.StopTyping"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.BaseChannel.OnDeleted">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.BaseChannel.Deleted"/>
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.DirectMessageChannel">
+            <summary>
+            Direct message channel between two users
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DirectMessageChannel.Active">
+            <summary>
+            Whether this direct message channel is currently open on both sides
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DirectMessageChannel.RecipientIds">
+            <summary>
+            2-tuple of user ids participating in direct message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DirectMessageChannel.LastMessageId">
+            <summary>
+            Id of the last message sent in this channel
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.GroupChannel">
+            <summary>
+            Group channel between 1 or more participants
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.GroupChannel.OwnerId">
+            <summary>
+            User id of the owner of the group
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.GroupChannel.RecipientIds">
+            <summary>
+            Array of user ids participating in channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.GroupChannel.Permissions">
+            <summary>
+            Permissions assigned to members of this group
+            (does not apply to the owner of the group)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.GroupChannel.IsNsfw">
+            <summary>
+            Whether this group is marked as not safe for work
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.MessageableChannel">
+            <summary>
+            A channel that can have messages in it
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.MessageableChannel.LastMessageId">
+            <summary>
+            Id of the last message sent in this channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.NamedChannel.Name">
+            <summary>
+            Display name of the channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.NamedChannel.Description">
+            <summary>
+            Channel description
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.NamedChannel.Icon">
+            <summary>
+            Custom icon attachment
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.SavedMessagesChannel">
+            <summary>
+            Personal "Saved Notes" channel which allows users to save messages
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SavedMessagesChannel.UserId">
+            <summary>
+            Id of the user this channel belongs to
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.TextChannel">
+            <summary>
+            Text channel belonging to a server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.TextChannel.ServerId">
+            <summary>
+            Id of the server this channel belongs to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.TextChannel.IsNsfw">
+            <summary>
+            Whether this channel is marked as not safe for work
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.TextChannel.DefaultPermissions">
+            <summary>
+            Default permissions assigned to users in this channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.TextChannel.RolePermissions">
+            <summary>
+            Permissions assigned based on role to this channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.VoiceChannel.ServerId">
+            <summary>
+            Id of the server this channel belongs to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.VoiceChannel.IsNsfw">
+            <summary>
+            Whether this channel is marked as not safe for work
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.VoiceChannel.DefaultPermissions">
+            <summary>
+            Default permissions assigned to users in this channel
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.VoiceChannel.RolePermissions">
+            <summary>
+            Permissions assigned based on role to this channel
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Clientable">
+            <summary>
+            A useful base class that is used for things that interact with <see cref="P:RevSharp.Core.Models.Clientable.Client"/> and that have methods that need to interact with <see cref="P:RevSharp.Core.Models.Clientable.Client"/>.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Clientable.ClientInit">
+            <summary>
+            Called when <see cref="P:RevSharp.Core.Models.Clientable.Client"/> is set to something that isn't `null`
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.SendableEmbed">
+            <summary>
+            An embed that can be sent in a message.
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.BaseEmbed">
+            <summary>
+            Base type for embeds that are on messages that we get. For sending embeds, use <see cref="T:RevSharp.Core.Models.SendableEmbed"/>
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.TextEmbed">
+            <summary>
+            Text embeds. Usually in messages that contain a <see cref="T:RevSharp.Core.Models.SendableEmbed"/>
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.MetadataEmbed">
+            <summary>
+            Used when information about a website is in an embed.
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.VideoEmbed">
+            <summary>
+            Used when an embedded link from a website like Youtube is received.
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Emoji">
+            <summary>
+            Representation of an Emoji on Revolt
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.Parent">
+            <summary>
+            What owns this emoji
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.CreatorId">
+            <summary>
+            Uploader user id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.Name">
+            <summary>
+            Emoji name
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.IsAnimated">
+            <summary>
+            Whether the emoji is animated
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Emoji.IsNsfw">
+            <summary>
+            Whether the emoji is marked as nsfw
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.EmojiParent">
+            <summary>
+            Information about what owns this emoji
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.EmojiParent.Id">
+            <summary>
+            Only set when <see cref="P:RevSharp.Core.Models.EmojiParent.Type"/> is `Server`
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.Tag">
+            <summary>
+            Tag / bucket this file was uploaded to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.Filename">
+            <summary>
+            Original filename
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.Metadata">
+            <summary>
+            Parsed metadata of this file
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.ContentType">
+            <summary>
+            Raw content type of this file
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.Size">
+            <summary>
+            Size of this file (in bytes)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.IsDeleted">
+            <summary>
+            Wether this file was deleted
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.IsReported">
+            <summary>
+            Wether this file was reported
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.File.ObjectId">
+            <summary>
+            Id of the file object this file is associated with
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.FileMetadata.Type">
+            <inheritdoc />
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.Tag">
+            <summary>
+            Tag / bucket this file was uploaded to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.Filename">
+            <summary>
+            Original filename
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.Metadata">
+            <summary>
+            Parsed metadata of this file
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.ContentType">
+            <summary>
+            Raw content type of this file
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.Size">
+            <summary>
+            Size of this file (in bytes)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.IsDeleted">
+            <summary>
+            Wether this file was deleted
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.IsReported">
+            <summary>
+            Wether this file was reported
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFile`1.ObjectId">
+            <summary>
+            Id of the file object this file is associated with
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IFileMetadata.Type">
+            <summary>
+            Valid Values: File|Text|Image|Video|Audio
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.ISnowflake.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Member">
+            <summary>
+            Server Member
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.Id">
+            <summary>
+            Unique member id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.JoinedAt">
+            <summary>
+            Time at which this user joined the server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.Nickname">
+            <summary>
+            Member's nickname
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.Avatar">
+            <summary>
+            Avatar attachment
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.RoleIds">
+            <summary>
+            Member's roles
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Member.TimeoutTimestamp">
+            <summary>
+            Timestamp this member is timed out until
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.FetchRoles(RevSharp.Core.Client,System.Boolean)">
+            <summary>
+            Fetch roles for this member from the API
+            </summary>
+            <param name="client"></param>
+            <param name="forceUpdate">When `true`, bypass the cache when fetching roles</param>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.FetchOrderedRoles(RevSharp.Core.Client,System.Boolean)">
+            <summary>
+            Fetch member roles but ordered based on the <see cref="P:RevSharp.Core.Models.ServerRole.Rank"/> property
+            </summary>
+            <param name="client"></param>
+            <param name="forceUpdate">When `true`, bypass the cache when fetching roles</param>
+            <returns></returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.Fetch(RevSharp.Core.Client)">
+            <summary>
+            Fetch fresh info from the API and inject it into this instance.
+            </summary>
+            <param name="client"></param>
+            <returns>Did it successfully fetch from the API and inject into this instance</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.Insert(RevSharp.Core.Models.Member,RevSharp.Core.Models.Member)">
+            <summary>
+            Inject data from one member into another. Used when updating self from a fresh copy from the API.
+            </summary>
+            <param name="source"></param>
+            <param name="target"></param>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.HasPermission(RevSharp.Core.Client,RevSharp.Core.Models.PermissionFlag,System.Boolean)">
+            <summary>
+            Does this member have a certain permission. This only checks for the ServerId defined at <see cref="!:Id.Server"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.HasPermission(RevSharp.Core.Models.PermissionFlag,System.Boolean)">
+            <summary>
+            Does this member have a certain permission. This only checks for the ServerId defined at <see cref="!:Id.Server"/>
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.MemberId">
+            <summary>
+            Composite primary key consisting of server and user id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.MemberId.ServerId">
+            <summary>
+            Server Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.MemberId.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Message">
+            <summary>
+            Representation of a Message on Revolt
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Nonce">
+            <summary>
+            Unique value generated by client sending this message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.ChannelId">
+            <summary>
+            Id of the channel this message was sent in
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.AuthorId">
+            <summary>
+            Id of the user that sent this message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Content">
+            <summary>
+            Message content
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.SystemMessage">
+            <summary>
+            System message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Attachments">
+            <summary>
+            Array of attachments
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.EditedAt">
+            <summary>
+            Time at which this message was last edited
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Embeds">
+            <summary>
+            Attached embeds to this message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.MentionIds">
+            <summary>
+            Array of user ids mentioned in this message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.MessageReplyIds">
+            <summary>
+            Array of message ids this message is replying to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Reactions">
+            <summary>
+            Hashmap of emoji IDs to array of user IDs
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Interactions">
+            <summary>
+            Information about how this message should be interacted with
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.Masquerade">
+            <summary>
+            Name and / or avatar overrides for this message
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Message.Fetch(RevSharp.Core.Client)">
+            <summary>
+            Fetch latest information about this message from the API.
+            </summary>
+            <returns>Did it successfully fetch and inject the latest data from the API</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Message.Parse(System.String)">
+            <summary>
+            Parse a JSON as a message. This is used for properly deserializing the <see cref="P:RevSharp.Core.Models.Message.Embeds"/> field since the item type can be many things.
+            </summary>
+            <param name="content">JSON content of the message</param>
+            <returns>Properly parsed message, null when <see cref="T:System.Text.Json.JsonSerializer"/> fails</returns>
+        </member>
+        <member name="E:RevSharp.Core.Models.Message.ReactAdd">
+            <summary>
+            Invoked when this message is reacted to.
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Models.Message.ReactRemove">
+            <summary>
+            Invoked when a reaction was removed from this message.
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Models.Message.Deleted">
+            <summary>
+            Invoked when the MessageDelete event is received on the WebSocket client.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Nonce">
+            <summary>
+            Unique token to prevent duplicate message sending
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Content">
+            <summary>
+            Message content to send. Maximum length is 2000
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Attachments">
+            <summary>
+            Attachments to include in message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Replies">
+            <summary>
+            Messages to reply to
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Embeds">
+             <summary>
+             Embeds to include in message
+            
+             Text embed content contributes to the content length cap
+             </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Masquerade">
+            <summary>
+            Masquerade to apply to this message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.SendableMessage.Interactions">
+            <summary>
+            Information about how this message should be interacted with
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageChannel">
+            Manage the channel or channels on the server
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageServer">
+            Manage the server
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManagePermissions">
+            Manage permissions on servers or channels
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageRole">
+            Manage roles on server
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageCustomisation">
+            Manage server customisation (includes emoji)
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.KickMembers">
+            Kick other members below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.BanMembers">
+            Ban other members below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.TimeoutMembers">
+            Timeout other members below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.AssignRoles">
+            Assign roles to members below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ChangeNickname">
+            Change own nickname
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageNicknames">
+            Change or remove other's nicknames below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ChangeAvatar">
+            Change own avatar
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.RemoveAvatars">
+            Remove other's avatars below their ranking
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ViewChannel">
+            View a channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ReadMessageHistory">
+            Read a channel's past message history
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.SendMessage">
+            Send a message in a channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageMessages">
+            Delete messages in a channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.ManageWebhooks">
+            Manage webhook entries on a channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.InviteOthers">
+            Create invites to this channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.SendEmbeds">
+            Send embedded content in this channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.UploadFiles">
+            Send attachments and media in this channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.Masquerade">
+            Masquerade messages using custom nickname and avatar
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.React">
+            React to messages with emojis
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.Connect">
+            Connect to a voice channel
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.Speak">
+            Speak in a voice call
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.Video">
+            Share video in a voice call
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.MuteMembers">
+            Mute other members with lower ranking in a voice call
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.DeafenMembers">
+            Deafen other members with lower ranking in a voice call
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.MoveMembers">
+            Move members between voice channels
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.GrantAllSafe">
+            Safely grant all permissions
+        </member>
+        <member name="F:RevSharp.Core.Models.PermissionFlag.GrantAll">
+            Grant all permissions
+        </member>
+        <member name="T:RevSharp.Core.Models.PublicBot">
+            <summary>
+            Public Bot
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.PublicBot.Id">
+            <summary>
+            Bot Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.PublicBot.Username">
+            <summary>
+            Bot Username
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.PublicBot.Avatar">
+            <summary>
+            Profile Avatar
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.PublicBot.Description">
+            <summary>
+            Profile Description
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.Server">
+            <summary>
+            Representation of a server on Revolt
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.OwnerId">
+            <summary>
+            User id of the owner
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Name">
+            <summary>
+            Name of the server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Description">
+            <summary>
+            Description for the server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.ChannelIds">
+            <summary>
+            Channels within this server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Categories">
+            <summary>
+            Categories for this server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.SystemMessageChannels">
+             <summary>
+             Configuration for sending system event messages.
+            
+             Key: Event Name
+             Value: Channel Id
+             </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Roles">
+            <summary>
+            Roles for this server
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.DefaultPermissions">
+            <summary>
+            Default set of server and channel permissions
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Icon">
+            <summary>
+            Icon attachment
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Banner">
+            <summary>
+            Banner attachment
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Flags">
+            <summary>
+            Bitfield of server flags
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.IsNsfw">
+            <summary>
+            Whether this server is flagged as not safe for work
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.EnableAnalytics">
+            <summary>
+            Whether to enable analytics
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.IsDiscoverable">
+            <summary>
+            Whether this server should be publicly discoverable
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Server.Members">
+            <summary>
+            List of parsed members
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Fetch(RevSharp.Core.Client)">
+            <summary>
+            Fetch latest data about this server from the API and insert into this instance
+            </summary>
+            <returns>Did it successfully fetch and inject from the API</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.FetchMembers(RevSharp.Core.Client)">
+            <summary>
+            Fetch members from the API
+            </summary>
+            <returns>Array of members</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Fetch">
+            <summary>
+            Fetch latest data about this server from the API and insert into this instance
+            </summary>
+            <returns>Did it successfully fetch and inject from the API</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.OnDeleted">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.Server.Deleted"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.OnMemberJoined(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.Server.MemberJoined"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.OnMemberLeft(System.String)">
+            <summary>
+            - If exists in <see cref="F:RevSharp.Core.Models.Server.MemberCache"/>
+                - Invoke <see cref="M:RevSharp.Core.Models.Member.OnLeft"/>
+            - Remove userId from <see cref="F:RevSharp.Core.Models.Server.MemberCache"/>
+            - Invoke <see cref="E:RevSharp.Core.Models.Server.MemberLeft"/>
+            </summary>
+            <param name="userId"></param>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.OnRoleDeleted(System.String)">
+            <summary>
+            - If exists in <see cref="P:RevSharp.Core.Models.Server.Roles"/>
+                - Invoke <see cref="E:RevSharp.Core.Models.ServerRole.Deleted"/>
+                - Remove from <see cref="P:RevSharp.Core.Models.Server.Roles"/>
+            - For ever member
+                - If has roleId force update calculated permissions
+                - If has roleId then remove it from that member
+            - Invoke <see cref="E:RevSharp.Core.Models.Server.RoleDeleted"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Acknowledge(RevSharp.Core.Client)">
+            <summary>
+            Mark server as read
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Acknowledge">
+            <summary>
+            Mark server as read
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Edit(RevSharp.Core.Client,RevSharp.Core.Models.ServerData)">
+            <summary>
+            Edit Server
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Edit(RevSharp.Core.Models.ServerData)">
+            <summary>
+            Edit Server
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Edit(RevSharp.Core.Client,System.String,System.String,System.String,System.String,RevSharp.Core.Models.ServerCategory[],System.Nullable{System.Int32},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String[])">
+            <summary>
+            Edit Server
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.Edit(System.String,System.String,System.String,System.String,RevSharp.Core.Models.ServerCategory[],System.Nullable{System.Int32},System.Nullable{System.Boolean},System.Nullable{System.Boolean},System.String[])">
+            <summary>
+            Edit Server
+            </summary>
+            <returns>Was it successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.Server.GetMemberRoles(System.String,System.Boolean)">
+            <summary>
+            Get a LinkedList of the roles that a member has.
+            </summary>
+            <exception cref="T:RevSharp.Core.RevoltException">When member is not found.</exception>
+        </member>
+        <member name="P:RevSharp.Core.Models.ServerRole.Name">
+            <summary>
+            Role Name
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.ServerRole.Colour">
+            <summary>
+            This can be any valid CSS colour
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.ServerRole.Hoist">
+            <summary>
+            Whether this role should be shown separately on the member sidebar
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.ServerRole.Rank">
+            <summary>
+            Ranking of this role
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.LoginSuccessResponse.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.LoginSuccessResponse.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.LoginSuccessResponse.Token">
+            <summary>
+            Session token
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.LoginSuccessResponse.DisplayName">
+            <summary>
+            Display name
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.LoginSuccessResponse.Subscription">
+            <summary>
+            Web Push subscription
+            </summary>
+        </member>
+        <member name="T:RevSharp.Core.Models.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.IsCurrentUser">
+            <summary>
+            Is this user the current used that we are connected to?
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Id">
+            <summary>
+            Unique Id
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Username">
+            <summary>
+            Username
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Discriminator">
+            <summary>
+            Discriminator
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.DisplayName">
+            <summary>
+            Display Name
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Avatar">
+            <summary>
+            Avatar attachment
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Relations">
+            <summary>
+            Relationships with other users
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Badges">
+            <summary>
+            Bitfield of user badges
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Status">
+            <summary>
+            User's current status
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Profile">
+            <summary>
+            User's profile page
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Flags">
+            <summary>
+            Enum of user flags
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.IsPrivileged">
+            <summary>
+            Whether this user is privileged
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Bot">
+            <summary>
+            Bot information. Only set when this user is actually a bot.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Relationship">
+            <summary>
+            Current session user's relationship with this user
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.IsOnline">
+            <summary>
+            Whether this user is currently online
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.Permission">
+            <summary>
+            Calculated permission for DM's
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.Fetch(RevSharp.Core.Client)">
+            <summary>
+            Pull latest data from API
+            </summary>
+            <param name="client"></param>
+            <returns>Was fetch successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.Fetch">
+            <summary>
+            Pull latest data from API
+            </summary>
+            <returns>Was fetch successful</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.FetchProfile(RevSharp.Core.Client)">
+            <summary>
+            Fetch this user's profile
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.FetchProfile">
+            <summary>
+            Fetch this user's profile
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.FetchDMChannel(RevSharp.Core.Client)">
+            <summary>
+            Fetch the <see cref="T:RevSharp.Core.Models.DirectMessageChannel"/> for this user. This will be <see cref="T:RevSharp.Core.Models.SavedMessagesChannel"/> if this is the user that we are logged in as.
+            </summary>
+            <returns><see cref="T:RevSharp.Core.Models.SavedMessagesChannel"/> when you are this user, <see cref="T:RevSharp.Core.Models.DirectMessageChannel"/> when you are not.</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.FetchDMChannel">
+            <summary>
+            Fetch the <see cref="T:RevSharp.Core.Models.DirectMessageChannel"/> for this user. This will be <see cref="T:RevSharp.Core.Models.SavedMessagesChannel"/> if this is the user that we are logged in as.
+            </summary>
+            <returns><see cref="T:RevSharp.Core.Models.SavedMessagesChannel"/> when you are this user, <see cref="T:RevSharp.Core.Models.DirectMessageChannel"/> when you are not.</returns>
+        </member>
+        <member name="E:RevSharp.Core.Models.User.StartTyping">
+            <summary>
+            Emitted when this user starts typing in the channel specified.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.OnStartTyping(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.User.StartTyping"/>
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Models.User.StopTyping">
+            <summary>
+            Emitted when this user stops typing in the channel specified.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.OnStopTyping(System.String)">
+            <summary>
+            Invoke <see cref="E:RevSharp.Core.Models.User.StopTyping"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.UpdateProfile(RevSharp.Core.Client,System.String,System.String)">
+            <param name="content">Profile Content, can be formatted in markdown and katex</param>
+            <param name="background">Attachment Id for the Background</param>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.UpdateProfile(System.String,System.String)">
+            <param name="content">Profile Content, can be formatted in markdown and katex</param>
+            <param name="background">Attachment Id for the Background</param>
+        </member>
+        <member name="M:RevSharp.Core.Models.User.SetFriendState(RevSharp.Core.Client,System.Boolean)">
+            <param name="state">True: Accept friend request, False: deny friend request/remove as friend</param>
+            <returns>Is response code 200</returns>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.Developer">
+            <summary>
+            Revolt Developer
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.Translator">
+            <summary>
+            Helped translate revolt
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.Supporter">
+            <summary>
+            Monetarily supported Revolt
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.ResponsibleDisclosure">
+            <summary>
+            Responsibly disclosed a security issue
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.Founder">
+            <summary>
+            Revolt Founder
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.PlatformModeration">
+            <summary>
+            Platform moderator
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.ActiveSupporter">
+            <summary>
+            Active monetary supporter
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.Paw">
+            <summary>
+            🦊🦝
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.EarlyAdopter">
+            <summary>
+            Joined as one of the first 1000 users in 2021
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.ReservedRelevantJokeBadge1">
+            <summary>
+            Amogus
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.Badges.ReservedRelevantJokeBadge2">
+            <summary>
+            Low resolution troll face
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Username">
+            <summary>
+            Username
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Avatar">
+            <summary>
+            Avatar as file attachment
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Relations">
+            <summary>
+            Relationship with other users
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Badges">
+            <summary>
+            Bitfield of user badges
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Status">
+            <summary>
+            User's current status
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Profile">
+            <summary>
+            User's profile page
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Flags">
+            <summary>
+            Enum of user flags
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.IsPrivileged">
+            <summary>
+            Whether this user is privileged
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Bot">
+            <summary>
+            Bot information (if this is a bot)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.Relationship">
+            <summary>
+            Current session user's relationship with this user
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUser.IsOnline">
+            <summary>
+            Whether this user is currently online
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUserStatus.Text">
+            <summary>
+            Custom status text
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUserStatus.Presence">
+            <summary>
+            Current presence option
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IUserProfile.Content">
+            <summary>
+            Text content on user's profile
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserFlags.Suspended">
+            <summary>
+            User has been suspended from the platform
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserFlags.Deleted">
+            <summary>
+            User has deleted their account
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserFlags.Banned">
+            <summary>
+            User was banned off the platform
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserPresence.Online">
+            <summary>
+            User is online
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserPresence.Idle">
+            <summary>
+            User is not currently available
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserPresence.Focus">
+            <summary>
+            User is focusing / will only receive mentions
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserPresence.Busy">
+            <summary>
+            User is busy / will not receive any notifications
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.UserPresence.Invisible">
+            <summary>
+            User appears to be offline
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateData.DisplayName">
+            <summary>
+            New display name
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateData.Avatar">
+            <summary>
+            Attachment Id for avatar
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateData.Badges">
+            <summary>
+            Bitfield of user badges
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateData.Flags">
+            <summary>
+            Enum of user flags
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateProfileData.Content">
+            <summary>
+            Text to set as user profile description
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateProfileData.Background">
+            <summary>
+            Attachment Id for background
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateStatusData.Text">
+            <summary>
+            Custom status text
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.UserUpdateStatusData.PresenceString">
+            <summary>
+            Current presence option
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.WebsocketClient.Connect">
+            <summary>
+            Create connection to Bonfire server
+            </summary>
+            <exception cref="T:RevSharp.Core.ClientInitializeException">Thrown when <see cref="!:Client.EndpointNodeInfo.WebSocket"/> is null</exception>
+        </member>
+        <member name="E:RevSharp.Core.WebsocketClient.WhenConnect">
+            <summary>
+            Invoked when the Ready message is received.
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.WebsocketClient.WhenDisconnect">
+            <summary>
+            Invoked when <see cref="!:WebSocket.Client.WebsocketClient.DisconnectionHappened"/> is invoked.
+            </summary>
+        </member>
+    </members>
+</doc>
