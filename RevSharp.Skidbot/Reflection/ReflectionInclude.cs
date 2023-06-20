@@ -59,15 +59,14 @@ public class ReflectionInclude
         item.Client = _client;
         _client.MessageReceived += async (m) =>
         {
-            if (m.AuthorId != _client.CurrentUserId)
+            if (m.AuthorId != _client.CurrentUserId && !m.IsSystemMessage)
             {
                 try
                 {
-                    bool isSystemMessage = m.SystemMessage != null && m.SystemMessage?.Type.Length > 3;
                     bool hasContent = m.Content?.Length > 0;
                     bool notSelf = m.AuthorId != _client.CurrentUserId;
                     bool startsWithPrefix = (m.Content ?? "").StartsWith(Program.ConfigData.Prefix);
-                    if (item.BaseCommandName != null && notSelf && !isSystemMessage && hasContent && startsWithPrefix)
+                    if (item.BaseCommandName != null && notSelf && hasContent && startsWithPrefix)
                     {
                         var commandInfo = CommandHelper.FetchInfo(m);
                         if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
