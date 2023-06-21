@@ -7,10 +7,9 @@ namespace RevSharp.Skidbot.Modules;
 [RevSharpModule]
 public class EconBalanceModule : BaseModule
 {
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo(message);
-        if (info == null || (info.Command != "bal" && info.Command != "balance"))
+        if (info.Command != "balance")
             return;
         
         var controller = Reflection.FetchModule<EconDataController>();
@@ -42,7 +41,6 @@ public class EconBalanceModule : BaseModule
         {
             "View your balance for this server",
             "```",
-            $"{p}bal        - View balance",
             $"{p}balance    - View Balance",
             "```"
         });

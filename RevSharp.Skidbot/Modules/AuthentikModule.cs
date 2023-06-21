@@ -43,13 +43,12 @@ public class AuthentikModule : BaseModule
     public override string? HelpCategory => "admin";
     public override string? BaseCommandName => "auth";
 
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
         if (!Program.ConfigData.OwnerUserIds.Contains(message.AuthorId))
             return;
 
-        var info = CommandHelper.FetchInfo(message);
-        if (info == null || info.Command != "auth")
+        if (info.Command != "auth")
             return;
 
         string action = " ";

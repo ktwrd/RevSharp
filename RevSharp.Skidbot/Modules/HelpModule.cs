@@ -43,9 +43,8 @@ public class HelpModule : BaseModule
         }        
         return Task.CompletedTask;
     }
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo(message);
         if (info is not { Command: "help" })
             return;
 

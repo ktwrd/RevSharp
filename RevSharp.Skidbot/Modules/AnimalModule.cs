@@ -48,9 +48,8 @@ public class AnimalModule : BaseModule
 
         CachedAnimals = deser.Available.ToList();
     }
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo(message);
         if (info?.Command != "animal")
             return;
 

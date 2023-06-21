@@ -91,6 +91,12 @@
             <param name="endpoint">When null, uses <see cref="P:RevSharp.Core.Client.Endpoint"/></param>
             <returns>Was successful with fetching node details. When true, <see cref="P:RevSharp.Core.Client.EndpointNodeInfo"/> is set.</returns>
         </member>
+        <member name="M:RevSharp.Core.Client.GetSavedMessagesChannel">
+            <summary>
+            Get the SavedMessagesChannel for the current user you're logged in as.
+            </summary>
+            <returns>Will return null if you're not logged in or it failed to fetch.</returns>
+        </member>
         <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.BaseChannel)">
             <returns>Was this channel in the cache already</returns>
         </member>
@@ -195,16 +201,40 @@
         <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.Message[])">
             <returns>Message Ids that were in the cache already</returns>
         </member>
+        <member name="M:RevSharp.Core.Client.GetMessage(System.String,System.String)">
+            <summary>
+            Get a Message from the cache or directly from the API
+            </summary>
+            <param name="channelId">Channel Id the message belongs to</param>
+            <param name="messageId">Message Id to fetch</param>
+            <returns>Will return `null` if it failed to fetch or something else happened.</returns>
+        </member>
         <member name="M:RevSharp.Core.Client.GetMessageOrCache(System.String,System.String)">
             <summary>
             Return message from cache if it exists there. Otherwise return <see cref="M:RevSharp.Core.Client.GetMessage(System.String,System.String)"/>
             </summary>
         </member>
+        <member name="M:RevSharp.Core.Client.AddToCache(RevSharp.Core.Models.Member)">
+            <summary>
+            Add server member to cache
+            </summary>
+            <param name="member">Target member to attempt to add to the cache</param>
+            <returns>Is this member in the cache already?</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.GetMember(System.String,System.String,System.Boolean)">
+            <summary>
+            Get server member
+            </summary>
+            <param name="serverId">Server Id the member belongs to</param>
+            <param name="userId">User Id to fetch</param>
+            <param name="forceUpdate">Force an update from the API</param>
+            <returns>Returns `null` when failed to fetch or something else bad happens.</returns>
+        </member>
         <member name="M:RevSharp.Core.Client.GetAllServers">
             <summary>
             Transform the ServerCache into a LinkedList
             </summary>
-            <returns></returns>
+            <returns>LinkedList of Servers.</returns>
         </member>
         <member name="M:RevSharp.Core.Client.GetServer(System.String,System.Boolean)">
             <summary>
@@ -219,6 +249,24 @@
         </member>
         <member name="M:RevSharp.Core.Client.InsertIntoCache(RevSharp.Core.Models.Server[])">
             <returns>Sever Ids that were in the cache already</returns>
+        </member>
+        <member name="M:RevSharp.Core.Client.CreateServer(System.String,System.String,System.Boolean)">
+            <summary>
+            Create a server. This can only be accessed if you are not a bot.
+            </summary>
+            <param name="name">Name of the server</param>
+            <param name="description">Server description</param>
+            <param name="nsfw">Is this an NSFW server</param>
+            <returns>`null` when failed to create server.</returns>
+            <exception cref="T:System.Exception">When parameter validation fails or you're logged in as a bot</exception>
+        </member>
+        <member name="M:RevSharp.Core.Client.CreateServer(RevSharp.Core.CreateServerData)">
+            <summary>
+            Create a server with <see cref="T:RevSharp.Core.CreateServerData"/>
+            </summary>
+            <param name="data">Data to create the server with</param>
+            <returns>`null` when failed to create the server.</returns>
+            <exception cref="T:System.Exception">Thrown when you're logged in as a bot.</exception>
         </member>
         <member name="M:RevSharp.Core.Client.SessionLogin(System.String,System.String,System.String)">
             <summary>
@@ -319,7 +367,7 @@
         </member>
         <member name="T:RevSharp.Core.FeatureFlags">
             <summary>
-            Used to centralize usage of <see cref="M:System.Environment.GetEnvironmentVariable(System.String)"/> so it's not scattered around the codebase.
+            Used to centralize usage of <see cref="!:Environment.GetEnvironmentVariable()"/> so it's not scattered around the codebase.
             </summary>
         </member>
         <member name="M:RevSharp.Core.FeatureFlags.ParseBool(System.String,System.Boolean)">
@@ -329,7 +377,7 @@
             </summary>
             <param name="environmentKey"></param>
             <param name="defaultValue">Used when environment variable is not set.</param>
-            <returns>`true` when envar is true, `false` when not true, <see cref="!:defaultValue"/> when not found.</returns>
+            <returns>`true` when the environment variable is true, `false` when not true, <paramref name="defaultValue"/> when not found.</returns>
         </member>
         <member name="M:RevSharp.Core.FeatureFlags.ParseString(System.String,System.String)">
             <summary>
@@ -390,6 +438,9 @@
             </summary>
         </member>
         <member name="P:RevSharp.Core.Models.BaseTypedResponse.Type">
+            <inheritdoc />
+        </member>
+        <member name="P:RevSharp.Core.Models.IBaseTypedResponse.Type">
             <summary>
             Type of the event
             </summary>
@@ -407,49 +458,53 @@
              </summary>
         </member>
         <member name="P:RevSharp.Core.Models.Bot.OwnerId">
-            <summary>
-            User Id of the bot owner
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.Token">
-            <summary>
-            Token used to authenticate requests for this bot
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.IsPublic">
-            <summary>
-            Whether the bot is public
-            (may be invited by anyone)
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.EnableAnalytics">
-            <summary>
-            Whether to enable analytics
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.IsDiscoverable">
-            <summary>
-            Whether this bot should be publicly discoverable
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.InteractionsUrl">
-            <summary>
-            Reserved; URL for handling interactions
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.TermsOfServiceUrl">
-            <summary>
-            URL for terms of service
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.PrivacyPolicyUrl">
-            <summary>
-            URL for privacy policy
-            </summary>
+            <inheritdoc />
         </member>
         <member name="P:RevSharp.Core.Models.Bot.Flags">
+            <inheritdoc />
+        </member>
+        <member name="M:RevSharp.Core.Models.Bot.Delete(RevSharp.Core.Client)">
+            <inheritdoc />
+        </member>
+        <member name="T:RevSharp.Core.Models.BotFlags">
             <summary>
-            Enum of bot flags
+            Flags for <see cref="T:RevSharp.Core.Models.IBot"/>
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.BotFlags.Unknown">
+            <summary>
+            Failed to deserialize flag (default value)
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.BotFlags.Verified">
+            <summary>
+            Bot is verified by Revolt
+            </summary>
+        </member>
+        <member name="F:RevSharp.Core.Models.BotFlags.Official">
+            <summary>
+            1st Party Revolt Bot
             </summary>
         </member>
         <member name="P:RevSharp.Core.Models.BaseChannel.Id">
@@ -781,6 +836,59 @@
             Valid Values: File|Text|Image|Video|Audio
             </summary>
         </member>
+        <member name="P:RevSharp.Core.Models.IBot.OwnerId">
+            <summary>
+            User Id of the bot owner
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.Token">
+            <summary>
+            Token used to authenticate requests for this bot
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.IsPublic">
+            <summary>
+            Whether the bot is public
+            (may be invited by anyone)
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.EnableAnalytics">
+            <summary>
+            Whether to enable analytics
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.IsDiscoverable">
+            <summary>
+            Whether this bot should be publicly discoverable
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.InteractionsUrl">
+            <summary>
+            Reserved; URL for handling interactions
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.TermsOfServiceUrl">
+            <summary>
+            URL for terms of service
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.PrivacyPolicyUrl">
+            <summary>
+            URL for privacy policy
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.IBot.Flags">
+            <summary>
+            Enum of bot flags
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.IBot.Delete(RevSharp.Core.Client)">
+            <summary>
+            Delete this bot. Client must be the owner of this bot.
+            </summary>
+            <param name="client">Client to use when deleting this bot.</param>
+            <returns>Was it successful? (Status Code is 2xx)</returns>
+        </member>
         <member name="P:RevSharp.Core.Models.ISnowflake.Id">
             <summary>
             Unique Id
@@ -908,6 +1016,11 @@
         <member name="P:RevSharp.Core.Models.Message.SystemMessage">
             <summary>
             System message
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.Message.IsSystemMessage">
+            <summary>
+            Is this a System Message? 
             </summary>
         </member>
         <member name="P:RevSharp.Core.Models.Message.Attachments">
@@ -1364,6 +1477,16 @@
         <member name="P:RevSharp.Core.Models.User.IsCurrentUser">
             <summary>
             Is this user the current used that we are connected to?
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.IsCurrentUserOwner">
+            <summary>
+            Does <see cref="P:RevSharp.Core.Client.CurrentUserId"/> match <see cref="P:RevSharp.Core.Models.Bot.OwnerId"/>. When either are `null`, this will be `false`
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.User.IsBot">
+            <summary>
+            Is this user a Bot?
             </summary>
         </member>
         <member name="P:RevSharp.Core.Models.User.Id">

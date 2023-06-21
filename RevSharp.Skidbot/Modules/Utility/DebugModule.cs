@@ -57,9 +57,8 @@ public class DebugModule : BaseModule
         embed.Description = HelpContent();
         await message.Reply(embed);
     }
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo(message);
         if (info?.Command != InternalName)
             return;
 

@@ -52,14 +52,11 @@ public partial class ContentDetectionModule : BaseModule
         });
     }
 
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
         // Ignore when ContentDetection is disabled
         if (!FeatureFlags.EnableContentDetection)
             return;
-        ContentDetectionTask(message);
-
-        var info = CommandHelper.FetchInfo(message);
         if (info == null || info.Command != InternalName)
             return;
 
@@ -90,6 +87,13 @@ public partial class ContentDetectionModule : BaseModule
             embed.Description = $"Action `{action}` not implemented";
             await message.Reply(embed);
         }
+    }
+    public override async Task MessageReceived(Message message)
+    {
+        // Ignore when ContentDetection is disabled
+        if (!FeatureFlags.EnableContentDetection)
+            return;
+        ContentDetectionTask(message);
     }
 
     public async Task ContentDetectionTask(Message message)

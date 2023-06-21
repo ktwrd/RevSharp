@@ -8,10 +8,9 @@ namespace RevSharp.Skidbot.Modules;
 [RevSharpModule]
 public class EconDailyModule : BaseModule
 {
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo(message);
-        if (info == null || info.Command != "daily")
+        if (info.Command != "daily")
             return;
 
         var controller = Reflection.FetchModule<EconDataController>();

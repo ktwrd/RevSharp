@@ -29,12 +29,10 @@ public class DiceModule : BaseModule
             "```"
         });
     }
-    public override async Task MessageReceived(Message message)
+
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        var info = CommandHelper.FetchInfo("r.", message.Content);
-        if (info == null)
-            return;
-        if (info.Command != "dice")
+        if (info is not {Command: "dice"})
             return;
         var help = Reflection.FetchModule<HelpModule>();
 

@@ -71,8 +71,8 @@ public class ReflectionInclude
                         var commandInfo = CommandHelper.FetchInfo(m);
                         if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                         {
-                            var author = await _client.GetUser(m.AuthorId);
-                            if (author != null && author.Bot == null)
+                            var author = await _client.GetUser(m.AuthorId, forceUpdate: false);
+                            if (author is not { IsBot: true })
                             {
                                 await item.CommandReceived(commandInfo, m);
 
@@ -84,20 +84,20 @@ public class ReflectionInclude
 
                                 var bch = await _client.GetChannel(m.ChannelId);
                                 INamedChannel? channel = null;
-                                if (bch is INamedChannel)
-                                    channel = (INamedChannel)bch;
+                                if (bch is INamedChannel namedChannel)
+                                    channel = namedChannel;
 
-                                statControl.CommandCounter.WithLabels(new string[]
+                                statControl?.CommandCounter.WithLabels(new string[]
                                 {
-                            server?.Name ?? "<None>",
-                            server?.Id ?? "<None>",
-                            authorName,
-                            author?.Id ?? "<None>",
-                            channel?.Name ?? "<None>",
-                            bch?.Id ?? "<None>",
-                            commandInfo.Command,
-                            string.Join(" ", commandInfo.Arguments),
-                            item.HelpCategory ?? "<None>"
+                                    server?.Name ?? "<None>",
+                                    server?.Id ?? "<None>",
+                                    authorName,
+                                    author?.Id ?? "<None>",
+                                    channel?.Name ?? "<None>",
+                                    bch?.Id ?? "<None>",
+                                    commandInfo.Command,
+                                    string.Join(" ", commandInfo.Arguments),
+                                    item.HelpCategory ?? "<None>"
                                 }).Inc();
                             }
                         }
@@ -119,9 +119,7 @@ public class ReflectionInclude
                 }
                 try
                 {
-                    var author = await _client.GetUser(m.AuthorId);
-                    if ((author?.IsBot ?? false) == false)
-                        await item.MessageReceived(m);
+                    await item.MessageReceived(m);
                 }
                 catch (Exception e)
                 {
