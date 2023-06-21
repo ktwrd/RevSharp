@@ -21,6 +21,8 @@ public partial class GoogleApiController : BaseModule
     {
         await GetDefaultCredential();
         await GetVisionCredential();
+        await GetStorageClient();
+        await GetImageAnnotator();
     }
 
     public async Task<GoogleCredential> GetDefaultCredential()

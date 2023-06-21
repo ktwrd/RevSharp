@@ -24,14 +24,28 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
         {
             ConfigCache.TryAdd(item.ServerId, item);
             ConfigCache[item.ServerId] = item;
+            
+            var s = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            ConfigCacheLastSet.TryAdd(item.ServerId, s);
+            ConfigCacheLastSet[item.ServerId] = s;
         }
         return item;
     }
 
+    public Dictionary<string, long> ConfigCacheLastSet = new Dictionary<string, long>();
+
     private Dictionary<string, AnalysisServerConfig> ConfigCache = new Dictionary<string, AnalysisServerConfig>();
 
+    /// <summary>
+    /// If config was last fetched more than 1min ago, <see cref="Fetch"/> is called instead
+    /// </summary>
+    /// <param name="serverId"></param>
+    /// <returns></returns>
     public async Task<AnalysisServerConfig?> Get(string serverId)
     {
+        if (ConfigCacheLastSet.TryGetValue(serverId, out var lastUpdated))
+            if ((DateTimeOffset.UtcNow.ToUnixTimeSeconds() - lastUpdated) > 120)
+                return await Fetch(serverId);
         if (ConfigCache.TryGetValue(serverId, out var value))
             return value;
 

@@ -20,12 +20,6 @@ public partial class GoogleApiController
     protected Dictionary<string, string> _safeSearchHashType = new Dictionary<string, string>();
 
     /// <summary>
-    /// Key: SHA256 of Value
-    /// Value: Byte array of data
-    /// </summary>
-    protected Dictionary<string, byte[]> _safeSearchByteHashCache = new Dictionary<string, byte[]>();
-
-    /// <summary>
     /// Key: Url
     /// Value: SHA256 Hash of content
     /// </summary>

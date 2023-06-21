@@ -17,11 +17,10 @@ public class AnalysisResult
     public decimal RacyAverage { get; set; }
     public decimal Total { get; set; }
     public decimal Average { get; set; }
-    public List<SafeSearchAnnotation> Annotations { get; set; }
-
-    public void AddAnnotation(SafeSearchAnnotation annotation)
+    public List<(SafeSearchAnnotation, string)> Annotations { get; set; }
+    public void AddAnnotation(SafeSearchAnnotation annotation, string tag)
     {
-        Annotations.Add(annotation);
+        Annotations.Add((annotation, tag));
         UpdateData();
     }
 
@@ -34,7 +33,7 @@ public class AnalysisResult
         decimal racy = 0;
 
         var workingAnnotations = Annotations.ToArray();
-        foreach (var item in workingAnnotations)
+        foreach (var (item, note) in workingAnnotations)
         {
             adult += (int)item.Adult;
             spoof += (int)item.Spoof;
@@ -86,6 +85,6 @@ public class AnalysisResult
     
     public AnalysisResult()
     {
-        Annotations = new List<SafeSearchAnnotation>();
+        Annotations = new List<(SafeSearchAnnotation, string)>();
     }
 }

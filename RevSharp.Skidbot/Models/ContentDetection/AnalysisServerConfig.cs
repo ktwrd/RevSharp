@@ -134,7 +134,16 @@ public class ContentAnalysisMessageMatch
             foreach (var key in validKeys)
             {
                 var thresholdValue = thresholdDict[key];
+                if (thresholdValue < 0)
+                    continue;
                 var analysisResult = decimal.Parse(analysisDict[key + "Average"].ToString());
+                var things = Analysis.Annotations.Select(
+                    (v) =>
+                    {
+                        var dct = JsonSerializer.Deserialize<Dictionary<string, object>>(
+                            JsonSerializer.Serialize(v.Item1, Program.SerializerOptions), Program.SerializerOptions);
+                        return ((dct[key]).ToString(), v.Item2);
+                    }).ToArray();
                 if (analysisResult >= thresholdValue)
                     dict.TryAdd(key, analysisResult);
             }

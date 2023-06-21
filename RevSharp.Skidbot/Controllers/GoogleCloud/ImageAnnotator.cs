@@ -49,7 +49,7 @@ public partial class GoogleApiController
         var filename = Path.GetFileName(obj.Name);
         
         var existingSummary = GetSummary(url: filename);
-        if (existingSummary is
+        if (existingSummary != null && existingSummary is
             {
                 Annotation: not null
             })
@@ -72,36 +72,21 @@ public partial class GoogleApiController
         if (!_hasCacheRead)
             await ReadCache();
         
-        var existingSummary = GetSummary(url: url);
+        if (_annotationCache.TryGetValue(url, out var search))
+        {
+            return search;
+        }
+        
+        /*var existingSummary = GetSummary(url: url);
         if (existingSummary is
             {
                 Annotation: not null
             })
-            return existingSummary.Annotation;
+            return existingSummary.Annotation;*/
         
         // when fails, return null
-        if (!await DownloadToCache(url))
-            return null;
-
-        if (_urlContentHashCache.TryGetValue(url, out var hash))
-        {
-            if (_safeSearchByteHashCache.TryGetValue(hash, out var byteData))
-            {
-                var image = VisionImage.FromBytes(byteData);
-                var data = await PerformSafeSearch(image);
-
-                if (data != null)
-                {
-                    _annotationCache.TryAdd(hash, data);
-                    _annotationCache.TryAdd(url, data);
-                    await SaveCache();
-                }
-
-                return data;
-            }
-        }
-
-        return null;
+        var uploadResult = await UploadToBucket(url, Program.ConfigData.ContentDetectionBucket, ImageContentTypes);
+        return await PerformSafeSearch(uploadResult);
     }
     public async Task<SafeSearchAnnotation?> PerformSafeSearch(VisionImage image)
     {
@@ -112,13 +97,16 @@ public partial class GoogleApiController
         var data = await client.DetectSafeSearchAsync(image);
         return data;
     }
-    public async Task<SafeSearchAnnotation?> PerformSafeSearch(RevoltClient revoltClient, RevoltFile file)
+    public Task<SafeSearchAnnotation?> PerformSafeSearch(RevoltClient revoltClient, RevoltFile file)
     {
-        var url = $"{revoltClient.EndpointNodeInfo.Features.Autumn.Url}/{file.Tag}/{file.Id}/{file.Filename}";
-        
-        return await PerformSafeSearch(url);
+        return PerformSafeSearch(file.GetURL(revoltClient));
     }
     #endregion
+
+    public static string[] ImageContentTypes => new[]
+    {
+        "image/png", "image/jpeg", "image/gif", "image/webp", "image/apng",
+    };
 
     public class SafeSearchCacheSummaryItem
     {
@@ -126,11 +114,12 @@ public partial class GoogleApiController
         public string Hash { get; set; }
         public string ContentType { get; set; }
         public SafeSearchAnnotation? Annotation { get; set; }
-        public byte[] Data { get; set; }
     }
 
     public SafeSearchCacheSummaryItem? GetSummary(string? url = null, string? hash = null)
     {
+        if (!(_annotationCache.ContainsKey(hash ?? "") && _annotationCache.ContainsKey(url ?? "")) || !_urlContentHashCache.ContainsKey(url ?? ""))
+            return null;
         if (url != null)
         {
             if (_urlContentHashCache.TryGetValue(url, out var h))
@@ -139,10 +128,8 @@ public partial class GoogleApiController
             }
         }
 
-        if (hash == null || !_safeSearchByteHashCache.ContainsKey(hash))
-            return null;
 
-        _annotationCache.TryGetValue(hash, out var annotation);
+        _annotationCache.TryGetValue(hash ?? url, out var annotation);
         
         return new SafeSearchCacheSummaryItem()
         {
@@ -150,73 +137,14 @@ public partial class GoogleApiController
             Hash = hash,
             ContentType = _safeSearchHashType[hash],
             Annotation = annotation,
-            Data = _safeSearchByteHashCache[hash]
         };
     }
 
-    private void AddToCache(string hash, string url, string contentType, byte[] data)
+    private void AddToCache(string hash, string url, string contentType)
     {
         _safeSearchHashType.TryAdd(hash, contentType);
-        _safeSearchByteHashCache.TryAdd(hash, data);
         _urlContentHashCache.TryAdd(url, hash);
     }
-    
-    /// <summary>
-    /// Download a url to the local cache.
-    /// </summary>
-    /// <param name="url">Url to attempt cache</param>
-    /// <returns>Was successful</returns>
-    private async Task<bool> DownloadToCache(string url)
-    {
-        if (!_hasCacheRead)
-            await ReadCache();
-
-        if (_urlContentHashCache.ContainsKey(url))
-        {
-            return true;
-        }
-        var result = await _httpClient.GetAsync(url);
-        if (result.StatusCode != HttpStatusCode.OK)
-            return false;
-        
-        var validContentType = new string[]
-        {
-            "image/png",
-            "image/jpeg",
-            "image/gif",
-            "image/webp",
-            "image/apng",
-        };
-        var contentType = result.Content.Headers.ContentType?.ToString();
-        if (contentType == null || result.Content.Headers.ContentType == null || !validContentType.Contains(result.Content.Headers.ContentType?.ToString()))
-            return false;
-
-        var data = await FetchByteArrayFromResponse(result);
-
-        var contentHash = ComputeSha256Hash(data);
-
-        AddToCache(contentHash, url, contentType, data);
-        
-        await SaveCache();
-        
-        return true;
-    }
-    
-    public static string ComputeSha256Hash(byte[] bytes)  
-    {  
-        // Create a SHA256   
-        using (SHA256 sha256Hash = SHA256.Create())  
-        {    
-  
-            // Convert byte array to a string   
-            StringBuilder builder = new StringBuilder();  
-            for (int i = 0; i < bytes.Length; i++)  
-            {  
-                builder.Append(bytes[i].ToString("x2"));  
-            }  
-            return builder.ToString();  
-        }  
-    } 
 
     private async Task<byte[]> FetchByteArrayFromResponse(HttpResponseMessage response)
     {
@@ -229,4 +157,16 @@ public partial class GoogleApiController
 
         return buffer.Length == 0 ? Array.Empty<byte>() : buffer.ToArray();
     }
+        
+    public static string ComputeSha256Hash(byte[] bytes)  
+    {  
+        var crypt = new SHA256Managed();
+        string hash = String.Empty;
+        byte[] crypto = crypt.ComputeHash(bytes);
+        foreach (byte theByte in crypto)
+        {
+            hash += theByte.ToString("x2");
+        }
+        return hash;
+    } 
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RevSharp.Core.Models;
 
 namespace RevSharp.Skidbot.Controllers
 {
@@ -35,6 +36,32 @@ namespace RevSharp.Skidbot.Controllers
             await UpdateData();
             Observable.Interval(TimeSpan.FromSeconds(60))
                 .Subscribe(_ => UpdateData().Wait());
+            Client.ServerCreated += (s) =>
+            {
+                LogEvent(
+                    "ServerCreated", string.Join(
+                        "\n", new string[]
+                        {
+                            $"`Id {s.Id}`", $"`Name: {s.Name}`",
+                            $"`Owner: {s.Owner?.Username}#{s.Owner?.Discriminator}` <@{s.OwnerId}>"
+                        }));
+            };
+            Client.ServerDeleted += (s) =>
+            {
+                LogEvent(
+                    "ServerDeleted", $"`Id {s}`");
+            };
+        }
+
+        private async Task LogEvent(string eventName, string content)
+        {
+            var channel = await Client.GetChannel(Program.ConfigData.LogChannelId) as TextChannel;
+            await channel.SendMessage(
+                new SendableEmbed()
+                {
+                    Title = $"Log - {eventName}",
+                    Description = content,
+                });
         }
         private async Task InitMetrics()
         {

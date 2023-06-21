@@ -83,6 +83,8 @@ public partial class ContentDetectionModule : BaseModule
             await Command_Status(info, message);
         else if (action == "request")
             await Command_Request(info, message);
+        else if (action == "admin")
+            await Command_Admin(info, message);
         else
         {
             embed.Description = $"Action `{action}` not implemented";
@@ -117,12 +119,42 @@ public partial class ContentDetectionModule : BaseModule
         var flagMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.FlagThreshold);
         if (deleteMatch.Majority != null)
         {
-            message.Delete();
             WriteLogThreshold(
                 serverConfig,
                 LogDetailReason.DeleteThresholdMet,
                 deleteMatch,
                 message);
+
+            try
+            {
+                if (!await message.Delete())
+                {
+                    var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+                    await channel.SendMessage(new SendableEmbed()
+                    {
+                        Title = "Failed to delete message!",
+                        Description = string.Join("\n", new string[]
+                        {
+                            $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>."
+                        })
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+                await channel.SendMessage(new SendableEmbed()
+                {
+                    Title = "Failed to delete message!",
+                    Description = string.Join("\n", new string[]
+                    {
+                        $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>.",
+                        "```",
+                        ex.Message,
+                        "```"
+                    })
+                });
+            }
         }
         else if (flagMatch.Majority != null)
         {
@@ -138,7 +170,8 @@ public partial class ContentDetectionModule : BaseModule
         AnalysisServerConfig serverConfig,
         LogDetailReason reason,
         ContentAnalysisMessageMatch match,
-        Message message)
+        Message message,
+        string otherContent = "")
     {
         var embed = new SendableEmbed()
         {
@@ -148,32 +181,38 @@ public partial class ContentDetectionModule : BaseModule
         embed.Title += reason switch
         {
             LogDetailReason.DeleteThresholdMet => "Deletion threshold met",
-            LogDetailReason.FlagThresholdMet => "Flag threshold met"
+            LogDetailReason.FlagThresholdMet => "Flag threshold met",
+            _ => reason.ToString()
         };
 
         var user = await Client.GetUser(message.AuthorId);
-        embed.Description = string.Join(
-            "\n", new string[]
-            {
-                "Info",
-                "```",
-                $"Channel:    {message.ChannelId}",
-                $"Author:     {user.Username} ({message.AuthorId})",
-                $"Message Id: {message.Id}",
-                "```",
-                "",
-                "Detections",
-                "```",
-                string.Join("\n", match.MajorityItems),
-                "```",
-                "",
-                "Threshold Data",
-                "```json",
-            }) + JsonSerializer.Serialize(match, Program.SerializerOptions) + "\n```";
+        if (reason != LogDetailReason.Error)
+        {
+            embed.Description = string.Join(
+                "\n", new string[]
+                {
+                    "Info",
+                    "```",
+                    $"Channel:    {message.ChannelId}",
+                    $"Author:     {user.Username}#{user.Discriminator} ({message.AuthorId})",
+                    $"Message Id: {message.Id}",
+                    "```",
+                    "",
+                    "Detections",
+                    "```",
+                    string.Join("\n", match.MajorityItems),
+                    "```"
+                });
+        }
+        else
+        {
+            embed.Description = $"```\n{otherContent}\n```";
+        }
         embed.Colour = reason switch
         {
             LogDetailReason.DeleteThresholdMet => "red",
-            LogDetailReason.FlagThresholdMet => "orange"
+            LogDetailReason.FlagThresholdMet => "orange",
+            LogDetailReason.Error => "white"
         };
 
         var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
@@ -183,7 +222,8 @@ public partial class ContentDetectionModule : BaseModule
     public enum LogDetailReason
     {
         FlagThresholdMet,
-        DeleteThresholdMet
+        DeleteThresholdMet,
+        Error
     }
 
     public async Task<AnalysisResult?> AnalyzeMessage(Message message)
@@ -193,71 +233,79 @@ public partial class ContentDetectionModule : BaseModule
 
         var result = new AnalysisResult();
 
-        async Task ProcessUrl(string url)
+        async Task ProcessUrl(string url, string tag)
         {
             var data = await googleController.PerformSafeSearch(url);
             if (data != null)
             {
-                result.AddAnnotation(data);
+                result.AddAnnotation(data, tag);
             }
-        }
-
-        string ParseRevoltFile(RevoltFile file)
-        {
-            return $"{Client.EndpointNodeInfo.Features.Autumn.Url}/{file.Tag}/{file.Id}/{file.Filename}";
         }
         
         var taskList = new List<Task>();
         if (message.Attachments != null)
         {
-            foreach (var file in message.Attachments)
+            for (int i = 0; i < message.Attachments.Length; i++)
             {
+                var ii = int.Parse(i.ToString());
                 taskList.Add(new Task(delegate
                 {
-                    ProcessUrl(ParseRevoltFile(file)).Wait();
+                    string u = message.Attachments[ii].GetURL(Client);
+                    ProcessUrl(u, $"message.Attachments[{ii}]").Wait();
                 }));
+            }
+            foreach (var file in message.Attachments)
+            {
             }
         }
 
         if (message.Embeds != null)
         {
-            foreach (var imageItem in message.Embeds.OfType<ImageEmbed>())
+            var messageImageEmbeds = message.Embeds.OfType<ImageEmbed>().ToArray();
+            for (int i = 0; i < messageImageEmbeds.Length; i++)
             {
+                var ii = int.Parse(i.ToString());
                 taskList.Add(new Task(
                     delegate
                     {
-                        ProcessUrl(imageItem.Url).Wait();
+                        ProcessUrl(messageImageEmbeds[ii].Url, $"message.Embeds[{ii}].Url").Wait();
                     }));
             }
 
-            foreach (var metadataItem in message.Embeds.OfType<MetadataEmbed>())
+            var messageMetaEmbeds = message.Embeds.OfType<MetadataEmbed>().ToArray();
+            for (int i = 0; i < messageMetaEmbeds.Length; i++)
             {
+                var itm = messageMetaEmbeds[i];
+                var ii = int.Parse(i.ToString());
                 taskList.Add(new Task(
                     delegate
                     {
-                        if (metadataItem.OriginalUrl != null)
-                            ProcessUrl(metadataItem.OriginalUrl).Wait();
-                        if (metadataItem.Url != null)
-                            ProcessUrl(metadataItem.Url).Wait();
-                        if (metadataItem.IconUrl != null)
-                            ProcessUrl(metadataItem.IconUrl).Wait();
-                        if (metadataItem.Image != null)
-                            if (metadataItem.Image.Url != null)
-                                ProcessUrl(metadataItem.Image.Url).Wait();
+                        if (itm.OriginalUrl != null)
+                            ProcessUrl(itm.OriginalUrl, $"message.Embeds[{ii}].OriginalUrl").Wait();
+                        if (itm.Url != null)
+                            ProcessUrl(itm.Url, $"message.Embeds[{ii}].Url").Wait();
+                        if (itm.IconUrl != null)
+                            ProcessUrl(itm.IconUrl, $"message.Embeds[{ii}].IconUrl").Wait();
+                        if (itm.Image != null)
+                            if (itm.Image.Url != null)
+                                ProcessUrl(itm.Image.Url, $"message.Embeds[{ii}].Image.Url").Wait();
                     }));
             }
 
-            foreach (var textEmbed in message.Embeds.OfType<TextEmbed>())
+            var messageTextEmbeds = message.Embeds.OfType<TextEmbed>().ToArray();
+            for (int i = 0; i < messageTextEmbeds.Length; i++)
             {
+                var itm = messageTextEmbeds[i];
+                var ii = int.Parse(i.ToString());
                 taskList.Add(new Task(
                     delegate
                     {
-                        if (textEmbed.Url != null)
-                            ProcessUrl(textEmbed.Url).Wait();
-                        if (textEmbed.IconUrl != null)
-                            ProcessUrl(textEmbed.IconUrl).Wait();
-                        if (textEmbed.Media != null)
-                            ProcessUrl(ParseRevoltFile(textEmbed.Media)).Wait();
+                        if (itm.Url != null)
+                            ProcessUrl(itm.Url, $"message.Embeds[{ii}].Url").Wait();
+                        if (itm.IconUrl != null)
+                            ProcessUrl(itm.IconUrl, $"message.Embeds[{ii}].IconUrl").Wait();
+                        if (itm.Media != null)
+                            ProcessUrl(itm.Media.GetURL(Client), $"message.Embeds[{ii}].Media").Wait();
                     }));
             }
         }
@@ -269,7 +317,7 @@ public partial class ContentDetectionModule : BaseModule
         if (result.Total < 1)
             return result;
         
-#if DEBUG
+/*#if DEBUG
         try
         {
             var data = JsonSerializer.Serialize(result, Program.SerializerOptions);
@@ -280,33 +328,10 @@ public partial class ContentDetectionModule : BaseModule
             Log.Error(ex);
             Debugger.Break();
         }
-#endif
+#endif*/
 
         Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
 
         return result;
-    }
-
-    public async Task<Object> UploadUrlToGCS(string url)
-    {
-        var client = new HttpClient();
-        var localOutputName = Path.GetTempFileName();
-        var res = await client.GetAsync(url);
-        var content = res.Content.ReadAsByteArrayAsync().Result;
-        var hash = SkidbotHelper.CreateSha256Hash(content);
-        var relativeLocation = $"data/{hash}";
-
-        var creds = await GoogleHelper.ParseCredential(Program.ConfigData.GoogleCloud.DefaultCred);
-        var storageClient = await StorageClient.CreateAsync(creds);
-        var projectId = Program.ConfigData.GoogleCloud.DefaultCred.ProjectId;
-        var buckets = storageClient.ListBuckets(projectId);
-        if (buckets.All(v => v.Id != Program.ConfigData.ContentDetectionBucket))
-        {
-            await storageClient.CreateBucketAsync(projectId, Program.ConfigData.ContentDetectionBucket);
-        }
-
-        var r = storageClient.UploadObject(
-            Program.ConfigData.ContentDetectionBucket, relativeLocation, null, new MemoryStream(content));
-        return r;
     }
 }

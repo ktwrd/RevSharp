@@ -53,6 +53,15 @@ public class ConfigData
     /// Enable <see cref="Controllers.StatisticController"/>
     /// </summary>
     public bool PrometheusEnable { get; set; }
+    
+    /// <summary>
+    /// Channel Id where internal server logs go
+    /// </summary>
+    public string LogChannelId { get; set; }
+    /// <summary>
+    /// Server Id where the Channel Id for internal logs go.
+    /// </summary>
+    public string LogChannelServerId { get; set; }
 
     public ConfigData()
     {

@@ -15,7 +15,7 @@ public partial class ContentDetectionModule
         
         
         var server = await message.FetchServer();
-        var member = await server.GetMember(message.AuthorId);
+        var member = await server.GetMember(message.AuthorId, false);
         if (!await member.HasPermission(PermissionFlag.ManageServer))
         {
             embed.Description = $"You do not have the required permission, `ManageServer`";
@@ -25,7 +25,7 @@ public partial class ContentDetectionModule
         }
         
         var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
-        var data = await controller.Get(server.Id) ??
+        var data = await controller.Fetch(server.Id) ??
                    new AnalysisServerConfig()
                    {
                        ServerId = server.Id
@@ -71,7 +71,7 @@ public partial class ContentDetectionModule
     {
         var server = await Client.GetServer(serverId);
         var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
-        var data = await controller.Get(server.Id) ??
+        var data = await controller.Fetch(server.Id) ??
                    new AnalysisServerConfig()
                    {
                        ServerId = server.Id
@@ -84,17 +84,22 @@ public partial class ContentDetectionModule
         data.HasRequested = true;
         data.AllowAnalysis = false;
 
-        var notificationChannel = await Client.GetChannel("01H0QMAXMHXT5YF5RD61ZGK1SZ") as TextChannel;
+        var notificationChannel = await Client.GetChannel(Program.ConfigData.LogChannelId) as TextChannel;
         await notificationChannel.SendMessage(
             new SendableEmbed()
             {
                 Description = string.Join(
-                    "\n", new string[]
+                    "\n",
+                    new string[]
                     {
-                        $"```", $"ServerId: {server.Id}", $"Name: {server.Name}", $"Members: {server.Members.Count}",
+                        $"```",
+                        $"ServerId: {server.Id}",
+                        $"Name: {server.Name}",
+                        $"Members: {server.Members.Count}",
                         $"```"
                     })
-            });  
+            });
+        await controller.Set(data);
         
         return true;
     }
