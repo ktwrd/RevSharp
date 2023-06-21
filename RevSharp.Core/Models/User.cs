@@ -31,6 +31,21 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
             return Client.CurrentUserId == Bot.OwnerId;
         }
     }
+
+    /// <summary>
+    /// Is this user a Bot?
+    /// </summary>
+    [JsonIgnore]
+    public bool IsBot
+    {
+        get
+        {
+            if (Bot == null)
+                return false;
+
+            return Bot.OwnerId != null && Bot.OwnerId.Length > 3;
+        }
+    }
     
     /// <summary>
     /// Unique Id
