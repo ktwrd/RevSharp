@@ -267,4 +267,21 @@ public partial class Client
         return false;
     }
 
+    public async Task<string?> UploadFile(Stream stream, string filename, string tag, string contentType)
+    {
+        var url = $"{EndpointNodeInfo.Features.Autumn.Url}/{tag}";
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(stream), "file", contentType);
+        var response = await HttpClient.PostAsync(url, content);
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var deser = JsonSerializer.Deserialize<IdEvent>(stringContent, SerializerOptions);
+
+            return deser.Id;
+        }
+
+        return null;
+    }
+
 }

@@ -35,6 +35,12 @@ public partial class ContentDetectionModule
             embed.Description = $"Server is banned\nReason: `{data.BanReason}`";
             embed.Colour = "red";
         }
+        else if (data.LogChannelId.Length < 1)
+        {
+            embed.Description =
+                $"Log Channel is not set. Please use `{Program.ConfigData.Prefix}{BaseCommandName} setlogchannel` in the channel that you want logs to go to.";
+            embed.Colour = "red";
+        }
         else if (data.HasRequested)
         {
             embed.Description = data.AllowAnalysis switch

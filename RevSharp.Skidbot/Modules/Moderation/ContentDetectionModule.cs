@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Google.Cloud.Storage.V1;
@@ -173,50 +174,64 @@ public partial class ContentDetectionModule : BaseModule
         Message message,
         string otherContent = "")
     {
-        var embed = new SendableEmbed()
+        try
         {
-            Title = "Threshold Reached!"
-        };
-        embed.Title += " ";
-        embed.Title += reason switch
-        {
-            LogDetailReason.DeleteThresholdMet => "Deletion threshold met",
-            LogDetailReason.FlagThresholdMet => "Flag threshold met",
-            _ => reason.ToString()
-        };
+            var embed = new SendableEmbed()
+            {
+                Title = "Threshold Reached!"
+            };
+            embed.Title += " ";
+            embed.Title += reason switch
+            {
+                LogDetailReason.DeleteThresholdMet => "Deletion threshold met",
+                LogDetailReason.FlagThresholdMet => "Flag threshold met",
+                _ => reason.ToString()
+            };
 
-        var user = await Client.GetUser(message.AuthorId);
-        if (reason != LogDetailReason.Error)
-        {
-            embed.Description = string.Join(
-                "\n", new string[]
-                {
-                    "Info",
-                    "```",
-                    $"Channel:    {message.ChannelId}",
-                    $"Author:     {user.Username}#{user.Discriminator} ({message.AuthorId})",
-                    $"Message Id: {message.Id}",
-                    "```",
-                    "",
-                    "Detections",
-                    "```",
-                    string.Join("\n", match.MajorityItems),
-                    "```"
-                });
-        }
-        else
-        {
-            embed.Description = $"```\n{otherContent}\n```";
-        }
-        embed.Colour = reason switch
-        {
-            LogDetailReason.DeleteThresholdMet => "red",
-            LogDetailReason.FlagThresholdMet => "orange",
-            LogDetailReason.Error => "white"
-        };
+            var user = await Client.GetUser(message.AuthorId, false);
+            if (reason != LogDetailReason.Error)
+            {
+                embed.Description = string.Join(
+                    "\n", new string[]
+                    {
+                        "Info",
+                        "```",
+                        $"Channel:    {message.ChannelId}",
+                        $"Author:     {user.Username}#{user.Discriminator} ({message.AuthorId})",
+                        $"Message Id: {message.Id}",
+                        "```",
+                        "",
+                        "Detections",
+                        "```",
+                        string.Join("\n", match.MajorityItems),
+                        "```"
+                    });
+            }
+            else
+            {
+                embed.Description = $"```\n{otherContent}\n```";
+            }
+            embed.Colour = reason switch
+            {
+                LogDetailReason.DeleteThresholdMet => "red",
+                LogDetailReason.FlagThresholdMet => "orange",
+                LogDetailReason.Error => "white"
+            };
 
-        var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
-        await channel.SendMessage(embed);
+            var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+            var file = await Client.UploadFile(
+                new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, Program.SerializerOptions))), "match.json",
+                "attachments", "application/json");
+            await channel.SendMessage(new DataMessageSend()
+            {
+                Embeds = new []{embed},
+                Attachments = file != null ? new []{file} : Array.Empty<string>()
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to send log threshold message\n{ex}");
+        }
     }
 
     public enum LogDetailReason
@@ -253,9 +268,6 @@ public partial class ContentDetectionModule : BaseModule
                     string u = message.Attachments[ii].GetURL(Client);
                     ProcessUrl(u, $"message.Attachments[{ii}]").Wait();
                 }));
-            }
-            foreach (var file in message.Attachments)
-            {
             }
         }
 
@@ -316,19 +328,6 @@ public partial class ContentDetectionModule : BaseModule
         
         if (result.Total < 1)
             return result;
-        
-/*#if DEBUG
-        try
-        {
-            var data = JsonSerializer.Serialize(result, Program.SerializerOptions);
-            await message.Reply($"```json\n{data}\n```");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex);
-            Debugger.Break();
-        }
-#endif*/
 
         Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
 

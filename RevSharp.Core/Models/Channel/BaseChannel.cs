@@ -299,7 +299,9 @@ public class BaseChannel : Clientable, IBaseChannel
         => SendMessage(Client, content, replies, embeds, masquerade, interactions, attachments);
     public Task<Message?> SendMessage(
         Client client,
-        DataMessageSend data)
+        DataMessageSend data,
+        Stream uploadData = null,
+        string filename = null)
     {
         return Message.Send(client, Id, data);
     }
