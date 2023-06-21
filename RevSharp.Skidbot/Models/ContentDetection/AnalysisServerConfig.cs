@@ -51,6 +51,7 @@ public class AnalysisServerConfig : BaseMongoModel
         TemplateId = GeneralHelper.GenerateUID();
         DeleteThreshold = DefaultDeleteThreshold;
         FlagThreshold = DefaultFlagThreshold;
+        LogChannelId = "";
     }
     
     #region Methods for matching
