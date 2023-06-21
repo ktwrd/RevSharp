@@ -62,6 +62,7 @@ public class ConfigData
     /// Server Id where the Channel Id for internal logs go.
     /// </summary>
     public string LogChannelServerId { get; set; }
+    public string PublicLogChannelId { get; set; }
 
     public ConfigData()
     {
