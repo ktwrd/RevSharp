@@ -38,13 +38,17 @@ public partial class Client
     #region HttpClient Wrappers
     internal async Task<HttpResponseMessage> GetAsync(string url)
     {
+        await Semaphore.WaitAsync();
         var response = await HttpClient.GetAsync($"{Endpoint}{url}");
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> DeleteAsync(string url)
     {
+        await Semaphore.WaitAsync();
         var response = await HttpClient.DeleteAsync($"{Endpoint}{url}");
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
@@ -52,14 +56,18 @@ public partial class Client
     #region Patch
     internal async Task<HttpResponseMessage> PatchAsync(string url, HttpContent content)
     {
+        await Semaphore.WaitAsync();
         var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> PatchAsync(string url, Dictionary<string, object> data)
     {
+        await Semaphore.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
         var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
@@ -67,15 +75,19 @@ public partial class Client
     #region Put
     internal async Task<HttpResponseMessage> PutAsync(string url, HttpContent? content=null)
     {
+        await Semaphore.WaitAsync();
         content ??= new StringContent("");
         var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> PutAsync(string url, Dictionary<string, object> data)
     {
+        await Semaphore.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
         var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }
@@ -83,7 +95,9 @@ public partial class Client
     #region Post
     internal async Task<HttpResponseMessage> PostAsync(string url, HttpContent content)
     {
+        await Semaphore.WaitAsync();
         var response = await HttpClient.PostAsync($"{Endpoint}{url}", content);
+        Semaphore.Release();
         CheckResponseError(response);
         return response;
     }

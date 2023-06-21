@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using kate.shared.Helpers;
 using Newtonsoft.Json.Linq;
 using RevSharp.Core.Controllers;
@@ -89,6 +90,7 @@ public partial class Client
 		: this("", false)
 	{
 	}
+    internal SemaphoreSlim Semaphore { get; set; }
     /// <summary>
     /// Create an instance of the Client
     /// </summary>
@@ -102,6 +104,7 @@ public partial class Client
         Endpoint = DefaultEndpoint;
         EndpointFactory = new EndpointFactory(this);
         WSClient = new WebsocketClient(this);
+        Semaphore = new SemaphoreSlim(10);
         HttpClient = new HttpClient();
         HttpClient.DefaultRequestHeaders.Accept.Clear();
         HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
