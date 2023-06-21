@@ -119,7 +119,9 @@ public class ReflectionInclude
                 }
                 try
                 {
-                    await item.MessageReceived(m);
+                    var author = await _client.GetUser(m.AuthorId);
+                    if ((author?.IsBot ?? false) == false)
+                        await item.MessageReceived(m);
                 }
                 catch (Exception e)
                 {
