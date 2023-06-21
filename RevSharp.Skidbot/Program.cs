@@ -2,8 +2,10 @@
 using System.Reflection;
 using System.Text.Json;
 using RevSharp.Core;
+using RevSharp.Core.Models;
 using RevSharp.Skidbot.Models;
 using RevSharp.Skidbot.Reflection;
+using File = System.IO.File;
 
 namespace RevSharp.Skidbot;
 
@@ -19,6 +21,14 @@ public static class Program
     {
         ReadConfig();
         Client = new Client(ConfigData.Token, ConfigData.IsBot);
+        Client.Ready += () =>
+        {
+            var c = Client.GetChannel(ConfigData.PublicLogChannelId).Result;
+            c.SendMessage(new DataMessageSend()
+            {
+                Content = $"Running Skidbot v{Version}"
+            }).Wait();
+        };
         await InitializeModules();
         await Client.LoginAsync();
         await Task.Delay(-1);
