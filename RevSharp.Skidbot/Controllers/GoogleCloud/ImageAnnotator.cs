@@ -9,7 +9,7 @@ using kate.shared.Helpers;
 using RevoltFile = RevSharp.Core.Models.File;
 using RevoltClient = RevSharp.Core.Client;
 using VisionImage = Google.Cloud.Vision.V1.Image;
-
+using StorageObject = Google.Apis.Storage.v1.Data.Object;
 namespace RevSharp.Skidbot.Modules;
 
 public partial class GoogleApiController
@@ -40,12 +40,33 @@ public partial class GoogleApiController
         return _annotatorClient;
     }
     
-    
-
     private bool _hasCacheRead = false;
     
     
     #region PerformSafeSearch
+    public async Task<SafeSearchAnnotation?> PerformSafeSearch(StorageObject obj)
+    {
+        var filename = Path.GetFileName(obj.Name);
+        
+        var existingSummary = GetSummary(url: filename);
+        if (existingSummary is
+            {
+                Annotation: not null
+            })
+            return existingSummary.Annotation;
+
+        var objUrl = $"gs://{obj.Bucket}/{obj.Name}";
+        var image = VisionImage.FromUri(objUrl);
+        var data = await PerformSafeSearch(image);
+        if (data != null)
+        {
+            _annotationCache.TryAdd(filename, data);
+            _annotationCache.TryAdd(objUrl, data);
+            await SaveCache();
+        }
+
+        return data;
+    }
     public async Task<SafeSearchAnnotation?> PerformSafeSearch(string url)
     {
         if (!_hasCacheRead)

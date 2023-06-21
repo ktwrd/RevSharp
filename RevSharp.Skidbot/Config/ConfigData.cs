@@ -30,6 +30,10 @@ public class ConfigData
     /// </summary>
     public GCSConfig GoogleCloud { get; set; }
     /// <summary>
+    /// Name of the GCS Bucket where all uploaded media will go to.
+    /// </summary>
+    public string ContentDetectionBucket { get; set; }
+    /// <summary>
     /// User Ids who are marked as an owner.
     /// </summary>
     public string[] OwnerUserIds { get; set; }
@@ -58,6 +62,7 @@ public class ConfigData
         MongoConnectionUrl = "mongodb://user:password@localhost:27021";
         MongoDatabaseName = "skidbot_revolt";
         GoogleCloud = new GCSConfig();
+        ContentDetectionBucket = "skidbot-condetect-data";
         OwnerUserIds = Array.Empty<string>();
         AuthentikUrl = "";
         AuthentikToken = "";

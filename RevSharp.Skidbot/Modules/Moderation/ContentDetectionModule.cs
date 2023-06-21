@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using Google.Cloud.Storage.V1;
 using Google.Cloud.Vision.V1;
 using kate.shared.Helpers;
 using RevSharp.Core.Models;
@@ -101,10 +102,6 @@ public partial class ContentDetectionModule : BaseModule
         var server = await message.FetchServer();
         if (server == null)
             return;
-        #if DEBUG
-        if (server?.Id != "01G5XEAEJSEXKXCNTF8E5B004A")
-            return;
-        #endif
         var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
         if (controller == null)
             return;
@@ -288,5 +285,28 @@ public partial class ContentDetectionModule : BaseModule
         Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
 
         return result;
+    }
+
+    public async Task<Object> UploadUrlToGCS(string url)
+    {
+        var client = new HttpClient();
+        var localOutputName = Path.GetTempFileName();
+        var res = await client.GetAsync(url);
+        var content = res.Content.ReadAsByteArrayAsync().Result;
+        var hash = SkidbotHelper.CreateSha256Hash(content);
+        var relativeLocation = $"data/{hash}";
+
+        var creds = await GoogleHelper.ParseCredential(Program.ConfigData.GoogleCloud.DefaultCred);
+        var storageClient = await StorageClient.CreateAsync(creds);
+        var projectId = Program.ConfigData.GoogleCloud.DefaultCred.ProjectId;
+        var buckets = storageClient.ListBuckets(projectId);
+        if (buckets.All(v => v.Id != Program.ConfigData.ContentDetectionBucket))
+        {
+            await storageClient.CreateBucketAsync(projectId, Program.ConfigData.ContentDetectionBucket);
+        }
+
+        var r = storageClient.UploadObject(
+            Program.ConfigData.ContentDetectionBucket, relativeLocation, null, new MemoryStream(content));
+        return r;
     }
 }
