@@ -109,26 +109,47 @@ public partial class ContentDetectionModule : BaseModule
         if (controller == null)
             return;
 
-        var serverConfig = await controller.Get(server.Id);
+        var serverConfig = await controller.Fetch(server.Id);
+        if (serverConfig == null)
+            serverConfig = new AnalysisServerConfig()
+            {
+                ServerId = server.Id
+            };
+        await controller.Set(serverConfig);
         if (serverConfig == null || serverConfig.Enabled == false)
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
 
-        var analysis = await AnalyzeMessage(message);
-        var deleteMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.DeleteThreshold);
-        var flagMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.FlagThreshold);
-        if (deleteMatch.Majority != null)
+        try
         {
-            WriteLogThreshold(
-                serverConfig,
-                LogDetailReason.DeleteThresholdMet,
-                deleteMatch,
-                message);
-
-            try
+            var analysis = await AnalyzeMessage(message);
+            var deleteMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.DeleteThreshold);
+            var flagMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.FlagThreshold);
+            if (deleteMatch.Majority != null)
             {
-                if (!await message.Delete())
+                WriteLogThreshold(
+                    serverConfig,
+                    LogDetailReason.DeleteThresholdMet,
+                    deleteMatch,
+                    message);
+
+                try
+                {
+                    if (!await message.Delete())
+                    {
+                        var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+                        await channel.SendMessage(new SendableEmbed()
+                        {
+                            Title = "Failed to delete message!",
+                            Description = string.Join("\n", new string[]
+                            {
+                                $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>."
+                            })
+                        });
+                    }
+                }
+                catch (Exception ex)
                 {
                     var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
                     await channel.SendMessage(new SendableEmbed()
@@ -136,37 +157,39 @@ public partial class ContentDetectionModule : BaseModule
                         Title = "Failed to delete message!",
                         Description = string.Join("\n", new string[]
                         {
-                            $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>."
+                            $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>.",
+                            "```",
+                            ex.Message,
+                            "```"
                         })
                     });
                 }
             }
-            catch (Exception ex)
+            else if (flagMatch.Majority != null)
             {
-                var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
-                await channel.SendMessage(new SendableEmbed()
-                {
-                    Title = "Failed to delete message!",
-                    Description = string.Join("\n", new string[]
-                    {
-                        $"Failed to delete message `{message.Id}` in <#{message.ChannelId}>.",
-                        "```",
-                        ex.Message,
-                        "```"
-                    })
-                });
+                WriteLogThreshold(
+                    serverConfig,
+                    LogDetailReason.FlagThresholdMet,
+                    flagMatch,
+                    message);
             }
         }
-        else if (flagMatch.Majority != null)
+        catch (Exception ex)
         {
-            WriteLogThreshold(
-                serverConfig,
-                LogDetailReason.FlagThresholdMet,
-                flagMatch,
-                message);
+            await WriteLine(serverConfig, $"Failed to run.\n```\n{ex}\n```");
         }
     }
 
+    public async Task WriteLine(AnalysisServerConfig config, string content)
+    {
+        var channel = await Client.GetChannel(config.LogChannelId) as TextChannel;
+        if (channel == null)
+            return;
+        await channel.SendMessage(new DataMessageSend()
+        {
+            Content = content
+        });
+    }
     public async Task WriteLogThreshold(
         AnalysisServerConfig serverConfig,
         LogDetailReason reason,
@@ -325,6 +348,11 @@ public partial class ContentDetectionModule : BaseModule
         foreach (var i in taskList)
             i.Start();
         await Task.WhenAll(taskList);
+
+        if (message.Content.Contains("r.condebug") && Program.ConfigData.OwnerUserIds.Contains(message.AuthorId))
+        {
+            await message.Reply("```json\n" + JsonSerializer.Serialize(result, Program.SerializerOptions) + "\n```");
+        }
         
         if (result.Total < 1)
             return result;
