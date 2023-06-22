@@ -25,6 +25,8 @@ public partial class GoogleApiController : BaseModule
         await GetImageAnnotator();
     }
 
+    public override bool WaitForInit => false;
+
     public async Task<GoogleCredential> GetDefaultCredential()
     {
         var cred = CredentialDefault ??
