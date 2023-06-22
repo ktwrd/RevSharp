@@ -2,6 +2,7 @@
 using RevSharp.Skidbot.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
@@ -103,6 +104,17 @@ namespace RevSharp.Skidbot.Controllers
         /// Value: Member Count
         /// </summary>
         public Dictionary<string, int> MemberCount { get; private set; } = new Dictionary<string, int>();
+
+        public int TotalMemberCount
+        {
+            get
+            {
+                int count = 0;
+                foreach (var p in MemberCount)
+                    count += p.Value;
+                return count;
+            }
+        }
 
         public Gauge ServerMemberGauge;
         public Gauge ServerGauge;
