@@ -29,7 +29,7 @@ public partial class Client
         var key = member.Id.UserId + member.Id.ServerId;
         if (MemberCache.ContainsKey(key))
             return true;
-        MemberCache.Add(key, member);
+        MemberCache.TryAdd(key, member);
         member.Client = this;
         return false;
     }
@@ -101,7 +101,7 @@ public partial class Client
         if (!inCache)
         {
             Log.Verbose($"{serverId} adding to cache");
-            ServerCache.Add(serverId, server);
+            ServerCache.TryAdd(serverId, server);
         }
         return ServerCache[serverId];
     }
@@ -111,7 +111,7 @@ public partial class Client
     {
         if (ServerCache.ContainsKey(server.Id))
             return true;
-        ServerCache.Add(server.Id, server);
+        ServerCache.TryAdd(server.Id, server);
         server.Client = this;
         return false;
     }
