@@ -13,13 +13,16 @@ public class ReflectionInclude
         _client = client;
         Modules = new List<BaseModule>();
         LoadedInstanceNames = new List<string>();
+        LoadedAssemblyNames = new List<string>();
     }
     private readonly Client _client;
 
     private List<BaseModule> Modules { get; set; }
     private List<string> LoadedInstanceNames { get; set; }
+    private List<string> LoadedAssemblyNames { get; set; }
     public async Task Search(Assembly assembly)
     {
+        LoadedAssemblyNames.Add(assembly.FullName.Split(',')[0]);
         Log.Debug($"[ReflectionInclude] Searching");
         IEnumerable<Type> typesWithAttr = from type in assembly.GetTypes()
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
@@ -50,6 +53,15 @@ public class ReflectionInclude
         foreach (var i in Modules)
             initCompleteQueue.Add(i.InitComplete());
         await Task.WhenAll(initCompleteQueue);
+    }
+
+    public string[] GetPlugins()
+    {
+        var items = new List<string>();
+        foreach (var item in LoadedAssemblyNames)
+            if (item.StartsWith("RevSharp.Skidbot"))
+                items.Add(item);
+        return items.ToArray();
     }
 
     public T? FetchModule<T>() where T : BaseModule
