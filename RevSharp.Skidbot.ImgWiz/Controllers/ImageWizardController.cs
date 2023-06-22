@@ -49,6 +49,25 @@ public partial class ImageWizardController : BaseModule
         }
     }
 
+    public override string? HelpContent()
+    {
+        var r = Reflection.Config.Prefix + BaseCommandName;
+        return string.Join("\n", new string[]
+        {
+            $">`{r} help`",
+            $">display this message",
+            "",
+            $">`{r} 1984 <speech bubble>[|<calendar>]`",
+            $">1984 calendar",
+            "",
+            $">`{r} yskysn <top text>[|<bottom text>]`",
+            ">that guy with the lighting behind him",
+            "",
+            $">`{r} caption <text>`",
+            ">caption an image. reply to a message that has an attachment or add one yourself for this to work"
+        });
+    }
+
     private async Task Command_Help(CommandInfo info, Message message)
     {
         await message.Reply(
