@@ -40,6 +40,9 @@ public partial class ImageWizardController : BaseModule
             case "1984":
                 await Command_1984(info, message);
                 break;
+            case "yskysn":
+                await Command_YSKYSN(info, message);
+                break;
         }
     }
 
