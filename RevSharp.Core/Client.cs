@@ -292,7 +292,7 @@ public partial class Client
     {
         var url = $"{EndpointNodeInfo.Features.Autumn.Url}/{tag}";
         var content = new MultipartFormDataContent();
-        content.Add(new StreamContent(stream), "file", contentType);
+        content.Add(new StreamContent(stream), "file", filename);
         var response = await HttpClient.PostAsync(url, content);
         var stringContent = response.Content.ReadAsStringAsync().Result;
         if (response.StatusCode == HttpStatusCode.OK)
