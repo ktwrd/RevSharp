@@ -33,6 +33,27 @@ public class TextChannel : MessageableChannel, IServerChannel
     /// </summary>
     [JsonPropertyName("role_permissions")]
     public Dictionary<string, PermissionCompare> RolePermissions { get; set; }
+    private Dictionary<string, long> PermissionCache { get; set; }
+    public async Task<long> GetPermissions(Client client, User user, bool forceUpdate = false)
+    {
+        if (PermissionCache.ContainsKey(user.Id) && !forceUpdate)
+            return PermissionCache[user.Id];
+        var res = await PermissionHelper.CalculatePermission(client, user, this);
+        PermissionCache.TryAdd(user.Id, res);
+        PermissionCache[user.Id] = res;
+        return PermissionCache[user.Id];
+    }
+
+    public Task<long> GetPermissions(User user, bool forceUpdate = false) => GetPermissions(Client, user, forceUpdate);
+
+    public async Task<bool> HasPermission(Client client, User user, PermissionFlag flag, bool forceUpdate = false)
+    {
+        var perms = await GetPermissions(client, user, forceUpdate);
+        return PermissionHelper.HasFlag(perms, (int)flag);
+    }
+
+    public Task<bool> HasPermission(User user, PermissionFlag flag, bool forceUpdate = false) =>
+        HasPermission(Client, user, flag, forceUpdate);
     public TextChannel()
         : this(null, "")
     {}
