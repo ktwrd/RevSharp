@@ -112,6 +112,8 @@ public class BaseChannel : Clientable, IBaseChannel
         return null;
     }
 
+    public Task<Message?> GetMessage(string id) => GetMessage(Client, id);
+
     public enum MessageSortDirection
     {
         Relevance,
