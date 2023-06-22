@@ -38,7 +38,7 @@ public class AuthentikModule : BaseModule
             });
     }
 
-    public override bool HasHelpContent => true;
+    public override bool HasHelpContent => false;
     public override string? InternalName => "auth";
     public override string? HelpCategory => "admin";
     public override string? BaseCommandName => "auth";
