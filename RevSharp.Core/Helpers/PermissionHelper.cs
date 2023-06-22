@@ -73,12 +73,12 @@ public static class PermissionHelper
                 if (server.OwnerId == user.Id)
                     return (long)PermissionFlag.GrantAllSafe;
 
-                var member = server.Members.Where(v => v.Id.UserId == user.Id).FirstOrDefault();
+                var member = await server.GetMember(user.Id);
                 if (member == null)
                     return 0;
 
                 var perm = await CalculatePermission(client, user, server);
-                if (server.DefaultPermissions != null)
+                if (server.DefaultPermissions != null && textChannel.DefaultPermissions != null)
                     perm = perm
                            | textChannel.DefaultPermissions.Allow
                            & (~textChannel.DefaultPermissions.Deny);
@@ -90,14 +90,14 @@ public static class PermissionHelper
                     {
                         if (textChannel.RolePermissions.TryGetValue(thing.Item1, out var overide))
                         {
-                            perm = perm | overide.Allow & (~overide.Deny);
+                            perm |= overide.Allow & (~overide.Deny);
                         }
                     }
                 }
 
                 if (member.TimeoutTimestamp != null && member.TimeoutTimestamp > DateTimeOffset.UtcNow)
                 {
-                    perm = perm & ALLOW_IN_TIMEOUT;
+                    perm &= ALLOW_IN_TIMEOUT;
                 }
 
                 return perm;
@@ -119,19 +119,15 @@ public static class PermissionHelper
         var memberRoles = await member.FetchOrderedRoles(client, forceUpdate: false);
         if (memberRoles is { Count: > 0 } && server.Roles.Count > 0)
         {
-            var permissions = memberRoles.Select(v => v.Item2.Permissions ?? new PermissionCompare()
-            {
-                Allow = 0,
-                Deny = 0
-            });
+            var permissions = memberRoles.Select(v => v.Item2.Permissions);
             foreach (var p in permissions)
             {
-                perm = perm | p.Allow & (~p.Deny);
+                perm |= p.Allow & ~p.Deny;
             }
         }
 
         if (member.TimeoutTimestamp != null && member.TimeoutTimestamp > DateTimeOffset.UtcNow)
-            perm = perm & ALLOW_IN_TIMEOUT;
+            perm &= ALLOW_IN_TIMEOUT;
         
         return perm;
     }
