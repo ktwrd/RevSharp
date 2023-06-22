@@ -65,13 +65,32 @@ public partial class Client
             ResponseHelper.ThrowException(stringContent);
         }
     }
+
+    private async Task<HttpResponseMessage> PrivateReq(HttpMethod method, string url, HttpContent? content)
+    {
+        var message = new HttpRequestMessage(method, $"{Endpoint}{url}");
+        if (content != null)
+        {
+            message.Content = content;
+        }
+
+        var response = await HttpClient.SendAsync(message);
+        if (response.StatusCode == HttpStatusCode.TooManyRequests)
+        {
+            await Task.Delay(1000);
+            return await PrivateReq(method, url, content);
+        }
+
+        CheckResponseError(response);
+        return response;
+    }
     
     #region HttpClient Wrappers
     internal async Task<HttpResponseMessage> GetAsync(string url)
     {
         var s = GetRateLimitName(url, "GET");
         await s.WaitAsync();
-        var response = await HttpClient.GetAsync($"{Endpoint}{url}");
+        var response = await PrivateReq(HttpMethod.Get, url, null);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -80,7 +99,7 @@ public partial class Client
     {
         var s = GetRateLimitName(url, "DELETE");
         await s.WaitAsync();
-        var response = await HttpClient.DeleteAsync($"{Endpoint}{url}");
+        var response = await PrivateReq(HttpMethod.Delete, url, null);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -91,7 +110,7 @@ public partial class Client
     {
         var s = GetRateLimitName(url, "PATCH");
         await s.WaitAsync();
-        var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
+        var response = await PrivateReq(HttpMethod.Patch, url, content);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -101,7 +120,7 @@ public partial class Client
         var s = GetRateLimitName(url, "PATCH");
         await s.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
-        var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
+        var response = await PrivateReq(HttpMethod.Patch, url, content);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -113,7 +132,7 @@ public partial class Client
         var s = GetRateLimitName(url, "PUT");
         await s.WaitAsync();
         content ??= new StringContent("");
-        var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
+        var response = await PrivateReq(HttpMethod.Put, url, content);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -123,7 +142,7 @@ public partial class Client
         var s = GetRateLimitName(url, "PUT");
         await s.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
-        var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
+        var response = await PrivateReq(HttpMethod.Put, url, content);
         s.Release();
         CheckResponseError(response);
         return response;
@@ -134,7 +153,7 @@ public partial class Client
     {
         var s = GetRateLimitName(url, "POST");
         await s.WaitAsync();
-        var response = await HttpClient.PostAsync($"{Endpoint}{url}", content);
+        var response = await PrivateReq(HttpMethod.Post, url, content);
         s.Release();
         CheckResponseError(response);
         return response;
