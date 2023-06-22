@@ -91,6 +91,23 @@ public partial class Client
 	{
 	}
     internal SemaphoreSlim Semaphore { get; set; }
+
+    internal List<(string, string?, int)> RateLimitRoutes = new List<(string, string?, int)>()
+    {
+        (@"\/users", null, 20),
+        (@"\/bots", null, 10),
+        (@"\/channels", null, 15),
+        (@"\/channels\/[a-zA-Z0-9]+\/messages", "POST", 10),
+        (@"\/servers", null, 5),
+        (@"\/auth", "DELETE", 255),
+        (@"\/auth", null, 3),
+        (@"\/swagger", null, 100)
+    };
+
+    internal Dictionary<string, SemaphoreSlim> RateLimitDict = new Dictionary<string, SemaphoreSlim>();
+
+    internal const int DefaultRateLimitBucketLimit = 20;
+    internal SemaphoreSlim DefaultRateLimit = new SemaphoreSlim(DefaultRateLimitBucketLimit, DefaultRateLimitBucketLimit);
     /// <summary>
     /// Create an instance of the Client
     /// </summary>
@@ -98,6 +115,7 @@ public partial class Client
     /// <param name="isBot">Does this token belong to a bot. This is important because for bots a different header is sent for HTTP requests.</param>
     public Client(string token, bool isBot)
     {
+        InitRateLimit();
         Token = token;
         TokenIsBot = isBot;
         Log.CensorList.Add(Token);

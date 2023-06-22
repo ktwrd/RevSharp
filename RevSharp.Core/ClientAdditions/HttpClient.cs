@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
 
@@ -9,6 +10,36 @@ namespace RevSharp.Core;
 public partial class Client
 {
     internal HttpClient HttpClient { get; set; }
+
+    internal void InitRateLimit()
+    {
+        foreach (var item in RateLimitRoutes)
+        {
+            string name = $"{item.Item1}_{item.Item2}";
+            RateLimitDict.Add(name, new SemaphoreSlim(item.Item3));
+        }
+    }
+
+    internal SemaphoreSlim GetRateLimitName(string url, string? method)
+    {
+        foreach (var (endpointRegex, itemMethod, itemTimeout) in RateLimitRoutes)
+        {
+            var regex = new Regex(endpointRegex);
+            if (regex.IsMatch(url) && method == (itemMethod ?? method))
+            {
+                string name = $"{endpointRegex}_{itemMethod}";
+                if (RateLimitDict.TryGetValue(name, out var limitName))
+                {
+                    /*Log.Info($"{method} {url} = {name}");*/
+                    return limitName;
+                }
+            }
+        }
+        
+        /*Log.Info($"{method} {url} = default");*/
+
+        return DefaultRateLimit;
+    }
     
     /// <summary>
     /// Savely throw exception if response is 400. Type should always <see cref="BaseTypedResponse"/>
@@ -38,17 +69,19 @@ public partial class Client
     #region HttpClient Wrappers
     internal async Task<HttpResponseMessage> GetAsync(string url)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "GET");
+        await s.WaitAsync();
         var response = await HttpClient.GetAsync($"{Endpoint}{url}");
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> DeleteAsync(string url)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "DELETE");
+        await s.WaitAsync();
         var response = await HttpClient.DeleteAsync($"{Endpoint}{url}");
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
@@ -56,18 +89,20 @@ public partial class Client
     #region Patch
     internal async Task<HttpResponseMessage> PatchAsync(string url, HttpContent content)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "PATCH");
+        await s.WaitAsync();
         var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> PatchAsync(string url, Dictionary<string, object> data)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "PATCH");
+        await s.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
         var response = await HttpClient.PatchAsync($"{Endpoint}{url}", content);
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
@@ -75,19 +110,21 @@ public partial class Client
     #region Put
     internal async Task<HttpResponseMessage> PutAsync(string url, HttpContent? content=null)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "PUT");
+        await s.WaitAsync();
         content ??= new StringContent("");
         var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
     internal async Task<HttpResponseMessage> PutAsync(string url, Dictionary<string, object> data)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "PUT");
+        await s.WaitAsync();
         var content = JsonContent.Create(data, options: SerializerOptions);
         var response = await HttpClient.PutAsync($"{Endpoint}{url}", content);
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
@@ -95,9 +132,10 @@ public partial class Client
     #region Post
     internal async Task<HttpResponseMessage> PostAsync(string url, HttpContent content)
     {
-        await Semaphore.WaitAsync();
+        var s = GetRateLimitName(url, "POST");
+        await s.WaitAsync();
         var response = await HttpClient.PostAsync($"{Endpoint}{url}", content);
-        Semaphore.Release();
+        s.Release();
         CheckResponseError(response);
         return response;
     }
