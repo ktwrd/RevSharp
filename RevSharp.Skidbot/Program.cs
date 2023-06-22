@@ -24,15 +24,24 @@ public static class Program
         Client.Ready += () =>
         {
             var c = Client.GetChannel(ConfigData.PublicLogChannelId).Result;
-            c.SendMessage(new DataMessageSend()
-            {
-                Content = $"Running Skidbot v{Version}"
-            }).Wait();
+            var plugins = Reflection.GetPlugins();
+            c.SendMessage(
+                new SendableEmbed()
+                {
+                    Title = $"Running Skidbot v{Version}",
+                    Description = string.Join(
+                        "\n", new string[]
+                        {
+                            $"Loaded {plugins.Length} plugins;",
+                            string.Join("\n",  plugins.Select(v => $"- `{v}`"))
+                        })
+                }).Wait();
         };
         await InitializeModules();
         await Client.LoginAsync();
         await Task.Delay(-1);
     }
+    private static ReflectionInclude Reflection { get; set; }
 
     private static async Task InitializeModules()
     {
@@ -57,6 +66,7 @@ public static class Program
         }
 
         await i.SearchFinale();
+        Reflection = i;
     }
 
     private static void LoadLocalAssemblies()
