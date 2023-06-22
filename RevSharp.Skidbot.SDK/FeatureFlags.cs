@@ -101,4 +101,10 @@ public static class FeatureFlags
     /// Enable the Content Detection Module.
     /// </summary>
     public static bool EnableContentDetection => ParseBool("SB_CONDETECT", false);
+
+    public static string FontCache =>
+        ParseString(
+            "SB_DIR_FC", Path.Join(
+                DataDirectory,
+                "fontcache"));
 }
