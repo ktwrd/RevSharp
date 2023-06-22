@@ -15,7 +15,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\RevSharp.Core\RevSharp.Core.csproj" />
+      <ProjectReference Include="..\RevSharp.Skidbot.ImgWiz\RevSharp.Skidbot.ImgWiz.csproj" />
+      <ProjectReference Include="..\RevSharp.Skidbot.SDK\RevSharp.Skidbot.SDK.csproj" />
     </ItemGroup>
 
     <ItemGroup>

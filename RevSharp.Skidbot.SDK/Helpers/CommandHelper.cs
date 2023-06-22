@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using RevSharp.Core.Models;
+using RevSharp.Skidbot.Reflection;
 
 namespace RevSharp.Skidbot.Helpers;
 
@@ -33,9 +34,14 @@ public static class CommandHelper
         };
     }
 
-    public static CommandInfo? FetchInfo(Message message)
+    public static CommandInfo? FetchInfo(ReflectionInclude include, Message message)
     {
-        return FetchInfo(Program.ConfigData.Prefix, message.Content ?? "");
+        return FetchInfo(include.Config.Prefix, message.Content ?? "");
+    }
+
+    public static CommandInfo? FetchInfo(BaseModule module, Message message)
+    {
+        return FetchInfo(module.Reflection.Config.Prefix, message.Content ?? "");
     }
 
     public static string? FindChannelId(string content)

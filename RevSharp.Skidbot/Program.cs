@@ -36,8 +36,38 @@ public static class Program
 
     private static async Task InitializeModules()
     {
-        var i = new ReflectionInclude(Client);
+        var i = new ReflectionInclude(Client)
+        {
+            Config = ConfigData
+        };
+        LoadLocalAssemblies();
+        var allAsm = AppDomain.CurrentDomain.GetAssemblies();
+        var ownAssembly = typeof(Program).Assembly;
+        var sdkAssembly = typeof(ReflectionInclude).Assembly;
         await i.Search(typeof(Program).Assembly);
+        Log.WriteLine("Searching in other Skidbot assemblies");
+
+        foreach (var a in allAsm)
+        {
+            if (a.FullName.Contains("RevSharp.Skidbot") && a.FullName != ownAssembly.FullName && a.FullName != sdkAssembly.FullName)
+            {
+                Log.WriteLine($"Searching Assembly {a.FullName}");
+                await i.Search(a);
+            }
+        }
+
+        await i.SearchFinale();
+    }
+
+    private static void LoadLocalAssemblies()
+    {
+        var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+        var loadedPaths = loadedAssemblies.Select(a => a.Location).ToArray();
+            
+        var referencedPaths = Directory.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll");
+        var toLoad = referencedPaths.Where(r => !loadedPaths.Contains(r, StringComparer.InvariantCultureIgnoreCase)).ToList();
+
+        toLoad.ForEach(path => loadedAssemblies.Add(AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(path))));
     }
     public static void Quit(int exitCode = 0)
     {

@@ -11,14 +11,13 @@ namespace RevSharp.Skidbot.Modules;
 [RevSharpModule]
 public class KickModule : BaseModule
 {
-    public override async Task MessageReceived(Message message)
+    public override async Task CommandReceived(CommandInfo info, Message message)
     {
         #if !DEBUG
         return;
         #endif
         
-        var info = CommandHelper.FetchInfo(message);
-        if (info == null || info.Command != "kick")
+        if (info.Command != "kick")
             return;
 
         var embed = new SendableEmbed()

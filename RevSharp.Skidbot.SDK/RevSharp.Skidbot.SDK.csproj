@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>RevSharp.Skidbot.SDK</AssemblyName>
+        <RootNamespace>RevSharp.Skidbot</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RevSharp.Core\RevSharp.Core.csproj" />
+    </ItemGroup>
+
+</Project>

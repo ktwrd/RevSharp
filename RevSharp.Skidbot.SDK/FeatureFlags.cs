@@ -2,7 +2,7 @@
 
 namespace RevSharp.Skidbot;
 
-internal static class FeatureFlags
+public static class FeatureFlags
 {
     /// <summary>
     /// Parses an environment variable as a boolean. When trimmed&lowercased to `true` it will return true, but anything else will return `false`.
@@ -57,7 +57,7 @@ internal static class FeatureFlags
     /// 
     /// Change console text/background color on logging.
     /// </summary>
-    internal static bool EnableLogColor => ParseBool("REVSHARP_LOG_COLOR", true);
+    public static bool EnableLogColor => ParseBool("REVSHARP_LOG_COLOR", true);
 
     /// <summary>
     /// Key: SB_DATA_DIR
@@ -65,7 +65,7 @@ internal static class FeatureFlags
     /// 
     /// Directory where all file-based data is stored. Used for caching and whatnot.
     /// </summary>
-    internal static string DataDirectory =>
+    public static string DataDirectory =>
         ParseString(
             "SB_DIR_DATA", Path.Join(
                 Directory.GetCurrentDirectory(),
@@ -77,7 +77,7 @@ internal static class FeatureFlags
     ///
     /// File location where the config is stored.
     /// </summary>
-    internal static string ConfigLocation =>
+    public static string ConfigLocation =>
         ParseString(
             "SB_CONFIG_LOCATION", Path.Join(
                 DataDirectory, "config.json"));
@@ -88,7 +88,7 @@ internal static class FeatureFlags
     /// 
     /// Directory for cached data.
     /// </summary>
-    internal static string ImageAnnotatorCacheDirectory =>
+    public static string ImageAnnotatorCacheDirectory =>
         ParseString(
             "SB_DIR_IACD", Path.Join(
                 DataDirectory,
@@ -100,5 +100,5 @@ internal static class FeatureFlags
     ///
     /// Enable the Content Detection Module.
     /// </summary>
-    internal static bool EnableContentDetection => ParseBool("SB_CONDETECT", false);
+    public static bool EnableContentDetection => ParseBool("SB_CONDETECT", false);
 }

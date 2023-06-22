@@ -2,7 +2,6 @@ using System.ComponentModel.Design.Serialization;
 using System.Reflection;
 using RevSharp.Core;
 using RevSharp.Core.Models;
-using RevSharp.Skidbot.Controllers;
 using RevSharp.Skidbot.Helpers;
 
 namespace RevSharp.Skidbot.Reflection;
@@ -13,10 +12,12 @@ public class ReflectionInclude
     {
         _client = client;
         Modules = new List<BaseModule>();
+        LoadedInstanceNames = new List<string>();
     }
     private readonly Client _client;
 
     private List<BaseModule> Modules { get; set; }
+    private List<string> LoadedInstanceNames { get; set; }
     public async Task Search(Assembly assembly)
     {
         Log.Debug($"[ReflectionInclude] Searching");
@@ -24,22 +25,31 @@ public class ReflectionInclude
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
                   && type.IsSubclassOf(typeof(BaseModule)) && type != null
             select type;
+        var localMods = new List<BaseModule>();
         foreach (var i in typesWithAttr)
         {
+            if (LoadedInstanceNames.Contains(i.FullName))
+                continue;
             var instance = (BaseModule)Activator.CreateInstance(i);
             instance.Reflection = this;
             Modules.Add(instance);
+            localMods.Add(instance);
+            LoadedInstanceNames.Add(i.FullName);
             // await InitializeEvents(instance, i);
         }
 
-        foreach (var i in Modules)
+        foreach (var i in localMods)
             await InitializeEvents(i, i.GetType());
+        Log.Debug($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
+    }
+
+    public async Task SearchFinale()
+    {
         await Task.WhenAll(InitAsyncQueue);
         var initCompleteQueue = new List<Task>();
         foreach (var i in Modules)
             initCompleteQueue.Add(i.InitComplete());
         await Task.WhenAll(initCompleteQueue);
-        Log.Debug($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
     }
 
     public T? FetchModule<T>() where T : BaseModule
@@ -61,6 +71,9 @@ public class ReflectionInclude
     }
 
     private List<Task> InitAsyncQueue = new List<Task>();
+    public event CommandExecuteDelegate CommandExecuteTrigger;
+    public delegate void CommandExecuteDelegate(Server? server, User? author, BaseChannel? channel, INamedChannel? namedChannel, CommandInfo info, BaseModule module);
+    public ConfigData Config { get; init; }
     private async Task InitializeEvents<T>(T item, Type type) where T : BaseModule
     {
         item.Client = _client;
@@ -72,10 +85,10 @@ public class ReflectionInclude
                 {
                     bool hasContent = m.Content?.Length > 0;
                     bool notSelf = m.AuthorId != _client.CurrentUserId;
-                    bool startsWithPrefix = (m.Content ?? "").StartsWith(Program.ConfigData.Prefix);
+                    bool startsWithPrefix = (m.Content ?? "").StartsWith(Config.Prefix);
                     if (item.BaseCommandName != null && notSelf && hasContent && startsWithPrefix)
                     {
-                        var commandInfo = CommandHelper.FetchInfo(m);
+                        var commandInfo = CommandHelper.FetchInfo(this, m);
                         if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                         {
                             var author = await _client.GetUser(m.AuthorId, forceUpdate: false);
@@ -83,7 +96,6 @@ public class ReflectionInclude
                             {
                                 await item.CommandReceived(commandInfo, m);
 
-                                var statControl = FetchModule<StatisticController>();
                                 var server = await m.FetchServer();
                                 var authorName = "<None>";
                                 if (author != null)
@@ -93,7 +105,14 @@ public class ReflectionInclude
                                 INamedChannel? channel = null;
                                 if (bch is INamedChannel namedChannel)
                                     channel = namedChannel;
-
+                                CommandExecuteTrigger?.Invoke(
+                                    server,
+                                    author,
+                                    bch,
+                                    channel,
+                                    commandInfo,
+                                    item);
+                                /*var statControl = FetchModule<StatisticController>();
                                 statControl?.CommandCounter.WithLabels(new string[]
                                 {
                                     server?.Name ?? "<None>",
@@ -105,7 +124,7 @@ public class ReflectionInclude
                                     commandInfo.Command,
                                     string.Join(" ", commandInfo.Arguments),
                                     item.HelpCategory ?? "<None>"
-                                }).Inc();
+                                }).Inc();*/
                             }
                         }
                     }
