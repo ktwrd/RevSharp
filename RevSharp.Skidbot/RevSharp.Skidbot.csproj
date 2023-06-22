@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <Company>Kate Ward</Company>
         <Product>Skidbot for Revolt</Product>
-        <AssemblyVersion>0.2.*</AssemblyVersion>
+        <AssemblyVersion>0.3.*</AssemblyVersion>
         <NeutralLanguage>en</NeutralLanguage>
         <AssemblyName>RevSharp.Skidbot</AssemblyName>
         <RootNamespace>RevSharp.Skidbot</RootNamespace>

@@ -29,9 +29,11 @@ public class XpModule : BaseModule
             case "setchannel":
                 await Command_SetChannel(info, message);
                 break;
-            /*case "setxp":
+            #if DEBUG
+            case "setxp":
                 await Command_SetXp(info, message);
-                break;*/
+                break;
+            #endif
             default:
                 await Command_Help(info, message);
                 break;

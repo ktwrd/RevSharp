@@ -91,8 +91,22 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
                         resultEmbed.Description += $"\n- Failed to send in level-up channel (`{ex.Message}`)";
                     }   
                 }
+
                 if (targetChannel == null)
-                    await message.Reply(resultEmbed);
+                {
+                    try
+                    {
+                        await message.Reply(resultEmbed);
+                    }
+                    catch (Exception ex)
+                    {
+                        try
+                        {
+                            await message.Reply(resultEmbed.Description);
+                        }
+                        catch (Exception exx){}
+                    }
+                }
             }
         }
     }
