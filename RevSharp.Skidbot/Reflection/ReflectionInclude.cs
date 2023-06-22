@@ -34,6 +34,7 @@ public class ReflectionInclude
 
         foreach (var i in Modules)
             await InitializeEvents(i, i.GetType());
+        await Task.WhenAll(InitAsyncQueue);
         var initCompleteQueue = new List<Task>();
         foreach (var i in Modules)
             initCompleteQueue.Add(i.InitComplete());
@@ -58,6 +59,8 @@ public class ReflectionInclude
     {
         return Modules.ToArray();
     }
+
+    private List<Task> InitAsyncQueue = new List<Task>();
     private async Task InitializeEvents<T>(T item, Type type) where T : BaseModule
     {
         item.Client = _client;
@@ -146,7 +149,14 @@ public class ReflectionInclude
         };
         try
         {
-            await item.Initialize(this);
+            if (item.WaitForInit)
+            {
+                await item.Initialize(this);
+            }
+            else
+            {
+                InitAsyncQueue.Add(item.Initialize(this));
+            }
         }
         catch (Exception ex)
         {

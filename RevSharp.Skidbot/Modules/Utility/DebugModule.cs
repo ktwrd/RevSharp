@@ -12,6 +12,7 @@ public class DebugModule : BaseModule
     public override string? InternalName => "debug";
     public override string? BaseCommandName => "debug";
     public override bool HasHelpContent => true;
+    public override bool WaitForInit => false;
 
     public override string HelpContent()
     {

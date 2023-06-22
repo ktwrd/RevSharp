@@ -12,6 +12,7 @@ public class PermissionCloneModule : BaseModule
     public override string? InternalName => "permissionclone";
     public override string? BaseCommandName => "permissionclone";
     public override bool HasHelpContent => true;
+    public override bool WaitForInit => false;
 
     public override string HelpContent()
     {

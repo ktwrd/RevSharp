@@ -52,5 +52,6 @@ namespace RevSharp.Skidbot.Modules
         public override string? InternalName => "info";
         public override string? HelpCategory => null;
         public override string? BaseCommandName => "info";
+        public override bool WaitForInit => false;
     }
 }

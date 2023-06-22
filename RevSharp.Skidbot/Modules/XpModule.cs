@@ -105,4 +105,5 @@ public class XpModule : BaseModule
     public override string? InternalName => "other";
     public override string? HelpCategory => "xp";
     public override string? BaseCommandName => "xp";
+    public override bool WaitForInit => false;
 }

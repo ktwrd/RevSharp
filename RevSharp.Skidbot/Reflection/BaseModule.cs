@@ -60,4 +60,5 @@ public class BaseModule
     /// </summary>
     public virtual string? HelpCategory => null;
     public virtual string? BaseCommandName => null;
+    public virtual bool WaitForInit => true;
 }
