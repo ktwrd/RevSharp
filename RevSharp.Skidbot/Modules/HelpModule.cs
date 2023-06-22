@@ -16,9 +16,9 @@ public class HelpModule : BaseModule
     {
         {"other", new Dictionary<string, string>()}
     };
-    public override Task Initialize(ReflectionInclude reflection)
+    public override Task InitComplete()
     {
-        foreach (var item in reflection.FetchModules())
+        foreach (var item in Reflection.FetchModules())
         {
             if (!item.HasHelpContent)
                 continue;

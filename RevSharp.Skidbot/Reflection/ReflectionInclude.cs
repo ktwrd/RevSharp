@@ -34,6 +34,10 @@ public class ReflectionInclude
 
         foreach (var i in Modules)
             await InitializeEvents(i, i.GetType());
+        var initCompleteQueue = new List<Task>();
+        foreach (var i in Modules)
+            initCompleteQueue.Add(i.InitComplete());
+        await Task.WhenAll(initCompleteQueue);
         Log.Debug($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
     }
 

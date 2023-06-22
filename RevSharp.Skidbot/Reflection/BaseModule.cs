@@ -19,6 +19,11 @@ public class BaseModule
     {
         return Task.CompletedTask;
     }
+
+    public virtual Task InitComplete()
+    {
+        return Task.CompletedTask;
+    }
     /// <summary>
     /// Called when the <see cref="RevSharp.Core.Client.MessageReceived"/> event is emitted.
     /// </summary>
