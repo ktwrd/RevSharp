@@ -18,6 +18,11 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                 await message.Reply($"Please attach an image to your message or reply to a message that has an image attached for this command to work.");
                 return;
             }
+            if (targetRevoltFile.ContentType.Contains("gif"))
+            {
+                await message.Reply($"Caption only supports static images. GIF's aren't supported yet.");
+                return;
+            }
             var caption = GetAfterArgs(info);
             if (caption == null || caption.Length < 1)
             {
