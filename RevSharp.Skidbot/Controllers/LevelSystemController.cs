@@ -3,9 +3,11 @@ using RevSharp.Core.Models;
 using RevSharp.Skidbot.Helpers;
 using RevSharp.Skidbot.Models;
 using RevSharp.Skidbot.Modules;
+using RevSharp.Skidbot.Reflection;
 
 namespace RevSharp.Skidbot.Controllers;
 
+[RevSharpModule]
 public class LevelSystemController : BaseMongoController<LevelMemberModel>
 {
     public LevelSystemController()
