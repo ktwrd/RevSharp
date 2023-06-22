@@ -18,12 +18,14 @@ public partial class ContentDetectionModule
                 new SendableEmbed()
                 {
                     Title = "Content Detection Admin - Help",
-                    Description = string.Join(
-                        "\n", new string[]
+                    Description = string.Join("\n",
+                        new string[]
                         {
-                            $"```", $"{r} admin allow <id>            - Allow server to use CD",
+                            $"```",
+                            $"{r} admin allow <id>            - Allow server to use CD",
                             $"{r} admin deny <id> <...reason> - Deny server to use CD",
-                            $"{r} admin deny <id> <...reason> - Ban server to use CD", "```"
+                            $"{r} admin deny <id> <...reason> - Ban server to use CD",
+                            "```"
                         })
                 });
             return;
