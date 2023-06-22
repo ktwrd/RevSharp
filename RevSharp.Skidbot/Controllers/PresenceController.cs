@@ -25,33 +25,16 @@ public class PresenceController : BaseModule
         Observable.Interval(TimeSpan.FromSeconds(360))
             .Subscribe(_ => SetPresence().Wait());
     }
-
-    private int MemberCount = 0;
-    private int ServerCount = 0;
-    private async Task<int> GetUserCount()
+    
+    public async Task SetPresence()
     {
-        int count = 0;
-        var s = await Client.GetAllServers();
-        foreach (var i in s)
-        {
-            var members = await i.FetchMembers(false);
-            if (members != null)
-                count += members.Count;
-        }
-
-        ServerCount = s.Count;
-        MemberCount = count;
-
-        return count;
-    }
-    private async Task SetPresence()
-    {
-
         try
         {
-            var count = await GetUserCount();
-            var res = await Client.CurrentUser.UpdatePresence(
-                $"{Program.ConfigData.Prefix}help | {count} users, {ServerCount} servers", UserPresence.Online);
+            var controller = Reflection.FetchModule<StatisticController>();
+            int members = controller.TotalMemberCount;
+            int servers = controller.ServerCount;
+            await Client.CurrentUser.UpdatePresence(
+                $"{Program.ConfigData.Prefix}help | {members} users, {servers} servers", UserPresence.Online);
         }
         catch (Exception ex)
         {
