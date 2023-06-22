@@ -140,6 +140,8 @@ namespace RevSharp.Skidbot.Controllers
             ServerGauge.Set(servers.Count);
             ServerCount = memberDict.Count;
             MemberCount = memberDict;
+            var presenceController = Reflection.FetchModule<PresenceController>();
+            await presenceController.SetPresence();
         }
 
         #region MetricServer Wrapper Methods
