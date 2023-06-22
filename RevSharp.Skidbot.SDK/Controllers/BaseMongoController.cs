@@ -18,7 +18,7 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
     }
     public override async Task Initialize(ReflectionInclude reflection)
     {
-        ConnectionString = Program.ConfigData.MongoConnectionUrl;
+        ConnectionString = reflection.Config.MongoConnectionUrl;
         await DatabaseInit();
     }
 
@@ -30,7 +30,7 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
             connectionSettings.VerifySslCertificate = false;
             _client = new MongoClient(connectionSettings);
             await _client.StartSessionAsync();
-            Database = _client.GetDatabase(Program.ConfigData.MongoDatabaseName);
+            Database = _client.GetDatabase(Reflection.Config.MongoDatabaseName);
             await Task.Delay(500);
             var collectionNames = await Database.ListCollectionNamesAsync();
             if (!collectionNames.ToList().Contains(CollectionName))
