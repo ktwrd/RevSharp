@@ -30,34 +30,36 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                 return;
             }
 
-            var originalFileData = await GetUrlContent(targetRevoltFile);
-            if (originalFileData == null)
+            using (var originalFileData = new MemoryStream(await GetUrlContent(targetRevoltFile) ?? Array.Empty<byte>()))
             {
-                await message.Reply($"Failed to fetch image content");
-                return;
+                if (originalFileData.Length < 1)
+                {
+                    await message.Reply($"Failed to fetch image content");
+                    return;
+                }
+                var imageToCaption = Normalize(Image.NewFromStream(originalFileData));
+
+                var fontSize = targetRevoltFile.Metadata.Width / 10f;
+                var textWidth = targetRevoltFile.Metadata.Width - ((targetRevoltFile.Metadata.Width / 25) * 2);
+
+
+                var text = Image.Text($"<span background='white'>{caption}</span>",
+                    rgba: true,
+                    align: Enums.Align.Centre,
+                    font: $"FuturaExtraBlackCondensed {fontSize}px",
+                    fontfile: GetFontLocation("font_caption"),
+                    width: textWidth);
+                text = text.BandAnd().Ifthenelse(new double[] { 255, 255, 255, 255 }, text)
+                    .Gravity(
+                        Enums.CompassDirection.Centre,
+                        imageToCaption.Width,
+                        text.Height + 24,
+                        extend: Enums.Extend.White,
+                        background: new double[] { 255, 255, 255, 255 });
+                text = text.Join(imageToCaption, Enums.Direction.Vertical, background: new double[] { 255, 255, 255, 255 }, expand: true);
+                await UploadPng(message, text);
+                imageToCaption.Close();
             }
-
-            var imageToCaption = Normalize(Image.NewFromBuffer(originalFileData));
-
-            var fontSize = targetRevoltFile.Metadata.Width / 10f;
-            var textWidth = targetRevoltFile.Metadata.Width - ((targetRevoltFile.Metadata.Width  / 25) * 2);
-
-
-            var text = Image.Text($"<span background='white'>{caption}</span>",
-                rgba: true,
-                align: Enums.Align.Centre,
-                font: $"FuturaExtraBlackCondensed {fontSize}px",
-                fontfile: GetFontLocation("font_caption"),
-                width: textWidth);
-            text = text.BandAnd().Ifthenelse(new double[] {255, 255, 255, 255}, text)
-                .Gravity(
-                    Enums.CompassDirection.Centre,
-                    imageToCaption.Width,
-                    text.Height + 24,
-                    extend: Enums.Extend.White,
-                    background: new double[] {255, 255, 255, 255});
-            text = text.Join(imageToCaption, Enums.Direction.Vertical, background: new double[] { 255, 255, 255, 255 }, expand: true);
-            await UploadPng(message, text);
         }
     }
 }

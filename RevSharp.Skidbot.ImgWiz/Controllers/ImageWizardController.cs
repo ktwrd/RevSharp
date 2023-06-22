@@ -79,7 +79,7 @@ public partial class ImageWizardController : BaseModule
     }
     public async Task UploadPng(Message message, Image img)
     {
-        using (var pngStream = new MemoryStream(img.PngsaveBuffer()))
+        using (var pngStream = new MemoryStream(img.PngsaveBuffer(compression: 4, bitdepth: 8, dither: 1)))
         {
             var uploadId = await Client.UploadFile(
                 pngStream,
@@ -98,6 +98,7 @@ public partial class ImageWizardController : BaseModule
                 await message.Reply($"Failed to upload image");
             }
         }
+        img.Close();
     }
     internal async Task<byte[]?> GetUrlContent(RevoltFile file)
     {
