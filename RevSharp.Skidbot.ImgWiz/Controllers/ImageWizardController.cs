@@ -43,6 +43,9 @@ public partial class ImageWizardController : BaseModule
             case "yskysn":
                 await Command_YSKYSN(info, message);
                 break;
+            case "caption":
+                await Command_Caption(info, message);
+                break;
         }
     }
 
@@ -57,24 +60,35 @@ public partial class ImageWizardController : BaseModule
     }
     public async Task UploadPng(Message message, Image img)
     {
-
-        var pngStream = new MemoryStream(img.PngsaveBuffer());
-        var uploadId = await Client.UploadFile(
-            pngStream,
-            "image.png",
-            "attachments",
-            "image/png");
-        if (uploadId != null)
+        using (var pngStream = new MemoryStream(img.PngsaveBuffer()))
         {
-            await message.Reply(new DataMessageSend()
+            var uploadId = await Client.UploadFile(
+                pngStream,
+                "image.png",
+                "attachments",
+                "image/png");
+            if (uploadId != null)
             {
-                Attachments = new string[] { uploadId }
-            });
+                await message.Reply(new DataMessageSend()
+                {
+                    Attachments = new string[] { uploadId }
+                });
+            }
+            else
+            {
+                await message.Reply($"Failed to upload image");
+            }
         }
-        else
+    }
+    internal async Task<byte[]?> GetUrlContent(RevoltFile file)
+    {
+        var client = new HttpClient();
+        var res = await client.GetAsync(file.GetURL(Client));
+        if (res.StatusCode == System.Net.HttpStatusCode.OK)
         {
-            await message.Reply($"Failed to upload image");
+            return res.Content.ReadAsByteArrayAsync().Result;
         }
+        return null;
     }
 
     internal string GetAfterArgs(CommandInfo info)
