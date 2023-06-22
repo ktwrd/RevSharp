@@ -26,7 +26,9 @@ public class BaseMongoController<TH> : BaseModule where TH : BaseMongoModel
     {
         try
         {
-            _client = new MongoClient(ConnectionString);
+            var connectionSettings = MongoClientSettings.FromConnectionString(ConnectionString);
+            connectionSettings.VerifySslCertificate = false;
+            _client = new MongoClient(connectionSettings);
             await _client.StartSessionAsync();
             Database = _client.GetDatabase(Program.ConfigData.MongoDatabaseName);
             await Task.Delay(500);
