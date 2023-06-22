@@ -79,6 +79,8 @@ public partial class ImageWizardController : BaseModule
     }
     public async Task UploadPng(Message message, Image img)
     {
+        if (img.Width > 900)
+            img = img.Resize(0.5);
         using (var pngStream = new MemoryStream(img.PngsaveBuffer(compression: 4, bitdepth: 8, dither: 1)))
         {
             var uploadId = await Client.UploadFile(
