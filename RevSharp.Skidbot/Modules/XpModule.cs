@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Xml.Schema;
 using RevSharp.Core;
 using RevSharp.Core.Models;
 using RevSharp.Skidbot.Controllers;
@@ -27,6 +29,9 @@ public class XpModule : BaseModule
             case "setchannel":
                 await Command_SetChannel(info, message);
                 break;
+            /*case "setxp":
+                await Command_SetXp(info, message);
+                break;*/
             default:
                 await Command_Help(info, message);
                 break;
@@ -44,6 +49,21 @@ public class XpModule : BaseModule
         await message.Reply(await GetProfile(message.AuthorId, server.Id));
     }
 
+    public async Task Command_SetXp(CommandInfo info, Message message)
+    {
+        await Task.Delay(1000);
+        if (info.Arguments.Count < 2)
+            return;
+        var server = await message.FetchServer();
+
+        int amount = int.Parse(info.Arguments[1]);
+        
+        var controller = Reflection.FetchModule<LevelSystemController>();
+        var data = await controller.Get(message.AuthorId, server.Id);
+        await controller.GrantXp(data, message, amount);
+        var asdasd = await controller.Get(message.AuthorId, server.Id);
+        message.Reply("ok\n```\n" + JsonSerializer.Serialize(asdasd, Program.SerializerOptions) + "\n```");
+    }
     public async Task Command_SetChannel(CommandInfo info, Message message)
     {
         var server = await message.FetchServer();
@@ -58,7 +78,7 @@ public class XpModule : BaseModule
             Title = "Xp System - Set Notification Channel"
         };
         var member = await server.GetMember(message.AuthorId, false);
-        if (!await member.HasPermission(PermissionFlag.ManageServer))
+        if (!await member.HasPermission(PermissionFlag.ManageServer, forceUpdate: false))
         {
             embed.Description = $"You do not have the required permission, `ManageServer`";
             embed.Colour = "red";
@@ -85,7 +105,7 @@ public class XpModule : BaseModule
 
         try
         {
-            var targetChannel = await Client.GetChannel(targetChannelId, true) as TextChannel;
+            var targetChannel = await Client.GetChannel(targetChannelId) as TextChannel;
             if (targetChannel == null)
             {
                 embed.Description = $"Failed to fetch target channel";
@@ -94,7 +114,7 @@ public class XpModule : BaseModule
                 return;
             }
 
-            if (!await targetChannel.HasPermission(Client.CurrentUser, PermissionFlag.ViewChannel, true))
+            if (!await targetChannel.HasPermission(Client.CurrentUser, PermissionFlag.ViewChannel))
             {
                 embed.Description = "I don't have permission to view that channel!";
                 embed.Colour = "red";
@@ -218,8 +238,9 @@ public class XpModule : BaseModule
             "\n", new string[]
             {
                 "```",
-                $"{r} help      - display this message",
-                $"{r} profile   - Get XP profile"
+                $"{r} help       - display this message",
+                $"{r} profile    - Get XP profile",
+                $"{r} setchannel - Set channel for level-up messages"
             });
     }
     public override bool HasHelpContent => false;

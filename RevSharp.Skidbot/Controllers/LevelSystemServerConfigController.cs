@@ -1,9 +1,11 @@
 using RevSharp.Skidbot.Models;
 using RevSharp.Skidbot.Modules;
 using MongoDB.Driver;
+using RevSharp.Skidbot.Reflection;
 
 namespace RevSharp.Skidbot.Controllers;
 
+[RevSharpModule]
 public class LevelSystemServerConfigController : BaseMongoController<LevelSystemServerConfigModel>
 {
     public LevelSystemServerConfigController()
