@@ -20,7 +20,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
             };
             var captionSplit = ParsePrompt(info, "JANUARY 1984");
 
-            bool originaldate = captionSplit[1].ToLower() != "january 1984";
+            bool originaldate = captionSplit[1].ToLower() == "january 1984";
 
             var img = Image.NewFromBuffer(ImageWizard.img_1984originaldate);
             img = Image.NewFromBuffer(ImageWizard.img_1984);
@@ -38,7 +38,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
             if (!originaldate)
             {
                 var dateText = Image.Text(
-                    captionSplit[1].ToUpper(),
+                    $"<span color='black'>{captionSplit[1].ToUpper()}</span>",
                     font: "ImpactMix",
                     rgba: true,
                     fontfile: GetFontLocation("font_ImpactMix"),
