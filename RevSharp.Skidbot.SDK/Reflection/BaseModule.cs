@@ -61,4 +61,5 @@ public class BaseModule
     public virtual string? HelpCategory => null;
     public virtual string? BaseCommandName => null;
     public virtual bool WaitForInit => true;
+    public virtual PermissionFlag? RequireServerPermission => null;
 }

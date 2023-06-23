@@ -104,11 +104,25 @@ public class ReflectionInclude
                         if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
                         {
                             var author = await _client.GetUser(m.AuthorId, forceUpdate: false);
-                            if (author is not { IsBot: true })
+                            if (author != null && author is not { IsBot: true })
                             {
+                                var server = await m.FetchServer();
+                                if (server != null && item.RequireServerPermission != null)
+                                {
+                                    var flag = (PermissionFlag)item.RequireServerPermission;
+                                    var member = await server.GetMember(author.Id, false);
+                                    if (member != null)
+                                    {
+                                        var hasPerm = await member.HasPermission(_client, flag);
+                                        if (!hasPerm)
+                                        {
+                                            await m.Reply($"Missing server permission `{flag}`");
+                                            return;
+                                        }
+                                    }
+                                }
                                 await item.CommandReceived(commandInfo, m);
 
-                                var server = await m.FetchServer();
                                 var authorName = "<None>";
                                 if (author != null)
                                     authorName = $"{author.Username}#{author.Discriminator}";
