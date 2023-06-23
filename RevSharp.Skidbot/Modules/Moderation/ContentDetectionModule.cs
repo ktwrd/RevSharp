@@ -348,11 +348,6 @@ public partial class ContentDetectionModule : BaseModule
         foreach (var i in taskList)
             i.Start();
         await Task.WhenAll(taskList);
-
-        if (message.Content.Contains("r.condebug") && Program.ConfigData.OwnerUserIds.Contains(message.AuthorId))
-        {
-            await message.Reply("```json\n" + JsonSerializer.Serialize(result, Program.SerializerOptions) + "\n```");
-        }
         
         if (result.Total < 1)
             return result;
