@@ -1,4 +1,5 @@
 using NetVips;
+using Newtonsoft.Json.Serialization;
 using RevSharp.Core.Models;
 using RevSharp.Skidbot.Helpers;
 using RevSharp.Skidbot.Reflection;
@@ -77,10 +78,20 @@ public partial class ImageWizardController : BaseModule
                 Description = HelpContent()
             });
     }
+    public Image ScaleImage(Image image)
+    {
+        if (image.Width > 1000)
+        {
+            image = image.Resize(1000f / image.Width);
+        }
+        if (image.Height > 1000)
+        {
+            image = image.Resize(1000f / image.Height);
+        }
+        return image;
+    }
     public async Task UploadPng(Message message, Image img)
     {
-        if (img.Width > 900)
-            img = img.Resize(0.5);
         using (var pngStream = new MemoryStream(img.PngsaveBuffer(compression: 4, bitdepth: 8, dither: 1)))
         {
             var uploadId = await Client.UploadFile(
@@ -112,6 +123,18 @@ public partial class ImageWizardController : BaseModule
         }
         return null;
     }
+    internal async Task<Stream?> GetUrlStream(RevoltFile file)
+    {
+        var client = new HttpClient();
+        var res = await client.GetAsync(file.GetURL(Client));
+        if (res.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            return res.Content.ReadAsStream();
+        }
+        return null;
+    }
+
+    public static double[] WhiteRGBA => new double[] { 255, 255, 255, 255 };
 
     internal string GetAfterArgs(CommandInfo info)
     {

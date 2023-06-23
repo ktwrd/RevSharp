@@ -23,6 +23,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                 await message.Reply($"Caption only supports static images. GIF's aren't supported yet.");
                 return;
             }
+
             var caption = GetAfterArgs(info);
             if (caption == null || caption.Length < 1)
             {
@@ -30,33 +31,44 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                 return;
             }
 
-            using (var originalFileData = new MemoryStream(await GetUrlContent(targetRevoltFile) ?? Array.Empty<byte>()))
+            using (var originalFileData = await GetUrlStream(targetRevoltFile))
             {
-                if (originalFileData.Length < 1)
+                if (originalFileData == null)
                 {
                     await message.Reply($"Failed to fetch image content");
                     return;
                 }
+
+                // Read detected image and scale it down if required
                 var imageToCaption = Normalize(Image.NewFromStream(originalFileData));
+                imageToCaption = ScaleImage(imageToCaption);
 
-                var fontSize = targetRevoltFile.Metadata.Width / 10f;
-                var textWidth = targetRevoltFile.Metadata.Width - ((targetRevoltFile.Metadata.Width / 25) * 2);
+                var fontSize = imageToCaption.Width / 10f;
+                var textWidth = imageToCaption.Width - ((imageToCaption.Width / 25) * 2);
 
-
-                var text = Image.Text($"<span background='white'>{caption}</span>",
+                // Create caption text
+                var text = Image.Text(
+                    text: $"<span background='white'>{caption}</span>",
                     rgba: true,
                     align: Enums.Align.Centre,
                     font: $"FuturaExtraBlackCondensed {fontSize}px",
                     fontfile: GetFontLocation("font_caption"),
                     width: textWidth);
-                text = text.BandAnd().Ifthenelse(new double[] { 255, 255, 255, 255 }, text)
+
+                // Align text and make sure all transparent stuff is white
+                text = text.BandAnd()
+                    .Ifthenelse(WhiteRGBA, text)
                     .Gravity(
                         Enums.CompassDirection.Centre,
                         imageToCaption.Width,
                         text.Height + 24,
                         extend: Enums.Extend.White,
-                        background: new double[] { 255, 255, 255, 255 });
-                text = text.Join(imageToCaption, Enums.Direction.Vertical, background: new double[] { 255, 255, 255, 255 }, expand: true);
+                        background: WhiteRGBA);
+
+                // Append vertically `imageToCaption` to `text`
+                text = text.Join(imageToCaption, Enums.Direction.Vertical, background: WhiteRGBA, expand: true);
+
+                // Upload and cleanup resources
                 await UploadPng(message, text);
                 imageToCaption.Close();
             }
