@@ -62,4 +62,17 @@ public static class CommandHelper
 
         return null;
     }
+    public static bool IsValidUlid(string content)
+    {
+        var ulidRegex = new Regex(@"^([0-9A-Za-z]{26})$");
+        return ulidRegex.IsMatch(content);
+    }
+    public static string FetchContent(CommandInfo info, int deleteBefore = 1)
+    {
+        var content = new List<string>();
+        for (int i = 0; i < info.Arguments.Count; i++)
+            if (i > deleteBefore)
+                content.Add(info.Arguments[i]);
+        return string.Join(' ', content);
+    }
 }
