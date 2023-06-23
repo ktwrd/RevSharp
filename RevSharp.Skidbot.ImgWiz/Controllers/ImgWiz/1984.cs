@@ -23,7 +23,8 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
             bool originaldate = captionSplit[1].ToLower() == "january 1984";
 
             var img = Image.NewFromBuffer(ImageWizard.img_1984originaldate);
-            img = Image.NewFromBuffer(ImageWizard.img_1984);
+            if (!originaldate)
+                img = Image.NewFromBuffer(ImageWizard.img_1984);
             var speechBubble = Image.Text(
                 captionSplit[0],
                 font: "Atkinson Hyperlegible Bold",
