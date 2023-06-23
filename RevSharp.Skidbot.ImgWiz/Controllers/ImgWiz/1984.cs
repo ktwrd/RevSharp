@@ -20,6 +20,12 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
             };
             var captionSplit = ParsePrompt(info, "JANUARY 1984");
 
+            if (captionSplit[0].Length < 1)
+            {
+                await message.Reply($"Missing speech bubble content");
+                return;
+            }
+
             bool originaldate = captionSplit[1].ToLower() == "january 1984";
 
             var img = Image.NewFromBuffer(ImageWizard.img_1984originaldate);
