@@ -28,10 +28,11 @@ public static class Program
             c.SendMessage(
                 new SendableEmbed()
                 {
-                    Title = $"Running Skidbot v{Version}",
                     Description = string.Join(
                         "\n", new string[]
                         {
+                            $"Running Skidbot v{Version}",
+                            "",
                             $"Loaded {plugins.Length} plugins;",
                             string.Join("\n",  plugins.Select(v => $"- `{v}`"))
                         })
