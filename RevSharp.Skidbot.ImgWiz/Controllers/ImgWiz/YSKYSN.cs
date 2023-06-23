@@ -13,6 +13,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
     {
         public async Task Command_YSKYSN(CommandInfo info, Message message)
         {
+            await message.AddReaction(Client, "✅");
             var caption = ParsePrompt(info, "NOW!");
 
             var img = Normalize(Image.NewFromBuffer(ImageWizard.img_yskysn));

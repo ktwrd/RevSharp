@@ -38,6 +38,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                     await message.Reply($"Failed to fetch image content");
                     return;
                 }
+                await message.AddReaction(Client, "✅");
 
                 // Read detected image and scale it down if required
                 var imageToCaption = Normalize(Image.NewFromStream(originalFileData));

@@ -25,6 +25,7 @@ namespace RevSharp.Skidbot.ImgWiz.Controllers
                 await message.Reply($"Missing speech bubble content");
                 return;
             }
+            await message.AddReaction(Client, "✅");
 
             bool originaldate = captionSplit[1].ToLower() == "january 1984";
 
