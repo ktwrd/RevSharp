@@ -6,6 +6,31 @@ namespace RevSharp.Core.Models;
 
 public partial class Server
 {
+
+
+    public async Task<bool> EditRole(Client client,
+        string roleId,
+        DataEditRole data)
+    {
+        var sc = JsonSerializer.Serialize(data, Client.PutSerializerOptions);
+        var content = new StringContent(sc, null, "application/json");
+        var response = await client.PatchAsync($"/servers/{Id}/roles/{roleId}", content);
+        var stringContent = response.Content.ReadAsStringAsync().Result;
+        if (response.StatusCode == HttpStatusCode.OK)
+        {
+            var deser = JsonSerializer.Deserialize<ServerRole>(stringContent, Client.SerializerOptions);
+            if (deser == null)
+                throw new Exception("Deserialized ServerRole to null");
+
+            Roles.TryAdd(roleId, deser);
+            Roles[roleId] = deser;
+            return true;
+        }
+        return false;
+    }
+    public Task<bool> EditRole(string roleId, DataEditRole data)
+        => EditRole(Client, roleId, data);
+
     /// <summary>
     /// Edit Server
     /// </summary>
