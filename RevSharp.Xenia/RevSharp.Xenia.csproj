@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Company>Kate Ward</Company>
+        <Product>Xenia Revolt Bot</Product>
+        <AssemblyVersion>0.4.*</AssemblyVersion>
+        <NeutralLanguage>en</NeutralLanguage>
+        <AssemblyName>RevSharp.Xenia</AssemblyName>
+        <RootNamespace>RevSharp.Xenia</RootNamespace>
+		<Deterministic>false</Deterministic>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RevSharp.Xenia.ImgWiz\RevSharp.Xenia.ImgWiz.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
+      <PackageReference Include="Google.Cloud.Vision.V1" Version="3.3.0" />
+      <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
+      <PackageReference Include="prometheus-net" Version="8.0.0" />
+      <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.0" />
+    </ItemGroup>
+
+</Project>

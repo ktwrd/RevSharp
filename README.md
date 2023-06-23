@@ -1,7 +1,7 @@
- # RevSharp
- A C# Library for the FOSS chat platform [Revolt](https://revolt.chat) with portability in mind.
+# RevSharp
+A C# Library for the FOSS chat platform [Revolt](https://revolt.chat) with portability in mind.
 
-[SkidBot Revolt Edition](https://skidbot.kate.pet/posts/revolt-edition) uses this library. You can view the README [here](README.ReBot)
+Xenia uses this library. You can view the README [here](README.Xenia)
 
 To add RevSharp to your project, you can install via the `RevSharp.Core` package or with the following command;
 ```bash

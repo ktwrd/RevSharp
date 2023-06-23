@@ -11,8 +11,8 @@ services:
       - ./mongoData:/data/db
     ports:
       - "27021:27017"
-  skidbot:
-    image: ktwrd/skidbot-revolt:latest
+  xenia:
+    image: ktwrd/xenia-revolt:latest
     restart: always
     volumes:
       - ./data:/app/data

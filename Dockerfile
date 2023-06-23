@@ -8,16 +8,16 @@ USER appuser
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["./RevSharp.Skidbot/RevSharp.Skidbot.csproj", "./"]
-RUN dotnet restore "RevSharp.Skidbot.csproj"
+COPY ["./RevSharp.Xenia/RevSharp.Xenia.csproj", "./"]
+RUN dotnet restore "RevSharp.Xenia.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "./RevSharp.Skidbot/RevSharp.Skidbot.csproj" -c Release -o /app/build
+RUN dotnet build "./RevSharp.Xenia/RevSharp.Xenia.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "./RevSharp.Skidbot/RevSharp.Skidbot.csproj" -c Release -o /app/publish
+RUN dotnet publish "./RevSharp.Xenia/RevSharp.Xenia.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "RevSharp.Skidbot.dll"]
+ENTRYPOINT ["dotnet", "RevSharp.Xenia.dll"]

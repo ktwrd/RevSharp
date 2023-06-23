@@ -45,33 +45,6 @@ internal static class Log
     };
     #endregion
 
-    /*private static List<string> linequeue = new List<string>();
-    private static System.Timers.Timer _timer = null;
-    internal static string LogOutput => Path.Combine(Directory.GetCurrentDirectory(), "Logs", $"log_{Program.StartTimestamp}.txt");
-    private static void CreateTimer()
-    {
-        if (_timer != null) return;
-        if ((Environment.GetEnvironmentVariable("SKIDBOT_WRITELOG") ?? "true") == "false")
-            return;
-        if (!Directory.Exists(Path.GetDirectoryName(LogOutput)))
-            Directory.CreateDirectory(Path.GetDirectoryName(LogOutput));
-        _timer = new System.Timers.Timer();
-        _timer.Interval = 5000;
-        _timer.Elapsed += _timer_Elapsed;
-        _timer.Enabled = true;
-        _timer.Start();
-    }
-
-    private static void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-    {
-        _timer.Stop();
-        string[] lines = linequeue.ToArray();
-        linequeue.Clear();
-        File.AppendAllLines(LogOutput, lines);
-        _timer.Start();
-    }
-    */
-
     internal static void SetColor(LogColor? color = null)
     {
         if (!FeatureFlags.EnableLogColor)

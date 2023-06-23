@@ -397,7 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Data
-SkidBot.Core/Properties/launchSettings.json
 .vscode
 mongoData
 config.json
@@ -405,4 +404,4 @@ config.json
 .idea/.idea.RevSharp/.idea/.name
 data
 .idea/.idea.RevSharp/.idea/statistic.xml
-RevSharp.Skidbot/Properties/launchSettings.json
+RevSharp.Xenia/Properties/launchSettings.json
