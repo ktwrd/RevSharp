@@ -24,7 +24,7 @@ public class HelpModule : BaseModule
             if (!item.HasHelpContent)
                 continue;
             
-            var key = item.InternalName;
+            var key = item.BaseCommandName;
             if (key == null)
                 continue;
             
