@@ -1,3 +1,4 @@
+using RevSharp.Skidbot.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -18,5 +19,17 @@ public static class SkidbotHelper
             }
             return builder.ToString();
         }
+    }
+    public static string GenerateHelp(BaseModule mod, List<(string, string)> data)
+    {
+        var r = mod.Reflection.Config.Prefix + mod.BaseCommandName;
+        var list = new List<string>();
+        foreach (var i in data)
+        {
+            list.Add($">`{r} {i.Item1}`");
+            list.Add($">{i.Item2}");
+            list.Add("");
+        }
+        return string.Join("\n", list);
     }
 }
