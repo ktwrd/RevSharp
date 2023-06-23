@@ -29,11 +29,9 @@ public class XpModule : BaseModule
             case "setchannel":
                 await Command_SetChannel(info, message);
                 break;
-            #if DEBUG
             case "setxp":
                 await Command_SetXp(info, message);
                 break;
-            #endif
             default:
                 await Command_Help(info, message);
                 break;
@@ -53,7 +51,12 @@ public class XpModule : BaseModule
 
     public async Task Command_SetXp(CommandInfo info, Message message)
     {
-        await Task.Delay(1000);
+        if (!Reflection.Config.OwnerUserIds.Contains(message.AuthorId))
+        {
+            await message.Reply("This command can only be used by the bot owner");
+            return;
+        }
+        await Task.Delay(500);
         if (info.Arguments.Count < 2)
             return;
         var server = await message.FetchServer();
@@ -64,7 +67,7 @@ public class XpModule : BaseModule
         var data = await controller.Get(message.AuthorId, server.Id);
         await controller.GrantXp(data, message, amount);
         var asdasd = await controller.Get(message.AuthorId, server.Id);
-        message.Reply("ok\n```\n" + JsonSerializer.Serialize(asdasd, Program.SerializerOptions) + "\n```");
+        await message.Reply("ok\n```\n" + JsonSerializer.Serialize(asdasd, Program.SerializerOptions) + "\n```");
     }
     public async Task Command_SetChannel(CommandInfo info, Message message)
     {
@@ -235,15 +238,12 @@ public class XpModule : BaseModule
 
     public override string? HelpContent()
     {
-        var r = Program.ConfigData.Prefix + BaseCommandName;
-        return string.Join(
-            "\n", new string[]
-            {
-                "```",
-                $"{r} help       - display this message",
-                $"{r} profile    - Get XP profile",
-                $"{r} setchannel - Set channel for level-up messages"
-            });
+        return SkidbotHelper.GenerateHelp(this, new List<(string, string)>()
+        {
+            ("help", "display this message"),
+            ("profile", "get xp profile"),
+            ("setchannel", "set the current channel for level-up messages")
+        });
     }
     public override bool HasHelpContent => false;
     public override string? InternalName => "other";
