@@ -14,10 +14,6 @@ namespace RevSharp.Xenia.ImgWiz.Controllers
         private async Task Command_1984(CommandInfo info, Message message)
         {
             await AttemptFontExtract();
-            var embed = new SendableEmbed()
-            {
-                Title = "Image Wizard = 1984"
-            };
             var captionSplit = ParsePrompt(info, "JANUARY 1984");
 
             if (captionSplit[0].Length < 1)
