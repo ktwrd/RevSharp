@@ -1,5 +1,6 @@
 using RevSharp.Core;
 using RevSharp.Core.Models;
+using RevSharp.Xenia.Controllers;
 using RevSharp.Xenia.Helpers;
 
 namespace RevSharp.Xenia.Reflection;
@@ -40,6 +41,7 @@ public class BaseModule
 
     internal void InitEvents()
     {
+        var errorController = Reflection.FetchModule<ErrorReportController>();
         var type = this.GetType();
         Client.MessageReceived += async (m) =>
         {
@@ -49,7 +51,10 @@ public class BaseModule
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to run {type.Name}.MessageReceived()\n{ex}");
+                if (errorController != null)
+                    await errorController.Report(ex, m, $"Failed to run {type.Name}.MessageReceived");
+                else
+                    Log.Error($"Failed to run {type.Name}.MessageReceived()\n{ex}");
                 try
                 {
                     await m.Reply(string.Join("\n", new string[]
@@ -74,7 +79,10 @@ public class BaseModule
             }
             catch (Exception e)
             {
-                Log.Error($"Failed to run {type.Name}.Client_HandleCommand()\n{e}");
+                if (errorController != null)
+                    await errorController.Report(e, m, $"Failed to run {type.Name}.Client_HandleCommand");
+                else
+                    Log.Error($"Failed to run {type.Name}.Client_HandleCommand()\n{e}");
                 try
                 {
                     await m.Reply(
@@ -92,6 +100,7 @@ public class BaseModule
 
     private async Task Client_HandleCommand(Message message)
     {
+        var errorController = Reflection.FetchModule<ErrorReportController>();
         var type = this.GetType();
 
         bool hasContent = message.Content?.Length > 0;
@@ -129,7 +138,10 @@ public class BaseModule
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to run {type.Name}.CommandReceived()\n{ex}");
+            if (errorController != null)
+                await errorController.Report(ex, message, $"Failed to run {type.Name}.CommandReceived");
+            else
+                Log.Error($"Failed to run {type.Name}.CommandReceived()\n{ex}");
             await message.Reply(string.Join("\n", new string[]
             {
                 $"Uncaught exception while running `{type.Name}.CommandReceived()`",
@@ -176,7 +188,16 @@ public class BaseModule
     /// What category does this module belong to? Defaults to `null` which is the `other` category.
     /// </summary>
     public virtual string? HelpCategory => null;
+    /// <summary>
+    /// Base command name to call <see cref="CommandReceived(CommandInfo, Message)"/>
+    /// </summary>
     public virtual string? BaseCommandName => null;
+    /// <summary>
+    /// Wait for <see cref="Initialize(ReflectionInclude)"/> to complete before calling the next module to init.
+    /// </summary>
     public virtual bool WaitForInit => true;
+    /// <summary>
+    /// What server permission does this module require. When `null`, no server permissions will be checked.
+    /// </summary>
     public virtual PermissionFlag? RequireServerPermission => null;
 }
