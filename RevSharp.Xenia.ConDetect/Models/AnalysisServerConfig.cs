@@ -29,20 +29,20 @@ public class AnalysisServerConfig : BaseMongoModel
         new()
         {
             Adult = 5,
-            Spoof = 5,
+            Spoof = -1,
             Medical = -1,
-            Violence = 4,
+            Violence = 5,
             Racy = -1
         };
 
     public static ConfigThreshold DefaultFlagThreshold =>
         new()
         {
-            Adult = 2,
-            Spoof = 3,
+            Adult = 3,
+            Spoof = -1,
             Medical = -1,
-            Violence = 3,
-            Racy = 2
+            Violence = 4,
+            Racy = -1
         };
     public ConfigThreshold DeleteThreshold { get; set; }
     public ConfigThreshold FlagThreshold { get; set; }
