@@ -244,7 +244,7 @@ public partial class ContentDetectionModule : BaseModule
             var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
             var file = await Client.UploadFile(
                 new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, Program.SerializerOptions))), "match.json",
-                "attachments", "application/json");
+                "attachments");
             await channel.SendMessage(new DataMessageSend()
             {
                 Embeds = new []{embed},

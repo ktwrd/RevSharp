@@ -97,8 +97,7 @@ public partial class ImageWizardController : BaseModule
             var uploadId = await Client.UploadFile(
                 pngStream,
                 "image.png",
-                "attachments",
-                "image/png");
+                "attachments");
             if (uploadId != null)
             {
                 await message.Reply(new DataMessageSend()
