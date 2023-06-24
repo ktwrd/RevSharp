@@ -62,7 +62,14 @@ public class ConfigData
     /// Server Id where the Channel Id for internal logs go.
     /// </summary>
     public string LogChannelServerId { get; set; }
+    /// <summary>
+    /// Notifications like bot restart/update/start messages.
+    /// </summary>
     public string PublicLogChannelId { get; set; }
+    /// <summary>
+    /// Channel Id for error reporting
+    /// </summary>
+    public string? ErrorLogChannelId { get; set; }
 
     public ConfigData()
     {
@@ -78,5 +85,6 @@ public class ConfigData
         AuthentikToken = "";
         PrometheusPort = 8771;
         PrometheusEnable = true;
+        ErrorLogChannelId = null;
     }
 }
