@@ -16,6 +16,7 @@ public class ReflectionInclude
         LoadedAssemblyNames = new List<string>();
     }
     private readonly Client _client;
+    public ConfigData Config { get; init; }
 
     private List<BaseModule> Modules { get; set; }
     private List<string> LoadedInstanceNames { get; set; }
@@ -82,116 +83,22 @@ public class ReflectionInclude
         return Modules.ToArray();
     }
 
-    private List<Task> InitAsyncQueue = new List<Task>();
     public event CommandExecuteDelegate CommandExecuteTrigger;
-    public delegate void CommandExecuteDelegate(Server? server, User? author, BaseChannel? channel, INamedChannel? namedChannel, CommandInfo info, BaseModule module);
-    public ConfigData Config { get; init; }
+    internal void OnCommandExecuteTrigger(
+        Server? server,
+        User? author,
+        BaseChannel? channel,
+        INamedChannel? namedChannel,
+        CommandInfo info,
+        BaseModule module)
+    {
+        CommandExecuteTrigger?.Invoke(server, author, channel, namedChannel, info, module);
+    }
+    private List<Task> InitAsyncQueue = new List<Task>();
     private async Task InitializeEvents<T>(T item, Type type) where T : BaseModule
     {
         item.Client = _client;
-        _client.MessageReceived += async (m) =>
-        {
-            if (m.AuthorId != _client.CurrentUserId && !m.IsSystemMessage)
-            {
-                try
-                {
-                    bool hasContent = m.Content?.Length > 0;
-                    bool notSelf = m.AuthorId != _client.CurrentUserId;
-                    bool startsWithPrefix = (m.Content ?? "").StartsWith(Config.Prefix);
-                    if (item.BaseCommandName != null && notSelf && hasContent && startsWithPrefix)
-                    {
-                        var commandInfo = CommandHelper.FetchInfo(this, m);
-                        if (commandInfo != null && commandInfo.Command == item.BaseCommandName)
-                        {
-                            var author = await _client.GetUser(m.AuthorId, forceUpdate: false);
-                            if (author != null && author is not { IsBot: true })
-                            {
-                                var server = await m.FetchServer();
-                                if (server != null && item.RequireServerPermission != null)
-                                {
-                                    var flag = (PermissionFlag)item.RequireServerPermission;
-                                    var member = await server.GetMember(author.Id, false);
-                                    if (member != null)
-                                    {
-                                        var hasPerm = await member.HasPermission(_client, flag);
-                                        if (!hasPerm)
-                                        {
-                                            await m.Reply($"Missing server permission `{flag}`");
-                                            return;
-                                        }
-                                    }
-                                }
-                                await item.CommandReceived(commandInfo, m);
-
-                                var authorName = "<None>";
-                                if (author != null)
-                                    authorName = $"{author.Username}#{author.Discriminator}";
-
-                                var bch = await _client.GetChannel(m.ChannelId);
-                                INamedChannel? channel = null;
-                                if (bch is INamedChannel namedChannel)
-                                    channel = namedChannel;
-                                CommandExecuteTrigger?.Invoke(
-                                    server,
-                                    author,
-                                    bch,
-                                    channel,
-                                    commandInfo,
-                                    item);
-                                /*var statControl = FetchModule<StatisticController>();
-                                statControl?.CommandCounter.WithLabels(new string[]
-                                {
-                                    server?.Name ?? "<None>",
-                                    server?.Id ?? "<None>",
-                                    authorName,
-                                    author?.Id ?? "<None>",
-                                    channel?.Name ?? "<None>",
-                                    bch?.Id ?? "<None>",
-                                    commandInfo.Command,
-                                    string.Join(" ", commandInfo.Arguments),
-                                    item.HelpCategory ?? "<None>"
-                                }).Inc();*/
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"Failed to run {type.Name}.CommandReceived()\n{e}");
-                    try
-                    {
-                        await m.Reply(
-                            string.Join(
-                                "\n", new string[]
-                                {
-                                    $"Uncaught exception while running `{type.Name}.CommandReceived()`", "```",
-                                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)), "```"
-                                }));
-                    } catch{}
-                }
-                try
-                {
-                    await item.MessageReceived(m);
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"Failed to run {type.Name}.MessageReceived()\n{e}");
-                    try
-                    {
-                        await m.Reply(string.Join("\n", new string[]
-                        {
-                            $"Uncaught exception while running `{type.Name}.MessageReceived()`",
-                            "```",
-                            e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)),
-                            "```"
-                        }));
-                    }
-                    catch
-                    { }
-
-                }
-            }
-        };
+        item.InitEvents();
         try
         {
             if (item.WaitForInit)

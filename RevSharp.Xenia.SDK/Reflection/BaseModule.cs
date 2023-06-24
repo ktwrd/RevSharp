@@ -38,6 +38,123 @@ public class BaseModule
         return Task.CompletedTask;
     }
 
+    internal void InitEvents()
+    {
+        var type = this.GetType();
+        Client.MessageReceived += async (m) =>
+        {
+            try
+            {
+                await MessageReceived(m);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to run {type.Name}.MessageReceived()\n{ex}");
+                try
+                {
+                    await m.Reply(string.Join("\n", new string[]
+                    {
+                            $"Uncaught exception while running `{type.Name}.MessageReceived()`",
+                            "```",
+                            ex.ToString().Substring(0, Math.Min(ex.ToString().Length, 2000)),
+                            "```"
+                    }));
+                }
+                catch
+                { }
+            }
+        };
+        Client.MessageReceived += async (m) =>
+        {
+            if (m.AuthorId == Client.CurrentUserId || m.IsSystemMessage)
+                return;
+            try
+            {
+                await Client_HandleCommand(m);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to run {type.Name}.Client_HandleCommand()\n{e}");
+                try
+                {
+                    await m.Reply(
+                        string.Join(
+                            "\n", new string[]
+                            {
+                                    $"Uncaught exception while running `{type.Name}.CommandReceived()`", "```",
+                                    e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)), "```"
+                            }));
+                }
+                catch { }
+            }
+        };
+    }
+
+    private async Task Client_HandleCommand(Message message)
+    {
+        var type = this.GetType();
+
+        bool hasContent = message.Content?.Length > 0;
+        bool notSelf = message.AuthorId != Client.CurrentUserId;
+        bool startsWithPrefix = (message.Content ?? "").StartsWith(Reflection.Config.Prefix);
+        if (BaseCommandName == null || !notSelf || !hasContent || !startsWithPrefix)
+            return;
+
+        var commandInfo = CommandHelper.FetchInfo(Reflection, message);
+        if (commandInfo == null || commandInfo.Command != BaseCommandName)
+            return;
+         
+        var author = await Client.GetUser(message.AuthorId, forceUpdate: false);
+        if (author == null || author.IsBot)
+            return;
+
+        var server = await message.FetchServer();
+        if (server != null && RequireServerPermission != null)
+        {
+            var flag = (PermissionFlag)RequireServerPermission;
+            var member = await server.GetMember(author.Id, false);
+            if (member != null)
+            {
+                var hasPerm = await member.HasPermission(Client, flag);
+                if (!hasPerm)
+                {
+                    await message.Reply($"Missing server permission `{flag}`");
+                    return;
+                }
+            }
+        }
+        try
+        {
+            await CommandReceived(commandInfo, message);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to run {type.Name}.CommandReceived()\n{ex}");
+            await message.Reply(string.Join("\n", new string[]
+            {
+                $"Uncaught exception while running `{type.Name}.CommandReceived()`",
+                "```",
+                ex.ToString().Substring(0, Math.Min(ex.ToString().Length, 2000)),
+                "```"
+            }));
+            return;
+        }
+
+        var authorName = $"{author.Username}#{author.Discriminator}";
+
+        var bch = await Client.GetChannel(message.ChannelId);
+        INamedChannel? channel = null;
+        if (bch is INamedChannel namedChannel)
+            channel = namedChannel;
+        Reflection.OnCommandExecuteTrigger(
+            server,
+            author,
+            bch,
+            channel,
+            commandInfo,
+            this);
+    }
+
     /// <summary>
     /// Content that is displayed in the Help command
     /// </summary>
