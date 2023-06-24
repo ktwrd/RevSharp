@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevSharp.Xenia.Modules
+namespace RevSharp.Xenia.Moderation.Modules
 {
     [RevSharpModule]
     public class RoleModule : BaseModule

@@ -17,7 +17,7 @@ public partial class GoogleApiController
     public GoogleCredential? CredentialVision { get; private set; }
     public async Task<GoogleCredential?> GetVisionCredential()
     {
-        return CredentialVision ??= await ParseCredential(Program.ConfigData.GoogleCloud.DefaultCred);
+        return CredentialVision ??= await ParseCredential(Reflection.Config.GoogleCloud.DefaultCred);
     }
     
     private ImageAnnotatorClient? _annotatorClient;
@@ -85,7 +85,7 @@ public partial class GoogleApiController
             return existingSummary.Annotation;*/
         
         // when fails, return null
-        var uploadResult = await UploadToBucket(url, Program.ConfigData.ContentDetectionBucket, ImageContentTypes);
+        var uploadResult = await UploadToBucket(url, Reflection.Config.ContentDetectionBucket, ImageContentTypes);
         return await PerformSafeSearch(uploadResult);
     }
     public async Task<SafeSearchAnnotation?> PerformSafeSearch(VisionImage image)

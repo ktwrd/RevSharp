@@ -6,7 +6,7 @@ using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
 using RevSharp.Xenia.Reflection;
 
-namespace RevSharp.Xenia.Modules;
+namespace RevSharp.Xenia.Moderation.Modules;
 
 [RevSharpModule]
 public class KickModule : BaseModule
@@ -168,7 +168,7 @@ public class KickModule : BaseModule
 
     public override string? HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Reflection.Config.Prefix;
         return string.Join("\n", new string[]
         {
             "```",

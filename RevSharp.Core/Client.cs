@@ -48,7 +48,7 @@ public partial class Client
     /// Value is set when <see cref="LoginAsync"/> is called.
     /// </summary>
     public RevoltNodeResponse? EndpointNodeInfo { get; private set; }
-    internal static JsonSerializerOptions SerializerOptions
+    public static JsonSerializerOptions SerializerOptions
     {
         get
         {
@@ -65,7 +65,7 @@ public partial class Client
         }
     }
 
-    internal static JsonSerializerOptions PutSerializerOptions
+    public static JsonSerializerOptions PutSerializerOptions
     {
         get
         {

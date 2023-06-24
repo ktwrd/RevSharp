@@ -8,12 +8,12 @@ public partial class ContentDetectionModule
 {
     private async Task Command_Admin(CommandInfo info, Message message)
     {
-        if (!Program.ConfigData.OwnerUserIds.Contains(message.AuthorId))
+        if (!Reflection.Config.OwnerUserIds.Contains(message.AuthorId))
             return;
 
         if (info.Arguments.Count < 3)
         {
-            var r = Program.ConfigData.Prefix + BaseCommandName;
+            var r = Reflection.Config.Prefix + BaseCommandName;
             await message.Reply(
                 new SendableEmbed()
                 {

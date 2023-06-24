@@ -20,7 +20,7 @@ public partial class GoogleApiController
 
         var creds = await GetDefaultCredential();
         _storageCredential = creds;
-        _storageKey = Program.ConfigData.GoogleCloud.DefaultCred;
+        _storageKey = Reflection.Config.GoogleCloud.DefaultCred;
         var client = await StorageClient.CreateAsync(_storageCredential);
         _storageClient = client;
         return _storageClient;

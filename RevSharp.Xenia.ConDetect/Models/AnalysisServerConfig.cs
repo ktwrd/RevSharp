@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using kate.shared.Helpers;
+using RevSharp.Core;
 
 namespace RevSharp.Xenia.Models.ContentDetection;
 
@@ -125,9 +126,9 @@ public class ContentAnalysisMessageMatch
                 "Adult", "Spoof", "Medical", "Violence", "Racy"
             };
             var analysisDict = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                JsonSerializer.Serialize(Analysis), Program.SerializerOptions);
+                JsonSerializer.Serialize(Analysis), Client.SerializerOptions);
             var thresholdDict = JsonSerializer.Deserialize<Dictionary<string, int>>(
-                JsonSerializer.Serialize(Threshold, Program.SerializerOptions), Program.SerializerOptions);
+                JsonSerializer.Serialize(Threshold, Client.SerializerOptions), Client.SerializerOptions);
             
             
             var dict = new Dictionary<string, decimal>();
@@ -142,7 +143,7 @@ public class ContentAnalysisMessageMatch
                     (v) =>
                     {
                         var dct = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                            JsonSerializer.Serialize(v.Item1, Program.SerializerOptions), Program.SerializerOptions);
+                            JsonSerializer.Serialize(v.Item1, Client.SerializerOptions), Client.SerializerOptions);
                         return ((dct[key]).ToString(), v.Item2);
                     }).ToArray();
                 if (analysisResult >= thresholdValue)

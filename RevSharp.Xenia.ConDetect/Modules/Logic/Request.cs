@@ -38,7 +38,7 @@ public partial class ContentDetectionModule
         else if (data.LogChannelId == null || data.LogChannelId.Length < 1)
         {
             embed.Description =
-                $"Log Channel is not set. Please use `{Program.ConfigData.Prefix}{BaseCommandName} setlogchannel` in the channel that you want logs to go to.";
+                $"Log Channel is not set. Please use `{Reflection.Config.Prefix}{BaseCommandName} setlogchannel` in the channel that you want logs to go to.";
             embed.Colour = "red";
         }
         else if (data.HasRequested)
@@ -90,7 +90,7 @@ public partial class ContentDetectionModule
         data.HasRequested = true;
         data.AllowAnalysis = false;
 
-        var notificationChannel = await Client.GetChannel(Program.ConfigData.LogChannelId) as TextChannel;
+        var notificationChannel = await Client.GetChannel(Reflection.Config.LogChannelId) as TextChannel;
         await notificationChannel.SendMessage(
             new SendableEmbed()
             {

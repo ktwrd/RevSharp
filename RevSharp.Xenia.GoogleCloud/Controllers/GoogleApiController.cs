@@ -30,12 +30,12 @@ public partial class GoogleApiController : BaseModule
     public async Task<GoogleCredential> GetDefaultCredential()
     {
         var cred = CredentialDefault ??
-                await ParseCredential(Program.ConfigData.GoogleCloud.DefaultCred);
+                await ParseCredential(Reflection.Config.GoogleCloud.DefaultCred);
 
         if (cred == null)
         {
             Log.Error("CredentialDefault was parsed to null. Aborting Process");
-            Program.Quit(1);
+            Environment.Exit(1);
             return null;
         }
 
@@ -62,11 +62,11 @@ public partial class GoogleApiController : BaseModule
         GoogleCredential? cred = null;
         using (CancellationTokenSource source = new CancellationTokenSource())
         {
-            var jsonText = JsonSerializer.Serialize(key, Program.SerializerOptions);
+            var jsonText = JsonSerializer.Serialize(key, RevoltClient.SerializerOptions);
             if (jsonText == null)
             {
                 Log.Error("Failed to serialize Google Cloud Config.");
-                Program.Quit(1);
+                Environment.Exit(1);
                 return null;
             }
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonText)))
@@ -83,7 +83,7 @@ public partial class GoogleApiController : BaseModule
 #if DEBUG
                     throw;
 #endif
-                    Program.Quit(1);
+                    Environment.Exit(1);
                 }
             }
         }
@@ -94,7 +94,7 @@ public partial class GoogleApiController : BaseModule
 #if DEBUG
             throw new Exception(errorMessage);
 #endif
-            Program.Quit(1);
+            Environment.Exit(1);
             return null;
         }
         return cred;

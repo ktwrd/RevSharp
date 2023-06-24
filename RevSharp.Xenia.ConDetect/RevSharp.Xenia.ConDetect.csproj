@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RevSharp.Xenia.GoogleCloud\RevSharp.Xenia.GoogleCloud.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Google.Cloud.Vision.V1">
+        <HintPath>..\..\..\..\.nuget\packages\google.cloud.vision.v1\3.3.0\lib\netstandard2.1\Google.Cloud.Vision.V1.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

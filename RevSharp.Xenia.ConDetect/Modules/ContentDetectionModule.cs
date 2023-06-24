@@ -10,6 +10,7 @@ using RevSharp.Core.Models.WebSocket;
 using RevSharp.Xenia.Helpers;
 using RevSharp.Xenia.Models.ContentDetection;
 using RevSharp.Xenia.Reflection;
+using RevoltClient = RevSharp.Core.Client;
 
 using RevoltFile = RevSharp.Core.Models.File;
 
@@ -25,7 +26,7 @@ public partial class ContentDetectionModule : BaseModule
 
     public override string? HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Reflection.Config.Prefix;
         return string.Join("\n", new string[]
         {
             "```",
@@ -243,7 +244,7 @@ public partial class ContentDetectionModule : BaseModule
 
             var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
             var file = await Client.UploadFile(
-                new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, Program.SerializerOptions))), "match.json",
+                new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, RevoltClient.SerializerOptions))), "match.json",
                 "attachments");
             await channel.SendMessage(new DataMessageSend()
             {

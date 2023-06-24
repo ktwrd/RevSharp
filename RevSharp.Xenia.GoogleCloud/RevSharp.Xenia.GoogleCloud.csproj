@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Google.Apis.Auth">
+        <HintPath>..\..\..\..\.nuget\packages\google.apis.auth\1.60.0\lib\netstandard2.0\Google.Apis.Auth.dll</HintPath>
+      </Reference>
+      <Reference Include="Google.Cloud.Vision.V1">
+        <HintPath>..\..\..\..\.nuget\packages\google.cloud.vision.v1\3.3.0\lib\netstandard2.1\Google.Cloud.Vision.V1.dll</HintPath>
+      </Reference>
+      <Reference Include="Grpc.Auth">
+        <HintPath>..\..\..\..\.nuget\packages\grpc.auth\2.51.0\lib\netstandard2.0\Grpc.Auth.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
+      <PackageReference Include="Google.Cloud.Vision.V1" Version="3.3.0" />
+    </ItemGroup>
+
+</Project>

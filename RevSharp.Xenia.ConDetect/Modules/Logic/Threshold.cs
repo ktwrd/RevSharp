@@ -37,7 +37,7 @@ public partial class ContentDetectionModule
             {
                 {"Delete", data.DeleteThreshold},
                 {"Flag", data.FlagThreshold}
-            }, Program.SerializerOptions) + "\n```";
+            }, Core.Client.SerializerOptions) + "\n```";
         await message.Reply(embed);
         
         await controller.Set(data);
@@ -61,7 +61,7 @@ public partial class ContentDetectionModule
         
         if (info.Arguments.Count < 4)
         {
-            var p = Program.ConfigData.Prefix;
+            var p = Reflection.Config.Prefix;
             embed.Description = string.Join(
             "\n", new string[]
             {

@@ -1091,6 +1091,36 @@
             Invoked when the MessageDelete event is received on the WebSocket client.
             </summary>
         </member>
+        <member name="M:RevSharp.Core.Models.DataMessageSend.AddEmbed(RevSharp.Core.Models.SendableEmbed)">
+            <summary>
+            Add an embed to this message
+            </summary>
+            <param name="embed">Embed to add</param>
+            <returns>Instance of this</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.DataMessageSend.AddAttachment(System.String)">
+            <summary>
+            Add an attachment id to this message
+            </summary>
+            <param name="id">Attachment Id to add</param>
+            <returns>Instance of this</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.DataMessageSend.AddReply(System.String,System.Boolean)">
+            <summary>
+            Add a reply to this message
+            </summary>
+            <param name="id">Message Id</param>
+            <param name="mention">Mention message</param>
+            <returns>Instance of this</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.DataMessageSend.AddReply(RevSharp.Core.Models.Message,System.Boolean)">
+            <summary>
+            Add a reply to this message
+            </summary>
+            <param name="message">Message that we want to reply to</param>
+            <param name="mention">Mention message</param>
+            <returns>Instance of this</returns>
+        </member>
         <member name="P:RevSharp.Core.Models.SendableMessage.Nonce">
             <summary>
             Unique token to prevent duplicate message sending
