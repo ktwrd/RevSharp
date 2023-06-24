@@ -54,10 +54,10 @@ public class BaseModule
                 {
                     await m.Reply(string.Join("\n", new string[]
                     {
-                            $"Uncaught exception while running `{type.Name}.MessageReceived()`",
-                            "```",
-                            ex.ToString().Substring(0, Math.Min(ex.ToString().Length, 2000)),
-                            "```"
+                        $"Uncaught exception while running `{type.Name}.MessageReceived()`",
+                        "```",
+                        ex.ToString().Substring(0, Math.Min(ex.ToString().Length, 2000)),
+                        "```"
                     }));
                 }
                 catch
