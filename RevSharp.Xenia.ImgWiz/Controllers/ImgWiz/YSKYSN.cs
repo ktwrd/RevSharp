@@ -14,6 +14,7 @@ namespace RevSharp.Xenia.ImgWiz.Controllers
         public async Task Command_YSKYSN(CommandInfo info, Message message)
         {
             await message.AddReaction(Client, "✅");
+            await AttemptFontExtract();
             var caption = ParsePrompt(info, "NOW!");
 
             var img = Normalize(Image.NewFromBuffer(ImageWizard.img_yskysn));

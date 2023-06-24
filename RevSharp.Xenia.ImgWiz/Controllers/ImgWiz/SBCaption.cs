@@ -39,6 +39,7 @@ namespace RevSharp.Xenia.ImgWiz.Controllers
                     return;
                 }
                 await message.AddReaction(Client, "✅");
+                await AttemptFontExtract();
 
                 // Read detected image and scale it down if required
                 var imageToCaption = Normalize(Image.NewFromStream(originalFileData));
