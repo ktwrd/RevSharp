@@ -2,10 +2,13 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using kate.shared.Helpers;
+using MimeTypes;
 using Newtonsoft.Json.Linq;
 using RevSharp.Core.Controllers;
 using RevSharp.Core.Helpers;
@@ -288,11 +291,13 @@ public partial class Client
         return false;
     }
 
-    public async Task<string?> UploadFile(Stream stream, string filename, string tag, string contentType)
+    public async Task<string?> UploadFile(Stream stream, string filename, string tag)
     {
         var url = $"{EndpointNodeInfo.Features.Autumn.Url}/{tag}";
-        var content = new MultipartFormDataContent();
-        content.Add(new StreamContent(stream), "file", filename);
+        var content = new MultipartFormDataContent
+        {
+            { new StreamContent(stream), "file", filename }
+        };
         var response = await HttpClient.PostAsync(url, content);
         var stringContent = response.Content.ReadAsStringAsync().Result;
         if (response.StatusCode == HttpStatusCode.OK)
@@ -304,5 +309,32 @@ public partial class Client
 
         return null;
     }
+    public Task<string?> UploadFile(Stream content, string filename, FileTag tag)
+    {
+        return UploadFile(content, filename, tag.ToString());
+    }
+    public Task<string?> UploadFile(string content, string filename, string tag)
+    {
+        return UploadFile(new MemoryStream(Encoding.UTF8.GetBytes(content)), filename, tag);
+    }
+    public Task<string?> UploadFile(string content, string filename, FileTag tag)
+    {
+        return UploadFile(content, filename, tag.ToString());
+    }
 
+}
+public enum FileTag
+{
+    [EnumMember(Value = "attachments")]
+    Attachment,
+    [EnumMember(Value = "avatars")]
+    Avatar,
+    [EnumMember(Value = "backgrounds")]
+    Background,
+    [EnumMember(Value = "icons")]
+    Icon,
+    [EnumMember(Value = "banners")]
+    Banner,
+    [EnumMember(Value = "emojis")]
+    Emoji,
 }
