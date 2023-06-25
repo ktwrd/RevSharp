@@ -98,7 +98,14 @@ public partial class ContentDetectionModule : BaseModule
         // Ignore when ContentDetection is disabled
         if (!FeatureFlags.EnableContentDetection)
             return;
-        ContentDetectionTask(message);
+
+        var detectionController = Reflection.FetchModule<ContentDetectionController>();
+        if (detectionController == null)
+        {
+            Log.Error($"ContentDetectionController not found!");
+            return;
+        }
+        await detectionController.RunDetection(message);
     }
 
     public async Task ContentDetectionTask(Message message)
