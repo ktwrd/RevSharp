@@ -118,6 +118,11 @@ public class BaseModule
             return;
 
         var server = await message.FetchServer(false);
+        if (ServerOnly && server == null)
+        {
+            await message.Reply($"This command can only be used in servers.");
+            return;
+        }
         if (server != null && RequireServerPermission != null)
         {
             var flag = (PermissionFlag)RequireServerPermission;
@@ -209,4 +214,8 @@ public class BaseModule
     /// What server permission does this module require. When `null`, no server permissions will be checked.
     /// </summary>
     public virtual PermissionFlag? RequireServerPermission => null;
+    /// <summary>
+    /// When enabled, the <see cref="CommandReceived(CommandInfo, Message)"/> method will only be called when a message is sent in a server.
+    /// </summary>
+    public virtual bool ServerOnly => false;
 }
