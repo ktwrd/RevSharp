@@ -12,6 +12,9 @@ public delegate void ReadyMessageDelegate(
 public delegate void UserIdDelegate(
     string userId);
 
+public delegate void UserDelegate(
+    User user);
+
 public delegate void MemberIdDelegate(
     string serverId,
     string userId);
