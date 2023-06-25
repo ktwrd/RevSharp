@@ -429,7 +429,7 @@ public class ConDetectConfigModule : BaseModule
         }
     };
 
-    public override bool HasHelpContent => false;
+    public override bool HasHelpContent => true;
     public override string? InternalName => "condetect_config";
     public override string? HelpCategory => "moderation";
     public override string? BaseCommandName => "cdconfig";
