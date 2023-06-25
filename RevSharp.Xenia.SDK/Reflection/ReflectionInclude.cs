@@ -1,4 +1,5 @@
 using System.ComponentModel.Design.Serialization;
+using System.Diagnostics;
 using System.Reflection;
 using RevSharp.Core;
 using RevSharp.Core.Models;
@@ -14,6 +15,7 @@ public class ReflectionInclude
         Modules = new List<BaseModule>();
         LoadedInstanceNames = new List<string>();
         LoadedAssemblyNames = new List<string>();
+        LoadedAssemblies = new List<Assembly>();
     }
     private readonly Client _client;
     public ConfigData Config { get; init; }
@@ -21,9 +23,11 @@ public class ReflectionInclude
     private List<BaseModule> Modules { get; set; }
     private List<string> LoadedInstanceNames { get; set; }
     private List<string> LoadedAssemblyNames { get; set; }
+    private List<Assembly> LoadedAssemblies { get; set; }
     public async Task Search(Assembly assembly)
     {
         LoadedAssemblyNames.Add(assembly.FullName.Split(',')[0]);
+        LoadedAssemblies.Add(assembly);
         Log.Debug($"[ReflectionInclude] Searching");
         IEnumerable<Type> typesWithAttr = from type in assembly.GetTypes()
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
