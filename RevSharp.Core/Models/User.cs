@@ -344,6 +344,13 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         Update?.Invoke();
     }
 
+    public event VoidDelegate RelationshipUpdate;
+
+    internal void OnRelationshipUpdate(UserRelationshipEvent message)
+    {
+        Relationship = message.Status;
+        RelationshipUpdate?.Invoke();
+    }
 
     internal static void Inject(PartialUser source, User target)
     {

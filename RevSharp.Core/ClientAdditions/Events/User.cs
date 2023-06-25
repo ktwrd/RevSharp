@@ -25,4 +25,20 @@ public partial class Client
         }
     }
 
+    public event UserDelegate UserRelationshipUpdate;
+
+    /// <summary>
+    /// - When exists in cache
+    ///     - Invoke <see cref="Models.User.OnRelationshipUpdate(UserRelationshipEvent)"/>
+    ///     - Invoke <see cref="UserRelationshipUpdate"/>
+    /// </summary>
+    /// <param name="message"></param>
+    internal void OnUserRelationship(UserRelationshipEvent message)
+    {
+        if (UserCache.TryGetValue(message.UserId, out Models.User value))
+        {
+            value.OnRelationshipUpdate(message);
+            UserRelationshipUpdate?.Invoke(value);
+        }
+    }
 }

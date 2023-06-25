@@ -16,6 +16,14 @@ internal partial class WebsocketClient
                     _client.OnUserUpdate(userUpdateData);
                 }
                 break;
+            case "UserRelationship":
+                var userRelationshipData =
+                    JsonSerializer.Deserialize<UserRelationshipEvent>(content, Client.SerializerOptions);
+                if (userRelationshipData != null)
+                {
+                    _client.OnUserRelationship(userRelationshipData);
+                }
+                break;
         }
     }
     
