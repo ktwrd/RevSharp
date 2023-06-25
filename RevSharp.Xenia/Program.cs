@@ -24,7 +24,7 @@ public static class Program
         Client.Ready += () =>
         {
             var c = Client.GetChannel(ConfigData.PublicLogChannelId).Result;
-            var plugins = Reflection.GetPlugins();
+            var plugins = Reflection.GetPlugins(includeVersion: true);
             c.SendMessage(
                 new SendableEmbed()
                 {
