@@ -26,5 +26,27 @@ public partial class Client
         }
         ServerRoleDeleted?.Invoke(serverId, roleId);
     }
+
+    /// <summary>
+    /// Emitted when a server role has been updated.
+    /// </summary>
+    public event ServerRoleDelegate ServerRoleUpdate;
+
+    /// <summary>
+    /// - When Role exists
+    ///     - Invoke <see cref="ServerRole.OnUpdate()"/>
+    /// - Invoke <see cref="ServerRoleUpdate"/>
+    /// </summary>
+    /// <param name="message">Websocket message</param>
+    internal void OnServerRoleUpdate(ServerRoleUpdateMessage message)
+    {
+        foreach (var server in ServerCache)
+        {
+            if (server.Value.Roles.TryGetValue(message.RoleId, out var role))
+            {
+                server.Value.OnRoleUpdate(message);
+                ServerRoleUpdate?.Invoke(server.Key, role);
+            }
+        }
     }
 }

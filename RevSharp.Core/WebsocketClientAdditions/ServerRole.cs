@@ -18,6 +18,14 @@ internal partial class WebsocketClient
                     _client.OnServerRoleDeleted(serverRoleDeleteData.Id, serverRoleDeleteData.RoleId);
                 }
                 break;
+            case "ServerRoleUpdate":
+                var serverRoleUpdateData =
+                    JsonSerializer.Deserialize<ServerRoleUpdateMessage>(content, Client.SerializerOptions);
+                if (serverRoleUpdateData != null)
+                {
+                    _client.OnServerRoleUpdate(serverRoleUpdateData);
+                }
+                break;
         }
     }
 }
