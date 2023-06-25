@@ -1,5 +1,8 @@
-﻿using RevSharp.Core.Models;
+﻿using System.Text.Json;
+using RevSharp.Core;
+using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
+using RevSharp.Xenia.Models.ContentDetection;
 using RevSharp.Xenia.Reflection;
 using Emoji = GEmojiSharp.Emoji;
 namespace RevSharp.Xenia.Modules;
@@ -22,7 +25,9 @@ public class ConDetectConfigModule : BaseModule
             case "help":
                 await Command_Help(info, message);
                 break;
-            
+            case "usedefault":
+                await Command_UseDefault(info, message);
+                break;
             case "logchannel":
                 await Command_LogChannel(info, message);
                 break;
@@ -281,6 +286,70 @@ public class ConDetectConfigModule : BaseModule
         await message.Reply(embed);
     }
     
+    public async Task Command_UseDefault(CommandInfo info, Message message)
+    {
+        var action = "";
+        if (info.Arguments.Count > 1)
+            action = info.Arguments[1].ToLower();
+
+        if (action != "delete" && action != "flag")
+        {
+            await message.Reply($"Invalid action `{action}`. Must be `delete` or `flag`");
+            return;
+        }
+
+        var embed = new SendableEmbed()
+        {
+            Title = "Content Detection Config - Default",
+            Colour = CommandHelper.DefaultColor
+        };
+        
+        var server = await message.FetchServer();
+        var configController = Reflection.FetchModule<ContentDetectionServerConfigController>();
+        if (configController == null)
+        {
+            embed.Colour = CommandHelper.ErrorColor;
+            embed.Description = $"Failed to get config controller (is null)";
+            await message.Reply(embed);
+            await ReportError(new Exception($"ContentDetectionServerConfigController is null (server: {server.Id}"), message);
+            return;
+        }
+        var data = await configController.Get(server.Id) ??
+                   new AnalysisServerConfig()
+                   {
+                       ServerId = server.Id
+                   };
+
+        if (action == "delete")
+        {
+            data.DeleteThreshold = AnalysisServerConfig.DefaultDeleteThreshold;
+        }
+        else if (action == "flag")
+        {
+            data.FlagThreshold = AnalysisServerConfig.DefaultFlagThreshold;
+        }
+
+
+        embed.Description = action switch
+        {
+            "delete" => $"Reset delete threshold to defaults.",
+            "flag" => $"Reset flag threshold to defaults."
+        };
+        try
+        {
+            await configController.Set(data);
+        }
+        catch (Exception ex)
+        {
+            embed.Description = $"Failed to save config. `{ex.Message}`";
+            embed.Colour = CommandHelper.ErrorColor;
+            await message.Reply(embed);
+            await ReportError(ex, message, $"Failed to save config for server {server.Id}");
+            return;
+        }
+        await message.Reply(embed);
+    }
+
     public async Task Command_Help(CommandInfo info, Message message)
     {
         var action = "";
