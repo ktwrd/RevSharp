@@ -1,5 +1,6 @@
 using RevSharp.Core.Helpers;
 using RevSharp.Core.Models;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core;
 
@@ -37,8 +38,48 @@ public partial class Client
         {
             OnMessageDeleted(messageId, value.ChannelId);
         }
+
         OnMessageDeleted(messageId, "");
     }
-    
-    
+
+    /// <summary>
+    /// Invoked when a message has a react added
+    /// </summary>
+    public event MessageReactedDelegate MessageReactAdd;
+    /// <summary>
+    /// - Call <see cref="GetMessageOrCache(string, string)"/>
+    /// - When not null
+    ///     - Call <see cref="Message.OnReactAdd(string, string)"/> in <see cref="MessageCache"/>
+    ///     - Invoke <see cref="MessageReactAdd"/>
+    /// </summary>
+    internal async void OnMessageReactAdd(MessageReactedEvent data)
+    {
+        var m = await GetMessageOrCache(data.ChannelId, data.MessageId);
+        if (m != null)
+        {
+            MessageCache[data.MessageId].OnReactAdd(data.UserId, data.Emoji);
+            MessageReactAdd?.Invoke(data.UserId, data.Emoji, data.MessageId);
+        }
+    }
+
+    /// <summary>
+    /// Invoked when a message has a reaction removed
+    /// </summary>
+    public event MessageReactedDelegate MessageReactRemove;
+    /// <summary>
+    /// - Call <see cref="GetMessageOrCache(string, string)"/>
+    /// - When not null
+    ///     - Call <see cref="Message.OnReactRemove(string, string)"/> in <see cref="MessageCache"/>
+    ///     - Invoke <see cref="MessageReactRemove"/>
+    /// </summary>
+    internal async void OnMessageReactRemove(MessageReactedEvent data)
+    {
+        var m = await GetMessageOrCache(data.UserId, data.Emoji);
+        if (m != null)
+        {
+            MessageCache[data.MessageId].OnReactRemove(data.UserId, data.Emoji);
+            MessageReactRemove?.Invoke(data.UserId, data.Emoji, data.MessageId);
+            
+        }
+    }
 }
