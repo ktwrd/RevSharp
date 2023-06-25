@@ -34,7 +34,9 @@ public static class Program
                             $"Running {ProductName} v{Version}",
                             "",
                             $"Loaded {plugins.Length} plugins;",
-                            string.Join("\n",  plugins.Select(v => $"- `{v}`"))
+                            "| Name | Version |",
+                            "| - | - |",
+                            string.Join("\n",  plugins.Select(v => "| " + v.Replace(" ", " | ") + " |"))
                         })
                 }).Wait();
         };
