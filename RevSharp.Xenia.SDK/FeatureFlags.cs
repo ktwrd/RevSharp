@@ -28,6 +28,17 @@ public static class FeatureFlags
     }
 
     /// <summary>
+    /// Parse environment variable into a string array, seperated by the `;` character
+    /// </summary>
+    /// <param name="envKey">Environment Key to search in</param>
+    /// <param name="defaultValue">Default return value when null</param>
+    /// <returns>Parsed string array</returns>
+    private static string[] ParseStringArray(string envKey, string[] defaultValue)
+    {
+        return (Environment.GetEnvironmentVariable(envKey) ?? string.Join(";", defaultValue)).Split(";");
+    }
+
+    /// <summary>
     /// Parse an environment variable as <see cref="Int32"/>.
     /// 
     /// - Fetch Environment variable (when null, set to <see cref="defaultValue"/> as string)
@@ -107,4 +118,8 @@ public static class FeatureFlags
             "XE_DIR_FC", Path.Join(
                 DataDirectory,
                 "fontcache"));
+
+    public static string[] PluginWhitelist =>
+        ParseStringArray(
+            "XE_PLUGIN_WHITELIST", Array.Empty<string>());
 }
