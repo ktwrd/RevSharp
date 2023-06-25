@@ -405,3 +405,4 @@ config.json
 data
 .idea/.idea.RevSharp/.idea/statistic.xml
 RevSharp.Xenia/Properties/launchSettings.json
+RevSharp.Skidbot/Properties/launchSettings.json

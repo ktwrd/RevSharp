@@ -12,6 +12,9 @@ public delegate void ReadyMessageDelegate(
 public delegate void UserIdDelegate(
     string userId);
 
+public delegate void UserDelegate(
+    User user);
+
 public delegate void MemberIdDelegate(
     string serverId,
     string userId);
@@ -49,5 +52,9 @@ public delegate void ServerIdDelegate(
 public delegate void ServerRoleIdDelegate(
     string serverId,
     string roleId);
+
+public delegate void ServerRoleDelegate(
+    string serverId,
+    ServerRole role);
 public delegate void RoleIdDelegate(
     string roleId);

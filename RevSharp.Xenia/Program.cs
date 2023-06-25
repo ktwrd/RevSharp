@@ -24,7 +24,7 @@ public static class Program
         Client.Ready += () =>
         {
             var c = Client.GetChannel(ConfigData.PublicLogChannelId).Result;
-            var plugins = Reflection.GetPlugins();
+            var plugins = Reflection.GetPlugins(includeVersion: true);
             c.SendMessage(
                 new SendableEmbed()
                 {
@@ -34,7 +34,9 @@ public static class Program
                             $"Running {ProductName} v{Version}",
                             "",
                             $"Loaded {plugins.Length} plugins;",
-                            string.Join("\n",  plugins.Select(v => $"- `{v}`"))
+                            "| Name | Version |",
+                            "| - | - |",
+                            string.Join("\n",  plugins.Select(v => "| " + v.Replace(" ", " | ") + " |"))
                         })
                 }).Wait();
         };

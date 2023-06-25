@@ -103,6 +103,7 @@ public partial class Client
             Log.Verbose($"{serverId} adding to cache");
             ServerCache.TryAdd(serverId, server);
         }
+        Server.Inject(server, ServerCache[serverId]);
         return ServerCache[serverId];
     }
 

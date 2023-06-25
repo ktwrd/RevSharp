@@ -117,14 +117,19 @@ public class BaseModule
         if (author == null || author.IsBot)
             return;
 
-        var server = await message.FetchServer();
+        var server = await message.FetchServer(false);
+        if (ServerOnly && server == null)
+        {
+            await message.Reply($"This command can only be used in servers.");
+            return;
+        }
         if (server != null && RequireServerPermission != null)
         {
             var flag = (PermissionFlag)RequireServerPermission;
             var member = await server.GetMember(author.Id, false);
             if (member != null)
             {
-                var hasPerm = await member.HasPermission(Client, flag);
+                var hasPerm = await member.HasPermission(Client, flag, forceUpdate: false);
                 if (!hasPerm)
                 {
                     await message.Reply($"Missing server permission `{flag}`");
@@ -152,8 +157,6 @@ public class BaseModule
             return;
         }
 
-        var authorName = $"{author.Username}#{author.Discriminator}";
-
         var bch = await Client.GetChannel(message.ChannelId);
         INamedChannel? channel = null;
         if (bch is INamedChannel namedChannel)
@@ -175,6 +178,17 @@ public class BaseModule
     {
         return null;
     }
+
+    public async Task ReportError(Exception exception, Message? message, string content)
+    {
+        var controller = Reflection.FetchModule<ErrorReportController>();
+        if (controller == null)
+            return;
+
+        await controller.Report(exception, message, content);
+    }
+    public Task ReportError(Exception exception, Message message) => ReportError(exception, message, "");
+    public Task ReportError(Exception exception) => ReportError(exception, null, "");
 
     /// <summary>
     /// Display in the help command
@@ -200,4 +214,8 @@ public class BaseModule
     /// What server permission does this module require. When `null`, no server permissions will be checked.
     /// </summary>
     public virtual PermissionFlag? RequireServerPermission => null;
+    /// <summary>
+    /// When enabled, the <see cref="CommandReceived(CommandInfo, Message)"/> method will only be called when a message is sent in a server.
+    /// </summary>
+    public virtual bool ServerOnly => false;
 }

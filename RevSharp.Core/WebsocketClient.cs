@@ -159,6 +159,8 @@ internal partial class WebsocketClient
             await ParseMessage_Channel(content, deser.Type);
         else if (deser.Type.StartsWith("Server"))
             await ParseMessage_Server(content, deser.Type);
+        else if (deser.Type.StartsWith("User"))
+            await ParseMessage_User(content, deser.Type);
         switch (deser.Type)
         {
             case "Authenticated":

@@ -29,8 +29,4 @@
       <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Modules\Moderation\" />
-    </ItemGroup>
-
 </Project>

@@ -12,6 +12,8 @@ public class CommandInfo
 }
 public static class CommandHelper
 {
+    public const string DefaultColor = "#0069d9";
+    public const string ErrorColor = "#c82333";
     public static CommandInfo? FetchInfo(string prefix, string content)
     {
         if (!content.StartsWith(prefix))

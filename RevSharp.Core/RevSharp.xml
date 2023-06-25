@@ -179,6 +179,11 @@
             <param name="serverId"></param>
             <param name="userId"></param>
         </member>
+        <member name="E:RevSharp.Core.Client.ServerRoleDeleted">
+            <summary>
+            Emitted when a server role has been deleted
+            </summary>
+        </member>
         <member name="M:RevSharp.Core.Client.OnServerRoleDeleted(System.String,System.String)">
             <summary>
             - When Server exists in cache
@@ -187,6 +192,40 @@
             </summary>
             <param name="serverId"></param>
             <param name="roleId"></param>
+        </member>
+        <member name="E:RevSharp.Core.Client.ServerRoleUpdate">
+            <summary>
+            Emitted when a server role has been updated.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnServerRoleUpdate(RevSharp.Core.Models.WebSocket.ServerRoleUpdateMessage)">
+            <summary>
+            - When Role exists
+                - Invoke <see cref="M:RevSharp.Core.Models.ServerRole.OnUpdate"/>
+            - Invoke <see cref="E:RevSharp.Core.Client.ServerRoleUpdate"/>
+            </summary>
+            <param name="message">Websocket message</param>
+        </member>
+        <member name="E:RevSharp.Core.Client.UserUpdate">
+            <summary>
+            Emitted when a user is updated. Parameter will be the updated content.
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnUserUpdate(RevSharp.Core.Models.WebSocket.UserUpdateMessage)">
+            <summary>
+            - When exists in cache
+                - Invoke <see cref="M:RevSharp.Core.Models.User.OnUpdate(RevSharp.Core.Models.WebSocket.UserUpdateMessage)"/>
+                - Invoke <see cref="E:RevSharp.Core.Client.UserUpdate"/>
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnUserRelationship(RevSharp.Core.Models.WebSocket.UserRelationshipEvent)">
+            <summary>
+            - When exists in cache
+                - Invoke <see cref="M:RevSharp.Core.Models.User.OnRelationshipUpdate(RevSharp.Core.Models.WebSocket.UserRelationshipEvent)"/>
+                - Invoke <see cref="E:RevSharp.Core.Client.UserRelationshipUpdate"/>
+            </summary>
+            <param name="message"></param>
         </member>
         <member name="M:RevSharp.Core.Client.CheckResponseError(System.Net.Http.HttpResponseMessage)">
             <summary>
@@ -1453,6 +1492,11 @@
             Get a LinkedList of the roles that a member has.
             </summary>
             <exception cref="T:RevSharp.Core.RevoltException">When member is not found.</exception>
+        </member>
+        <member name="E:RevSharp.Core.Models.Server.RoleUpdate">
+            <summary>
+            Emitted when a server role has been updated
+            </summary>
         </member>
         <member name="P:RevSharp.Core.Models.ServerRole.Name">
             <summary>

@@ -52,16 +52,14 @@ internal partial class WebsocketClient
                 var reactData = JsonSerializer.Deserialize<MessageReactedEvent>(content, Client.SerializerOptions);
                 if (reactData != null)
                 {
-                    if (await _client.GetMessageOrCache(reactData.ChannelId, reactData.MessageId) != null)
-                        _client.MessageCache[reactData.MessageId].OnReactAdd(reactData.UserId, reactData.Emoji);
+                    _client.OnMessageReactAdd(reactData);
                 }
                 break;
             case "MessageUnreact":
                 var unreactData = JsonSerializer.Deserialize<MessageReactedEvent>(content, Client.SerializerOptions);
                 if (unreactData != null)
                 {
-                    if (await _client.GetMessageOrCache(unreactData.ChannelId, unreactData.MessageId) != null)
-                        _client.MessageCache[unreactData.MessageId].OnReactRemove(unreactData.UserId, unreactData.Emoji);
+                    _client.OnMessageReactRemove(unreactData);
                 }
                 break;
         }

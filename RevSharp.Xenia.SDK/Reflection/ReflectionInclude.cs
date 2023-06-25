@@ -1,4 +1,5 @@
 using System.ComponentModel.Design.Serialization;
+using System.Diagnostics;
 using System.Reflection;
 using kate.shared.Extensions;
 using RevSharp.Core;
@@ -15,6 +16,7 @@ public class ReflectionInclude
         Modules = new List<BaseModule>();
         LoadedInstanceNames = new List<string>();
         LoadedAssemblyNames = new List<string>();
+        LoadedAssemblies = new List<Assembly>();
     }
     private readonly Client _client;
     public ConfigData Config { get; init; }
@@ -22,6 +24,7 @@ public class ReflectionInclude
     private List<BaseModule> Modules { get; set; }
     private List<string> LoadedInstanceNames { get; set; }
     private List<string> LoadedAssemblyNames { get; set; }
+    private List<Assembly> LoadedAssemblies { get; set; }
     public async Task Search(Assembly assembly)
     {
         var assemblyName = assembly.FullName.Split(',')[0];
@@ -31,6 +34,7 @@ public class ReflectionInclude
                 return;
         }
         LoadedAssemblyNames.Add(assembly.FullName.Split(',')[0]);
+        LoadedAssemblies.Add(assembly);
         Log.Debug($"[ReflectionInclude] Searching");
         IEnumerable<Type> typesWithAttr = from type in assembly.GetTypes()
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
@@ -63,12 +67,24 @@ public class ReflectionInclude
         await Task.WhenAll(initCompleteQueue);
     }
 
-    public string[] GetPlugins()
+    public string[] GetPlugins(bool includeVersion = false)
     {
         var items = new List<string>();
-        foreach (var item in LoadedAssemblyNames)
-            if (item.StartsWith("RevSharp.Xenia"))
-                items.Add(item);
+        foreach (var item in LoadedAssemblies)
+            if (item.FullName.StartsWith("RevSharp.Xenia"))
+            {
+                var name = item.FullName.Split(',')[0];
+                if (includeVersion)
+                {
+                    var versionInfo = item.GetName().Version;
+                    if (versionInfo != null)
+                        items.Add($"{name} v{versionInfo}");
+                    else
+                        items.Add(name);
+                }
+                else
+                    items.Add(name);
+            }
         return items.ToArray();
     }
 

@@ -2,7 +2,9 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using kate.shared.Helpers;
 using RevSharp.Core.Helpers;
+using RevSharp.Core.Models.WebSocket;
 
 namespace RevSharp.Core.Models;
 
@@ -71,7 +73,7 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     /// Avatar attachment
     /// </summary>
     [JsonPropertyName("avatar")]
-    public File Avatar { get; set; }
+    public File? Avatar { get; set; }
     /// <summary>
     /// Relationships with other users
     /// </summary>
@@ -310,5 +312,73 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     internal void OnStopTyping(string channelId)
     {
         StopTyping?.Invoke(channelId);
+    }
+
+    public event VoidDelegate Update;
+
+    internal void OnUpdate(UserUpdateMessage message)
+    {
+        Inject(message.Data, this);
+        if (message.Clear != null)
+        {
+            foreach (var i in message.Clear)
+            {
+                switch (i)
+                {
+                    case "ProfileContent":
+                        Profile.Content = "";
+                        break;
+                    case "ProfileBackground":
+                        Profile.Background = null;
+                        break;
+                    case "StatusText":
+                        Status.Text = "";
+                        break;
+                    case "Avatar":
+                        Avatar = null;
+                        break;
+                }
+            }
+        }
+
+        Update?.Invoke();
+    }
+
+    public event VoidDelegate RelationshipUpdate;
+
+    internal void OnRelationshipUpdate(UserRelationshipEvent message)
+    {
+        Relationship = message.Status;
+        RelationshipUpdate?.Invoke();
+    }
+
+    internal static void Inject(PartialUser source, User target)
+    {
+        if (source.Id != null)
+            target.Id = source.Id;
+        if (source.Username != null)
+            target.Username = source.Username;
+        if (source.DisplayName != null)
+            target.DisplayName = source.DisplayName;
+        if (source.Avatar != null)
+            target.Avatar = source.Avatar;
+        if (source.Relations != null)
+            target.Relations = source.Relations;
+        if (source.Badges != null)
+            target.Badges = source.Badges;
+        if (source.Status != null)
+            target.Status = source.Status;
+        if (source.Profile != null)
+            target.Profile = source.Profile;
+        if (source.Flags != null)
+            target.Flags = (UserFlags)source.Flags;
+        if (source.Privileged != null)
+            target.IsPrivileged = (bool)source.Privileged;
+        if (source.Bot != null)
+            target.Bot = source.Bot;
+        if (source.Relationship != null)
+            target.Relationship = (UserRelationship)source.Relationship;
+        if (source.Online != null)
+            target.IsOnline = (bool)source.Online;
     }
 }

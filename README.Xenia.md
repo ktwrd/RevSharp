@@ -1,4 +1,8 @@
-# ReBot README
+# Xenia Bot
+
+- [Invite](https://r.kate.pet/xeniainvite)
+- [Stats](https://r.kate.pet/xeniastats)
+- [Support Server](https://r.kate.pet/revolt)
 
 ## Development
 Clone repository

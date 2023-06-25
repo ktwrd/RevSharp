@@ -12,9 +12,9 @@ namespace RevSharp.Xenia.Controllers
     [RevSharpModule]
     public class ErrorReportController : BaseModule
     {
-        public async Task Report(Exception exception, Message message, string content)
+        public async Task Report(Exception exception, Message? message, string content)
         {
-            Log.Error($"Error when handling message in {message.ChannelId} {content}\n{exception}");
+            Log.Error($"Error when handling message in {message?.ChannelId} {content}\n{exception}");
             await SendAsMessage(exception, message, content);
         }
         public async Task Report(Exception exception, string content)
