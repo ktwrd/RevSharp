@@ -60,12 +60,24 @@ public class ReflectionInclude
         await Task.WhenAll(initCompleteQueue);
     }
 
-    public string[] GetPlugins()
+    public string[] GetPlugins(bool includeVersion = false)
     {
         var items = new List<string>();
-        foreach (var item in LoadedAssemblyNames)
-            if (item.StartsWith("RevSharp.Xenia"))
-                items.Add(item);
+        foreach (var item in LoadedAssemblies)
+            if (item.FullName.StartsWith("RevSharp.Xenia"))
+            {
+                var name = item.FullName.Split(',')[0];
+                if (includeVersion)
+                {
+                    var versionInfo = item.GetName().Version;
+                    if (versionInfo != null)
+                        items.Add($"{name} v{versionInfo}");
+                    else
+                        items.Add(name);
+                }
+                else
+                    items.Add(name);
+            }
         return items.ToArray();
     }
 
