@@ -65,6 +65,7 @@ public partial class ContentDetectionModule : BaseModule
         };
         
         var action = info.Arguments.FirstOrDefault() ?? "help";
+        var prefix = Reflection.Config.Prefix;
         if (action == "help")
         {
             embed.Title += " - Help";
@@ -72,11 +73,11 @@ public partial class ContentDetectionModule : BaseModule
             await message.Reply(embed);
         }
         else if (action == "thresholdget")
-            await Command_ThresholdGet(info, message);
+            await message.Reply($"Moved to the `{prefix}.cdadmin` command.");
         else if (action == "thresholdset")
-            await Command_ThresholdSet(info, message);
+            await message.Reply($"Moved to the `{prefix}.cdadmin` command.");
         else if (action == "setlogchannel")
-            await Command_SetLogChannel(info, message);
+            await message.Reply($"Moved to the `{prefix}.cdadmin` command.");
         else if (action == "status")
             await Command_Status(info, message);
         else if (action == "request")
