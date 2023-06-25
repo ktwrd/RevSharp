@@ -401,9 +401,30 @@ public class ConDetectConfigModule : BaseModule
             "usedefault",
             new string[]
             {
-                $">`{Prefix} usedefault [delete|flag]`",
-                "Use the global default settings for content detection.",
+                $">`{Prefix} usedefault <delete|flag>`",
+                ">Use the global default settings for content detection.",
                 "`delete` for resetting the delete threshold, and `flag` for the flag message threshold."
+            }
+        },
+        {
+            "logchannel",
+            new string[]
+            {
+                $">`{Prefix} logchannel <channel>`",
+                ">Set the log channel for content detection.",
+                "When channel is not specified, it will default to the channel that you're sending the message in."
+            }
+        },
+        {
+            "threshold",
+            new string[]
+            {
+                $">`{Prefix} threshold <func=get|set> <action=delete|flag> <type> <value>`",
+                 ">Set threshold for specific types",
+                $"- when `action` isn't valid or empty and the `func` parameter is `get`, it will print both `delete` and `flag` thresholds.",
+                $"- `value` must be >= -1 or <= 5",
+                $"- `type` must be one of the following;",
+                 "- `adult, spoof, medical, violence, racy`"
             }
         }
     };
@@ -413,4 +434,5 @@ public class ConDetectConfigModule : BaseModule
     public override string? HelpCategory => "moderation";
     public override string? BaseCommandName => "cdconfig";
     public override PermissionFlag? RequireServerPermission => PermissionFlag.ManageServer;
+    public override bool ServerOnly => true;
 }
