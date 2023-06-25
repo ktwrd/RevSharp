@@ -23,6 +23,12 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
     {
         if (message.IsSystemMessage || message.Masquerade != null)
             return;
+        if (message.AuthorId == Client.CurrentUserId)
+            return;
+
+        var author = await Client.GetUser(message.AuthorId);
+        if (author != null && author.IsBot)
+            return;
 
         var server = await message.FetchServer();
         if (server == null)
