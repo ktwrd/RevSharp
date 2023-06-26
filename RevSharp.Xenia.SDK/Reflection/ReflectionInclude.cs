@@ -1,6 +1,7 @@
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Reflection;
+using kate.shared.Extensions;
 using RevSharp.Core;
 using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
@@ -26,6 +27,12 @@ public class ReflectionInclude
     private List<Assembly> LoadedAssemblies { get; set; }
     public async Task Search(Assembly assembly)
     {
+        var assemblyName = assembly.FullName.Split(',')[0];
+        if (FeatureFlags.PluginWhitelist.Length > 0)
+        {
+            if (!FeatureFlags.PluginWhitelist.Contains(assemblyName))
+                return;
+        }
         LoadedAssemblyNames.Add(assembly.FullName.Split(',')[0]);
         LoadedAssemblies.Add(assembly);
         Log.Debug($"[ReflectionInclude] Searching");
