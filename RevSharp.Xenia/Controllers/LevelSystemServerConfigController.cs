@@ -15,7 +15,7 @@ public class LevelSystemServerConfigController : BaseMongoController<LevelSystem
     public async Task<LevelSystemServerConfigModel?> Get(string serverId)
     {
         var collection = GetCollection();
-        var filter = MongoDB.Driver.Builders<LevelSystemServerConfigModel>
+        var filter = Builders<LevelSystemServerConfigModel>
             .Filter
             .Where(v => v.ServerId == serverId);
 
@@ -27,7 +27,7 @@ public class LevelSystemServerConfigController : BaseMongoController<LevelSystem
     public async Task Set(LevelSystemServerConfigModel model)
     {
         var collection = GetCollection();
-        var filter = MongoDB.Driver.Builders<LevelSystemServerConfigModel>
+        var filter = Builders<LevelSystemServerConfigModel>
             .Filter
             .Where(v => v.ServerId == model.ServerId);
 
