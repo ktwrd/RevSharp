@@ -35,7 +35,7 @@ public class ReflectionInclude
         }
         LoadedAssemblyNames.Add(assembly.FullName.Split(',')[0]);
         LoadedAssemblies.Add(assembly);
-        Log.Debug($"[ReflectionInclude] Searching");
+        Log.WriteLine($"[ReflectionInclude] Searching");
         IEnumerable<Type> typesWithAttr = from type in assembly.GetTypes()
             where type.IsDefined(typeof(RevSharpModuleAttribute), false)
                   && type.IsSubclassOf(typeof(BaseModule)) && type != null
@@ -45,6 +45,7 @@ public class ReflectionInclude
         {
             if (LoadedInstanceNames.Contains(i.FullName))
                 continue;
+            Log.WriteLine($"Loading {i.FullName}");
             var instance = (BaseModule)Activator.CreateInstance(i);
             instance.Reflection = this;
             Modules.Add(instance);
@@ -55,7 +56,7 @@ public class ReflectionInclude
 
         foreach (var i in localMods)
             await InitializeEvents(i, i.GetType());
-        Log.Debug($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
+        Log.WriteLine($"[ReflectionInclude] Init {typesWithAttr.Count()} modules");
     }
 
     public async Task SearchFinale()

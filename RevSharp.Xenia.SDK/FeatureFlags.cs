@@ -35,7 +35,7 @@ public static class FeatureFlags
     /// <returns>Parsed string array</returns>
     private static string[] ParseStringArray(string envKey, string[] defaultValue)
     {
-        return (Environment.GetEnvironmentVariable(envKey) ?? string.Join(";", defaultValue)).Split(";");
+        return (Environment.GetEnvironmentVariable(envKey) ?? string.Join(";", defaultValue)).Trim().Split(";").Where(v => v.Length > 0).ToArray();
     }
 
     /// <summary>

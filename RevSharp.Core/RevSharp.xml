@@ -148,6 +148,32 @@
             Invoke <see cref="E:RevSharp.Core.Client.MessageDeleted"/>, <see cref="E:RevSharp.Core.Models.Message.Deleted"/>, <see cref="E:RevSharp.Core.Models.BaseChannel.MessageDeleted"/>
             </summary>
         </member>
+        <member name="E:RevSharp.Core.Client.MessageReactAdd">
+            <summary>
+            Invoked when a message has a react added
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnMessageReactAdd(RevSharp.Core.Models.WebSocket.MessageReactedEvent)">
+            <summary>
+            - Call <see cref="M:RevSharp.Core.Client.GetMessageOrCache(System.String,System.String)"/>
+            - When not null
+                - Call <see cref="M:RevSharp.Core.Models.Message.OnReactAdd(System.String,System.String)"/> in <see cref="P:RevSharp.Core.Client.MessageCache"/>
+                - Invoke <see cref="E:RevSharp.Core.Client.MessageReactAdd"/>
+            </summary>
+        </member>
+        <member name="E:RevSharp.Core.Client.MessageReactRemove">
+            <summary>
+            Invoked when a message has a reaction removed
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.OnMessageReactRemove(RevSharp.Core.Models.WebSocket.MessageReactedEvent)">
+            <summary>
+            - Call <see cref="M:RevSharp.Core.Client.GetMessageOrCache(System.String,System.String)"/>
+            - When not null
+                - Call <see cref="M:RevSharp.Core.Models.Message.OnReactRemove(System.String,System.String)"/> in <see cref="P:RevSharp.Core.Client.MessageCache"/>
+                - Invoke <see cref="E:RevSharp.Core.Client.MessageReactRemove"/>
+            </summary>
+        </member>
         <member name="M:RevSharp.Core.Client.OnServerCreated(RevSharp.Core.Models.Server)">
             <summary>
             - Set Client property
