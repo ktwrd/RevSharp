@@ -27,7 +27,7 @@ public class ContentDetectionController : BaseModule
                 ServerId = server.Id
             };
         await controller.Set(serverConfig);
-        if (serverConfig == null || serverConfig.ShouldAllowAnalysis())
+        if (serverConfig == null || !serverConfig.ShouldAllowAnalysis())
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
