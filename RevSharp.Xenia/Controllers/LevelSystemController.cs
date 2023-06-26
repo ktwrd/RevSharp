@@ -26,8 +26,16 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
         if (message.AuthorId == Client.CurrentUserId)
             return;
 
-        var author = await Client.GetUser(message.AuthorId);
-        if (author != null && author.IsBot)
+        User? author = null;
+        try
+        {
+            author = await Client.GetUser(message.AuthorId);
+        }
+        catch (Exception ex)
+        {
+            await ReportError(ex, null, $"Failed to fetch user {message.AuthorId}");
+        }
+        if (author == null || author.IsBot)
             return;
 
         var server = await message.FetchServer();
