@@ -48,17 +48,36 @@ public static class CommandHelper
 
     public static string? FindChannelId(string content)
     {
-        var channelIdRegex = new Regex(@"^([0-9A-Za-z]{26})$");
-        if (channelIdRegex.IsMatch(content))
+        var idRegex = new Regex(@"^([0-9A-Za-z]{26})$");
+        if (idRegex.IsMatch(content))
             return content;
 
-        var channelMentionRegex = new Regex(@"^<#([0-9A-Za-z]{26})>$");
-        var channelMentionMatch = channelMentionRegex.Match(content);
-        if (channelMentionMatch != null)
+        var mentionRegex = new Regex(@"^<#([0-9A-Za-z]{26})>$");
+        var mentionMatch = mentionRegex.Match(content);
+        if (mentionMatch != null)
         {
-            if (channelMentionMatch.Groups.Count > 1)
+            if (mentionMatch.Groups.Count > 1)
             {
-                return channelMentionMatch.Groups[1].Value.ToString();
+                return mentionMatch.Groups[1].Value.ToString();
+            }
+        }
+
+        return null;
+    }
+
+    public static string? FindUserId(string content)
+    {
+        var idRegex = new Regex(@"^([0-9A-Za-z]{26})$");
+        if (idRegex.IsMatch(content))
+            return content;
+
+        var mentionRegex = new Regex(@"^<@([0-9A-Za-z]{26})>$");
+        var mentionMatch = mentionRegex.Match(content);
+        if (mentionMatch != null)
+        {
+            if (mentionMatch.Groups.Count > 1)
+            {
+                return mentionMatch.Groups[1].Value.ToString();
             }
         }
 
