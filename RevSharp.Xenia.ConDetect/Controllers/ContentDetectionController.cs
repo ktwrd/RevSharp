@@ -192,6 +192,20 @@ public class ContentDetectionController : BaseModule
         if (result.Total < 1)
             return result;
 
+        
+        
+        if ((message.Content?.Contains("r.condebug") ??
+             false) && Reflection.Config.OwnerUserIds.Contains(message.AuthorId))
+            await message.Reply(
+                "```\n" + string.Join("\n", result.Annotations.Select(
+                    (v) =>
+                    {
+                        var pairs = JsonSerializer.Deserialize<Dictionary<string, string>>(
+                                JsonSerializer.Serialize(v.Item1, Client.SerialzerOptions), Client.SerialzerOptions)
+                            .Select(a => $"  - {a.Key,-9}={a.Value}");
+                        return $"- {v.Item2}\n" + string.Join("\n", pairs);
+                    })) + "\n```");
+
         Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
         return result;
     }
