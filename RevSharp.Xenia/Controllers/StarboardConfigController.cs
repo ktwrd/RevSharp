@@ -5,6 +5,7 @@ using RevSharp.Xenia.Reflection;
 
 namespace RevSharp.Xenia.Controllers;
 
+[RevSharpModule]
 public class StarboardConfigController : BaseMongoController<StarboardConfigModel>
 {
     public StarboardConfigController()
