@@ -1,7 +1,7 @@
 # RevSharp
 A C# Library for the FOSS chat platform [Revolt](https://revolt.chat) with portability in mind.
 
-Xenia uses this library. You can view the README [here](README.Xenia)
+Xenia uses this library. You can view the README [here](README.Xenia.md)
 
 To add RevSharp to your project, you can install via the `RevSharp.Core` package or with the following command;
 ```bash
