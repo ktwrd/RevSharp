@@ -38,7 +38,7 @@ public class StarboardModule : CommandModule
 
             data = await controller.Get(server.Id);
             data.MessageReact.TryAdd(messageId, 0);
-            data.MessageReact[messageId]++;
+            data.MessageReact[messageId] += 1;
             await controller.Set(data);
             if (data.MessageReact[messageId] >= data.MinimumRequired)
             {
