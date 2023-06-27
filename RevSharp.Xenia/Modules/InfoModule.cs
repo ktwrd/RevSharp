@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RevSharp.Xenia.Modules
 {
     [RevSharpModule]
-    public class InfoModule : BaseModule
+    public class InfoModule : CommandModule
     {
         public override async Task CommandReceived(CommandInfo info, Message message)
         {
@@ -50,7 +50,6 @@ namespace RevSharp.Xenia.Modules
         }
 
         public override bool HasHelpContent => true;
-        public override string? InternalName => "info";
         public override string? HelpCategory => null;
         public override string? BaseCommandName => "info";
         public override bool WaitForInit => false;

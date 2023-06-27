@@ -50,7 +50,8 @@ public static class Program
     {
         var i = new ReflectionInclude(Client)
         {
-            Config = ConfigData
+            Config = ConfigData,
+            ConfigContent = ConfigContent
         };
         LoadLocalAssemblies();
         var allAsm = AppDomain.CurrentDomain.GetAssemblies();

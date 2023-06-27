@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace RevSharp.Xenia.Moderation.Modules
 {
     [RevSharpModule]
-    public class RoleModule : BaseModule
+    public class RoleModule : CommandModule
     {
         public override async Task CommandReceived(CommandInfo info, Message message)
         {
@@ -99,7 +99,7 @@ namespace RevSharp.Xenia.Moderation.Modules
                 Description = HelpContent()
             });
         }
-        public override PermissionFlag? RequireServerPermission => PermissionFlag.ManageRole;
+        public override PermissionFlag? RequirePermission => PermissionFlag.ManageRole;
         public override string? HelpContent()
         {
             var r = Reflection.Config.Prefix + BaseCommandName;
@@ -123,7 +123,6 @@ namespace RevSharp.Xenia.Moderation.Modules
             });
         }
         public override bool HasHelpContent => true;
-        public override string? InternalName => "mod_role";
         public override string? HelpCategory => "moderation";
         public override string? BaseCommandName => "role";
     }

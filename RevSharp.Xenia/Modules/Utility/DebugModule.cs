@@ -6,17 +6,16 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules.Utility;
 
 [RevSharpModule]
-public class DebugModule : BaseModule
+public class DebugModule : CommandModule
 {
     public override string? HelpCategory => "utility";
-    public override string? InternalName => "debug";
     public override string? BaseCommandName => "debug";
     public override bool HasHelpContent => true;
     public override bool WaitForInit => false;
 
     public override string HelpContent()
     {
-        var p = Program.ConfigData.Prefix + InternalName;
+        var p = Program.ConfigData.Prefix + BaseCommandName;
         return string.Join("\n", new string[]
         {
             "```",
@@ -60,7 +59,7 @@ public class DebugModule : BaseModule
     }
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        if (info?.Command != InternalName)
+        if (info?.Command != BaseCommandName)
             return;
 
         var action = "help";

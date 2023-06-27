@@ -5,10 +5,10 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class HelpModule : BaseModule
+public class HelpModule : CommandModule
 {
+    public override string? HelpCategory => null;
     public override bool HasHelpContent => false;
-    public override string? InternalName => "help";
     public override string? BaseCommandName => "help";
     public override bool WaitForInit => false;
     public Dictionary<string, string> HelpDict = new();
@@ -19,7 +19,7 @@ public class HelpModule : BaseModule
     };
     public override Task InitComplete()
     {
-        foreach (var item in Reflection.FetchModules())
+        foreach (var item in Reflection.FetchModules<CommandModule>())
         {
             if (!item.HasHelpContent)
                 continue;

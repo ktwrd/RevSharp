@@ -8,10 +8,10 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class DiceModule : BaseModule
+public class DiceModule : CommandModule
 {
+    public override string? HelpCategory => null;
     public override bool HasHelpContent => true;
-    public override string? InternalName => "dice";
     public override string? BaseCommandName => "dice";
     public override bool WaitForInit => false;
 

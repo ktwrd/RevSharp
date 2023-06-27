@@ -8,7 +8,7 @@ using Emoji = GEmojiSharp.Emoji;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public partial class ConDetectConfigModule : BaseModule
+public partial class ConDetectConfigModule : CommandModule
 {
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
@@ -99,9 +99,8 @@ public partial class ConDetectConfigModule : BaseModule
     };
 
     public override bool HasHelpContent => true;
-    public override string? InternalName => "condetect_config";
     public override string? HelpCategory => "moderation";
     public override string? BaseCommandName => "cdconfig";
-    public override PermissionFlag? RequireServerPermission => PermissionFlag.ManageServer;
+    public override PermissionFlag? RequirePermission => PermissionFlag.ManageServer;
     public override bool ServerOnly => true;
 }

@@ -20,7 +20,7 @@ public static class XeniaHelper
             return builder.ToString();
         }
     }
-    public static string GenerateHelp(BaseModule mod, List<(string, string)> data)
+    public static string GenerateHelp(CommandModule mod, List<(string, string)> data)
     {
         var r = mod.Reflection.Config.Prefix + mod.BaseCommandName;
         var list = new List<string>();

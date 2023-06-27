@@ -10,7 +10,7 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class XpModule : BaseModule
+public class XpModule : CommandModule
 {
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
@@ -365,7 +365,6 @@ public class XpModule : BaseModule
         });
     }
     public override bool HasHelpContent => false;
-    public override string? InternalName => "other";
     public override string? HelpCategory => "xp";
     public override string? BaseCommandName => "xp";
     public override bool WaitForInit => false;

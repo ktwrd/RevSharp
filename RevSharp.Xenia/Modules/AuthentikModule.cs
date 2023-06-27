@@ -9,7 +9,7 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class AuthentikModule : BaseModule
+public class AuthentikModule : CommandModule
 {
     public override string? HelpContent()
     {
@@ -39,7 +39,6 @@ public class AuthentikModule : BaseModule
     }
 
     public override bool HasHelpContent => false;
-    public override string? InternalName => "auth";
     public override string? HelpCategory => "admin";
     public override string? BaseCommandName => "auth";
     public override bool WaitForInit => false;

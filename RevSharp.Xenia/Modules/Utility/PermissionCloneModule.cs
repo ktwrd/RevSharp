@@ -6,17 +6,16 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules.Utility;
 
 [RevSharpModule]
-public class PermissionCloneModule : BaseModule
+public class PermissionCloneModule : CommandModule
 {
     public override string? HelpCategory => "utility";
-    public override string? InternalName => "permissionclone";
     public override string? BaseCommandName => "permissionclone";
     public override bool HasHelpContent => true;
     public override bool WaitForInit => false;
 
     public override string HelpContent()
     {
-        var p = Program.ConfigData.Prefix + InternalName;
+        var p = Program.ConfigData.Prefix + BaseCommandName;
         return string.Join(
             "\n", new string[]
             {
@@ -273,7 +272,7 @@ public class PermissionCloneModule : BaseModule
 
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
-        if (info?.Command != InternalName)
+        if (info?.Command != BaseCommandName)
             return;
 
         var action = "help";

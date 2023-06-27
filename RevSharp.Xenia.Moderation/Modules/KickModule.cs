@@ -9,7 +9,7 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Moderation.Modules;
 
 [RevSharpModule]
-public class KickModule : BaseModule
+public class KickModule : CommandModule
 {
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
@@ -186,7 +186,7 @@ public class KickModule : BaseModule
     #else
         false;
     #endif
-    public override string? InternalName => "kick";
+    public override PermissionFlag? RequirePermission => PermissionFlag.KickMembers;
     public override string? HelpCategory => "moderation";
     public override string? BaseCommandName => "kick";
     public override bool WaitForInit => false;

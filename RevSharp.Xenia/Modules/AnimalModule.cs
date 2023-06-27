@@ -8,7 +8,7 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class AnimalModule : BaseModule
+public class AnimalModule : CommandModule
 {
     private List<string> CachedAnimals = new List<string>();
     private HttpClient _httpClient = new HttpClient();
@@ -135,7 +135,6 @@ public class AnimalModule : BaseModule
         return string.Join("\n", lines);
     }
     public override bool HasHelpContent => true;
-    public override string? InternalName => "animal";
     public override string? HelpCategory => "fun";
     public override string? BaseCommandName => "animal";
     public override bool WaitForInit => false;

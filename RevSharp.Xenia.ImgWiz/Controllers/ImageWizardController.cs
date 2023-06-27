@@ -11,7 +11,7 @@ using RevoltFile = RevSharp.Core.Models.File;
 namespace RevSharp.Xenia.ImgWiz.Controllers;
 
 [RevSharpModule]
-public partial class ImageWizardController : BaseModule
+public partial class ImageWizardController : CommandModule
 {
     public override async Task Initialize(ReflectionInclude reflectionInclude)
     {
@@ -240,7 +240,6 @@ public partial class ImageWizardController : BaseModule
     }
 
     public override bool HasHelpContent => true;
-    public override string? InternalName => "imgwiz";
     public override string? HelpCategory => "fun";
     public override string? BaseCommandName => "imgwiz";
 }

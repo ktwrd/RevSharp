@@ -17,10 +17,9 @@ using RevoltFile = RevSharp.Core.Models.File;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public partial class ContentDetectionModule : BaseModule
+public partial class ContentDetectionModule : CommandModule
 {
     public override bool HasHelpContent => FeatureFlags.EnableContentDetection;
-    public override string? InternalName => "condetect";
     public override string? HelpCategory => "moderation";
     public override string? BaseCommandName => "condetect";
 
@@ -56,7 +55,7 @@ public partial class ContentDetectionModule : BaseModule
         // Ignore when ContentDetection is disabled
         if (!FeatureFlags.EnableContentDetection)
             return;
-        if (info == null || info.Command != InternalName)
+        if (info == null || info.Command != BaseCommandName)
             return;
 
         var embed = new SendableEmbed()

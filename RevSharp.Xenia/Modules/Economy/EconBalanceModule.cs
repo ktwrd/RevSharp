@@ -5,7 +5,7 @@ using RevSharp.Xenia.Reflection;
 
 namespace RevSharp.Xenia.Modules;
 [RevSharpModule]
-public class EconBalanceModule : BaseModule
+public class EconBalanceModule : CommandModule
 {
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
@@ -47,7 +47,6 @@ public class EconBalanceModule : BaseModule
     }
 
     public override bool HasHelpContent => true;
-    public override string? InternalName => "balance";
     public override string? BaseCommandName => "balance";
     public override string? HelpCategory => "economy";
 }

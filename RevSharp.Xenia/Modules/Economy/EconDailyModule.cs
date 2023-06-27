@@ -6,7 +6,7 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Modules;
 
 [RevSharpModule]
-public class EconDailyModule : BaseModule
+public class EconDailyModule : CommandModule
 {
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
@@ -82,7 +82,6 @@ public class EconDailyModule : BaseModule
     }
 
     public override bool HasHelpContent => true;
-    public override string? InternalName => "daily";
     public override string? BaseCommandName => "daily";
     public override string? HelpCategory => "economy";
 }

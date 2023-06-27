@@ -19,6 +19,9 @@ namespace RevSharp.Xenia.Controllers
             InternalInit();
             reflection.CommandExecuteTrigger += (server, author, channel, namedChannel, info, module) =>
             {
+                string helpCategory = "<None>";
+                if (module.GetType().IsSubclassOf(typeof(CommandModule)))
+                    helpCategory = ((CommandModule)module).HelpCategory;
                 CommandCounter.WithLabels(new string[]
                 {
                     server?.Name ?? "<None>",
@@ -29,7 +32,7 @@ namespace RevSharp.Xenia.Controllers
                     channel?.Id ?? "<None>",
                     info.Command,
                     string.Join(" ", info.Arguments),
-                    module.HelpCategory ?? "<None>"
+                    helpCategory ?? "<None>"
                 }).Inc();
             };
         }
