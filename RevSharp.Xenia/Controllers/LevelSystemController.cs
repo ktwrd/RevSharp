@@ -41,6 +41,17 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
         var server = await message.FetchServer();
         if (server == null)
             return;
+        
+        var serverConfController = Reflection.FetchModule<LevelSystemServerConfigController>();
+        var serverData = await serverConfController.Get(server.Id);
+        if (serverData == null)
+            serverData = new LevelSystemServerConfigModel()
+            {
+                ServerId = server.Id
+            };
+        if (!serverData.Enable)
+            return;
+        
         var data = await Get(message.AuthorId, server.Id);
         if (data == null)
             data = new LevelMemberModel()
@@ -57,13 +68,6 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
             var (levelUp, metadata) = await GrantXp(data, message);
             if (levelUp)
             {
-                var serverConfController = Reflection.FetchModule<LevelSystemServerConfigController>();
-                var serverData = await serverConfController.Get(server.Id);
-                if (serverData == null)
-                    serverData = new LevelSystemServerConfigModel()
-                    {
-                        ServerId = server.Id
-                    };
                 await serverConfController.Set(serverData);
                 var resultEmbed = new SendableEmbed()
                 {
