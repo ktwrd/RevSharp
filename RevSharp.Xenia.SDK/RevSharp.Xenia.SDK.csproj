@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <AssemblyName>RevSharp.Xenia.SDK</AssemblyName>
         <RootNamespace>RevSharp.Xenia</RootNamespace>
+        <Version>1.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
