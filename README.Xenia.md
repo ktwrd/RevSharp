@@ -1,37 +1,60 @@
 # Xenia Bot
 
+Xenia is an Open-Source Revolt Bot designed with the balance of simplicity and power, for the end-user and developers. Multiple plugins are provided by default. This includes but isn't limited to;
+- [Media Content Detection](RevSharp.Xenia.ConDetect/) - Used for automatically moderating content that contains images/media with Google's Safe Search Vision API
+- [Image Wizard](RevSharp.Xenia.ImgWiz/) - esmBot-like Image Manupliation
+- [Plugin SDK](RevSharp.Xenia.SDK/) - SDK for easily developing plugins for Xenia. Currently only projects references by [RevSharp.Xenia](RevSharp.Xenia/) will be included.
+- [Moderation](RevSharp.Xenia.Moderation/) - Command suite to easily moderate channels and manage your server.
+
+## Contents
+- [Why](#why)
+- [Links](#links)
+- [Development](#development)
+  - [Environment Variables](#environment-variables)
+  - [Example Config](#example-config)
+
+## Why?
+There was a gap in the Revolt Bot market for a multitude of features that would be extremely useful for end-users. Xenia started out as a bot to fill in the gap that is media restrictions on Revolt, which turned into the [Content Detection Module](RevSharp.Xenia.ConDetect/). Then after that was implemented and released, more and more commands/modules have been added to the Official Xenia Bot.
+
+## Links
 - [Invite](https://r.kate.pet/xeniainvite)
 - [Stats](https://r.kate.pet/xeniastats)
 - [Support Server](https://r.kate.pet/revolt)
+- Developer Tools
+  - [Module Generator](https://ktwrd.github.io/xenia-modulegen.html)
+  - [JSON Class Generator](https://ktwrd.github.io/typegen.html)
+  - [Enum String Creator](https://ktwrd.github.io/enumgen.html)
 
 ## Development
-Clone repository
+Initialize Environment
 ```bash
+# Clone repository
 git clone https://github.com/ktwrd/revsharp.git
 cd revsharp
+
+# Create MongoDB Database
+## Exposed to port 27021
+## username: user
+## password: password
+./initializeMongoDB.sh    # Bash
+pwsh initializeMongoDB.ps # Powershell
 ```
 
-Create MongoDB
+Run Xenia
 ```bash
-./initializeMongoDB.sh
-# connection url;
-#      mongodb://user:password@localhost:27021
-```
-
-Run ReBot
-```bash
-dotnet run --project RevSharp.ReBot
-
 # Disable log colors
 export REVSHARP_LOG_COLOR="false"
 
-# Set config location
+# Run Xenia
+dotnet run --project RevSharp.Xenia
+
+# Run Xenia with custom config location (optional)
 XE_CONFIG_LOCATION=~/some/location/XE_config.json \
-    dotnet run --project RevSharp.ReBot
+    dotnet run --project RevSharp.Xenia
 ```
 
-## Environment Variables
-[Extends](README#environment-variables)
+### Environment Variables
+[Extends RevSharp.Core](README#environment-variables). All are listed in [FeatureFlags.cs](RevSharp.Xenia.SDK/FeatureFlags.cs)
 | Name | Type | Default Value | Description |
 | ---- | ---- | ------------- | ----------- |
 | `REVSHARP_LOG_COLOR` | boolean | `true` | Custom color for log output |
@@ -39,20 +62,30 @@ XE_CONFIG_LOCATION=~/some/location/XE_config.json \
 | `XE_DATA_DIR` | string | `./data/` | Data directory |
 | `XE_DIR_IACD` | string | `./{XE_DATA_DIR}/icad` | Content Detection Cache |
 | `XE_CONDETECT` | bool | `false` | Enable ContentDetection module |
+| `XE_DIR_FC` | string | `./{XE_DATA_DIR}/fontcache` | Font Cache for ImgWiz |
+| `XE_PLUGIN_WHITELIST` | string[] | Empty Array | Comma-seperated list of Assemblies to only include. When empty, all assemblies will be searched for ([see code](RevSharp.Xenia.SDK/Reflection/ReflectionInclude.cs#L28)) |
 
-## Example Config
+### Example Config
 ```json
 {
     "Token": "",
     "IsBot": false,
-	"Prefix": "r.",
-	"MonogCollectionUrl": "mongodb://username:password@example.com:27017",
-	"MongoDatabaseName": "xenia_revolt",
-	"GoogleCloud": {
-		"DefaultCred": {},
-		"VisionAPI": {}
-	},
-	"AuthentikUrl": "",
-	"AuthentikToken": ""
+    "Prefix": "r.",
+    "MonogCollectionU)rl": "mongodb://username:password@localhost:27017",
+    "MongoDatabaseName": "xenia_revolt",
+    "GoogleCloud": {
+        "DefaultCred": {},
+        "VisionAPI": null
+    },
+    "ContentDetectionBucket": "xenia-condetect-data",
+    "OwnerUserIds": [],
+    "AuthentikUrl": "",
+    "AuthentikToken": "",
+    "PrometheusPort": 8771,
+    "PrometheusEnable": true,
+    "LogChannelId": "",
+    "LogChannelServerId": "",
+    "PublicLogChannelId": "",
+    "ErrorLogChannelId": null
 }
 ```
