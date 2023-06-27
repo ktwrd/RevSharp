@@ -87,5 +87,6 @@ public class AnalysisResult
     public AnalysisResult()
     {
         Annotations = new List<(SafeSearchAnnotation, string)>();
+        HashList = new List<(string, string)>();
     }
 }
