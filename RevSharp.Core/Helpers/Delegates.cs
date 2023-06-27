@@ -28,7 +28,8 @@ public delegate void MessageDeleteDelegate(
 public delegate void MessageReactedDelegate(
     string userId,
     string react,
-    string messageId);
+    string messageId,
+    string channelId);
 #endregion
 
 #region Channels

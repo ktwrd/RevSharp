@@ -219,7 +219,7 @@ public partial class Message : Clientable, ISnowflake
                 userId
             });
         }
-        ReactAdd?.Invoke(userId, react, Id);
+        ReactAdd?.Invoke(userId, react, Id, ChannelId);
     }
 
     /// <summary>
@@ -231,7 +231,7 @@ public partial class Message : Clientable, ISnowflake
     {
         if (Reactions.ContainsKey(react))
             Reactions[react] = Reactions[react].Where(v => v != userId).ToArray();
-        ReactRemove?.Invoke(userId, react, Id);
+        ReactRemove?.Invoke(userId, react, Id, ChannelId);
     }
 
     /// <summary>

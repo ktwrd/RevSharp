@@ -58,7 +58,7 @@ public partial class Client
         if (m != null)
         {
             MessageCache[data.MessageId].OnReactAdd(data.UserId, data.Emoji);
-            MessageReactAdd?.Invoke(data.UserId, data.Emoji, data.MessageId);
+            MessageReactAdd?.Invoke(data.UserId, data.Emoji, data.MessageId, data.ChannelId);
         }
     }
 
@@ -78,7 +78,7 @@ public partial class Client
         if (m != null)
         {
             MessageCache[data.MessageId].OnReactRemove(data.UserId, data.Emoji);
-            MessageReactRemove?.Invoke(data.UserId, data.Emoji, data.MessageId);
+            MessageReactRemove?.Invoke(data.UserId, data.Emoji, data.MessageId, data.ChannelId);
             
         }
     }
