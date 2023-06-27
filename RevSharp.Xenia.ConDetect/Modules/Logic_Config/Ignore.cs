@@ -33,7 +33,7 @@ public partial class ConDetectConfigModule
         string targetType = "";
         if (info.Arguments.Count > 1)
             targetType = info.Arguments[1];
-        if (targetType != "user" || targetType != "channel")
+        if (targetType != "user" && targetType != "channel")
         {
             embed.Description = $"Invalid type `{targetType,-1}`";
             embed.Colour = CommandHelper.ErrorColor;
