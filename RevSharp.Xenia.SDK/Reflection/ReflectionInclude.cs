@@ -1,10 +1,13 @@
 using System.ComponentModel.Design.Serialization;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.Json;
 using kate.shared.Extensions;
+using Newtonsoft.Json.Linq;
 using RevSharp.Core;
 using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
+using RevSharp.Xenia.Models;
 
 namespace RevSharp.Xenia.Reflection;
 
@@ -123,6 +126,20 @@ public class ReflectionInclude
     public BaseModule[] FetchModules()
     {
         return Modules.ToArray();
+    }
+
+    public T[] FetchModules<T>() where T : BaseModule
+    {
+        var items = new List<T>();
+        foreach (var item in Modules)
+        {
+            if (item.GetType().IsSubclassOf(typeof(T)))
+            {
+                items.Add((T)item);
+            }
+        }
+
+        return items.ToArray();
     }
 
     public event CommandExecuteDelegate CommandExecuteTrigger;
