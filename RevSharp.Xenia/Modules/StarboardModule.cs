@@ -6,6 +6,7 @@ using RevSharp.Xenia.Reflection;
 
 namespace RevSharp.Xenia.Modules;
 
+[RevSharpModule]
 public class StarboardModule : CommandModule
 {
 
