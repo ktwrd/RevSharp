@@ -31,6 +31,10 @@ public class ContentDetectionController : BaseModule
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
+        if (serverConfig.IgnoredAuthorIds.Contains(message.AuthorId.ToUpper()))
+            return;
+        if (serverConfig.IgnoredChannelIds.Contains(message.ChannelId.ToUpper()))
+            return;
 
         try
         {
