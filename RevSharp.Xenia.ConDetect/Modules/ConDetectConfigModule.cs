@@ -34,6 +34,9 @@ public partial class ConDetectConfigModule : BaseModule
             case "threshold":
                 await Command_Threshold(info, message);
                 break;
+            case "ignore":
+                await Command_Ignore(info, message);
+                break;
             default:
                 await message.Reply($"Invalid action `{action}`");
                 break;
