@@ -20,10 +20,32 @@ There was a gap in the Revolt Bot market for a multitude of features that would 
 - [Invite](https://r.kate.pet/xeniainvite)
 - [Stats](https://r.kate.pet/xeniastats)
 - [Support Server](https://r.kate.pet/revolt)
+- [Setup Content Detection(#setup-content-detection)
 - Developer Tools
   - [Module Generator](https://ktwrd.github.io/xenia-modulegen.html)
   - [JSON Class Generator](https://ktwrd.github.io/typegen.html)
   - [Enum String Creator](https://ktwrd.github.io/enumgen.html)
+
+## Setup Content Detection
+
+In order to setup content detection for Xenia, you'll have to do the following steps
+
+1. Invite Xenia
+2. Give Xenia the following permissions
+  - Manage Messages
+  - Send Messages
+  - Send Embeds
+  - View Channels
+  - Kick Members
+  - Upload Files
+  - Use Reactions
+3. Create a private channel that Xenia has access to
+
+Once you've done those steps, you can setup Xenia and request access with the following commands;
+
+Run the `r.cdconfig logchannel` command in the channel you just created.
+
+Then run `r.cdconfig request`
 
 ## Development
 Initialize Environment
