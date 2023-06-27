@@ -32,12 +32,129 @@ public class XpModule : BaseModule
             case "setxp":
                 await Command_SetXp(info, message);
                 break;
+            case "disable":
+                await Command_Disable(info, message);
+                break;
+            case "enable":
+                await Command_Enable(info, message);
+                break;
             default:
                 await Command_Help(info, message);
                 break;
         }
     }
 
+    public async Task Command_Disable(CommandInfo info, Message message)
+    {
+        var server = await message.FetchServer();
+        if (server == null)
+        {
+            await message.Reply(ServerOnlyMessage);
+            return;
+        }
+
+        var embed = new SendableEmbed()
+        {
+            Title = "Xp System - Disable"
+        };
+        var member = await server.GetMember(message.AuthorId, false);
+        if (!await member.HasPermission(PermissionFlag.ManageServer, forceUpdate: false))
+        {
+            embed.Description = $"You do not have the required permission, `ManageServer`";
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
+        }
+        
+        var configController = Reflection.FetchModule<LevelSystemServerConfigController>();
+        if (configController == null)
+        {
+            embed.Colour = CommandHelper.ErrorColor;
+            embed.Description = $"Failed to get config controller (is null)";
+            await message.Reply(embed);
+            await ReportError(new Exception($"LevelSystemServerConfigController is null (server: {server?.Id}"), message);
+            return;
+        }
+        var data = await configController.Get(server.Id) ??
+                   new LevelSystemServerConfigModel()
+                   {
+                       ServerId = server.Id
+                   };
+
+        data.Enable = false;
+        try
+        {
+            await configController.Set(data);
+        }
+        catch (Exception ex)
+        {
+            embed.Colour = CommandHelper.ErrorColor;
+            embed.Description = $"Failed to save data `{ex.Message}`";
+            await message.Reply(embed);
+            await ReportError(ex, message, $"Failed to save data for server {server.Id}");
+            return;
+        }
+        
+        embed.Description = "Success";
+        embed.Colour = CommandHelper.DefaultColor;
+        await message.Reply(embed);
+    }
+    public async Task Command_Enable(CommandInfo info, Message message)
+    {
+        var server = await message.FetchServer();
+        if (server == null)
+        {
+            await message.Reply(ServerOnlyMessage);
+            return;
+        }
+
+        var embed = new SendableEmbed()
+        {
+            Title = "Xp System - Enable"
+        };
+        var member = await server.GetMember(message.AuthorId, false);
+        if (!await member.HasPermission(PermissionFlag.ManageServer, forceUpdate: false))
+        {
+            embed.Description = $"You do not have the required permission, `ManageServer`";
+            embed.Colour = "red";
+            await message.Reply(embed);
+            return;
+        }
+        
+        var configController = Reflection.FetchModule<LevelSystemServerConfigController>();
+        if (configController == null)
+        {
+            embed.Colour = CommandHelper.ErrorColor;
+            embed.Description = $"Failed to get config controller (is null)";
+            await message.Reply(embed);
+            await ReportError(new Exception($"LevelSystemServerConfigController is null (server: {server?.Id}"), message);
+            return;
+        }
+        var data = await configController.Get(server.Id) ??
+                   new LevelSystemServerConfigModel()
+                   {
+                       ServerId = server.Id
+                   };
+
+        data.Enable = true;
+        try
+        {
+            await configController.Set(data);
+        }
+        catch (Exception ex)
+        {
+            embed.Colour = CommandHelper.ErrorColor;
+            embed.Description = $"Failed to save data `{ex.Message}`";
+            await message.Reply(embed);
+            await ReportError(ex, message, $"Failed to save data for server {server.Id}");
+            return;
+        }
+
+        embed.Description = "Success";
+        embed.Colour = CommandHelper.DefaultColor;
+        await message.Reply(embed);
+    }
+    
     public async Task Command_Profile(CommandInfo info, Message message)
     {
         var server = await message.FetchServer();
@@ -242,7 +359,9 @@ public class XpModule : BaseModule
         {
             ("help", "display this message"),
             ("profile", "get xp profile"),
-            ("setchannel", "set the current channel for level-up messages")
+            ("setchannel", "set the current channel for level-up messages"),
+            ("enable", "Enable XP System on this server."),
+            ("disable", "Disable XP System on this server.")
         });
     }
     public override bool HasHelpContent => false;
