@@ -65,6 +65,8 @@ public partial class Client
         }
     }
 
+    public JsonSerializerOptions SerialzerOptions => RevSharp.Core.Client.SerializerOptions;
+
     public static JsonSerializerOptions PutSerializerOptions
     {
         get
