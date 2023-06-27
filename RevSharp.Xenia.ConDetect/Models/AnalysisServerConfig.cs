@@ -10,13 +10,38 @@ public class AnalysisServerConfig : BaseMongoModel
     
     public string ServerId { get; set; }
     public string LogChannelId { get; set; }
+    public string Guid { get; set; }
     
     public bool Enabled { get; set; }
     public bool AllowAnalysis { get; set; }
     public bool HasRequested { get; set; }
     public bool IsBanned { get; set; }
     public string? BanReason { get; set; }
+    public string[] IgnoredChannelIds { get; set; }
+    public string[] IgnoredAuthorIds { get; set; }
+    
+    public ConfigThreshold DeleteThreshold { get; set; }
+    public ConfigThreshold FlagThreshold { get; set; }
+    public AnalysisServerConfig()
+    {
+        TemplateId = GeneralHelper.GenerateUID();
 
+        ServerId = "";
+        LogChannelId = "";
+        Guid = new Guid().ToString();
+
+        Enabled = false;
+        AllowAnalysis = false;
+        HasRequested = false;
+        IsBanned = false;
+        BanReason = null;
+        
+        IgnoredChannelIds = Array.Empty<string>();
+        IgnoredAuthorIds = Array.Empty<string>();
+        
+        DeleteThreshold = DefaultDeleteThreshold;
+        FlagThreshold = DefaultFlagThreshold;
+    }
     public bool ShouldAllowAnalysis()
     {
         if (IsBanned)
@@ -44,16 +69,7 @@ public class AnalysisServerConfig : BaseMongoModel
             Violence = 4,
             Racy = -1
         };
-    public ConfigThreshold DeleteThreshold { get; set; }
-    public ConfigThreshold FlagThreshold { get; set; }
 
-    public AnalysisServerConfig()
-    {
-        TemplateId = GeneralHelper.GenerateUID();
-        DeleteThreshold = DefaultDeleteThreshold;
-        FlagThreshold = DefaultFlagThreshold;
-        LogChannelId = "";
-    }
     
     #region Methods for matching
     public ContentAnalysisMessageMatch GetMessageThresholdMatch(AnalysisResult analysisResult,
