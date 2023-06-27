@@ -64,6 +64,7 @@ public class BaseModule
                         ex.ToString().Substring(0, Math.Min(ex.ToString().Length, 2000)),
                         "```"
                     }));
+                    await ReportError(ex, m, $"Uncaught exception while running `{type.Name}.MessageReceived()`");
                 }
                 catch
                 { }
@@ -92,6 +93,7 @@ public class BaseModule
                                     $"Uncaught exception while running `{type.Name}.CommandReceived()`", "```",
                                     e.ToString().Substring(0, Math.Min(e.ToString().Length, 2000)), "```"
                             }));
+                    await ReportError(e, m, $"Uncaught exception while running `{type.Name}.CommandReceived()`");
                 }
                 catch { }
             }

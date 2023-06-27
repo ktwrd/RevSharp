@@ -78,6 +78,9 @@ public class ContentDetectionController : BaseModule
                             "```"
                         })
                     });
+                    await ReportError(
+                        ex, message,
+                        $"Failed to delete message {message.Id} in channel {message.ChannelId} in server {server.Id}");
                 }
             }
             else if (flagMatch.Majority != null)
@@ -262,6 +265,9 @@ public class ContentDetectionController : BaseModule
         catch (Exception ex)
         {
             Log.Error($"Failed to send log threshold message\n{ex}");
+            await ReportError(
+                ex, message,
+                $"Failed to send log threshold message");
         }
     }
 }
