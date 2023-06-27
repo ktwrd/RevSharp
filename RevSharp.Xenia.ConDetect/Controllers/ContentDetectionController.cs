@@ -216,7 +216,7 @@ public class ContentDetectionController : BaseModule
             return;
         await channel.SendMessage(new DataMessageSend()
         {
-            Content = content
+            Content = content.Substring(0, Math.Min(2000, content.Length))
         });
     }
     public async Task WriteLogThreshold(
