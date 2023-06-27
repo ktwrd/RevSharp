@@ -17,6 +17,7 @@ public class AnalysisResult
     public decimal RacyAverage { get; set; }
     public decimal Total { get; set; }
     public decimal Average { get; set; }
+    public List<(string, string)> HashList { get; set; }
     public List<(SafeSearchAnnotation, string)> Annotations { get; set; }
     public void AddAnnotation(SafeSearchAnnotation annotation, string tag)
     {

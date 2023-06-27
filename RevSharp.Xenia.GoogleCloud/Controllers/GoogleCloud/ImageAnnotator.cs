@@ -67,14 +67,16 @@ public partial class GoogleApiController
 
         return data;
     }
-    public async Task<SafeSearchAnnotation?> PerformSafeSearch(string url)
+    public async Task<(SafeSearchAnnotation?, string)> PerformSafeSearch(string url)
     {
         if (!_hasCacheRead)
             await ReadCache();
         
         if (_annotationCache.TryGetValue(url, out var search))
         {
-            return search;
+            if (_urlContentHashCache.TryGetValue(url, out var hash))
+                return (search, hash);
+            return (search, "<unknown>");
         }
         
         /*var existingSummary = GetSummary(url: url);
@@ -86,7 +88,7 @@ public partial class GoogleApiController
         
         // when fails, return null
         var uploadResult = await UploadToBucket(url, Reflection.Config.ContentDetectionBucket, ImageContentTypes);
-        return await PerformSafeSearch(uploadResult);
+        return (await PerformSafeSearch(uploadResult), uploadResult.Name);
     }
     public async Task<SafeSearchAnnotation?> PerformSafeSearch(VisionImage image)
     {
@@ -97,7 +99,7 @@ public partial class GoogleApiController
         var data = await client.DetectSafeSearchAsync(image);
         return data;
     }
-    public Task<SafeSearchAnnotation?> PerformSafeSearch(RevoltClient revoltClient, RevoltFile file)
+    public Task<(SafeSearchAnnotation?, string)> PerformSafeSearch(RevoltClient revoltClient, RevoltFile file)
     {
         return PerformSafeSearch(file.GetURL(revoltClient));
     }

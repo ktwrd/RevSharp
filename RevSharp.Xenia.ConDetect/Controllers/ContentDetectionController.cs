@@ -47,7 +47,9 @@ public class ContentDetectionController : BaseModule
                     serverConfig,
                     ContentDetectionModule.LogDetailReason.DeleteThresholdMet,
                     deleteMatch,
-                    message);
+                    message,
+                    "",
+                    analysis);
 
                 try
                 {
@@ -85,11 +87,13 @@ public class ContentDetectionController : BaseModule
             }
             else if (flagMatch.Majority != null)
             {
-                WriteLogThreshold(
+                await WriteLogThreshold(
                     serverConfig,
                     ContentDetectionModule.LogDetailReason.FlagThresholdMet,
                     flagMatch,
-                    message);
+                    message,
+                    "",
+                    analysis);
             }
         }
         catch (Exception ex)
@@ -108,10 +112,11 @@ public class ContentDetectionController : BaseModule
 
         async Task ProcessUrl(string url, string tag)
         {
-            var data = await googleController.PerformSafeSearch(url);
+            var (data, hash) = await googleController.PerformSafeSearch(url);
             if (data != null)
             {
                 result.AddAnnotation(data, tag);
+                result.HashList.Add((tag, hash));
             }
         }
         
@@ -188,7 +193,6 @@ public class ContentDetectionController : BaseModule
             return result;
 
         Log.Debug($"Took {(GeneralHelper.GetMicroseconds() / 1000) - startTs}ms");
-
         return result;
     }
     public async Task WriteLine(AnalysisServerConfig config, string content)
@@ -206,7 +210,8 @@ public class ContentDetectionController : BaseModule
         ContentDetectionModule.LogDetailReason reason,
         ContentAnalysisMessageMatch match,
         Message message,
-        string otherContent = "")
+        string otherContent = "",
+        AnalysisResult? analysis = null)
     {
         try
         {
@@ -221,6 +226,7 @@ public class ContentDetectionController : BaseModule
                 ContentDetectionModule.LogDetailReason.FlagThresholdMet => "Flag threshold met",
                 _ => reason.ToString()
             };
+            var server = await message.FetchServer();
 
             var user = await Client.GetUser(message.AuthorId, false);
             if (reason != ContentDetectionModule.LogDetailReason.Error)
@@ -229,16 +235,15 @@ public class ContentDetectionController : BaseModule
                     "\n", new string[]
                     {
                         "Info",
-                        "```",
-                        $"Channel:    {message.ChannelId}",
-                        $"Author:     {user.Username}#{user.Discriminator} ({message.AuthorId})",
-                        $"Message Id: {message.Id}",
-                        "```",
+                        $"`Channel:    {message.ChannelId}`",
+                        $"`Author:     {user.Username}#{user.Discriminator} ({message.AuthorId})`",
+                        $"`Message Id: {message.Id}`",
                         "",
                         "Detections",
-                        "```",
-                        string.Join("\n", match.MajorityItems),
-                        "```"
+                        string.Join("\n", match.MajorityPairs.Select(v => $"`{v.Key} {v.Value}`")),
+                        $"[Jump to Message](https://app.revolt.chat/servers/{server.Id}/channels/{message.ChannelId}/{message.Id}",
+                        "Hashes",
+                        string.Join("\n", analysis?.HashList.Select(v => $"`{v.Item1} {v.Item2}`") ?? Array.Empty<string>()),
                     });
             }
             else
