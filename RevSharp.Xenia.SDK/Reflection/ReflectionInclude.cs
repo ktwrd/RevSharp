@@ -20,6 +20,7 @@ public class ReflectionInclude
     }
     private readonly Client _client;
     public ConfigData Config { get; init; }
+    public string ConfigContent { get; init; }
 
     private List<BaseModule> Modules { get; set; }
     private List<string> LoadedInstanceNames { get; set; }
@@ -68,6 +69,23 @@ public class ReflectionInclude
         await Task.WhenAll(initCompleteQueue);
     }
 
+    public T? GetConfig<T>(string name)
+    {
+        var jobj = JObject.Parse(ConfigContent);
+        var items = jobj["Configs"]?.ToArray();
+        for (int i = 0; i < Config.Configs.Length; i++)
+        {
+            if (name == Config.Configs[i].Name)
+            {
+                var str = items[i].ToString();
+                var des = JsonSerializer.Deserialize<T>(str, Client.SerializerOptions);
+                return des;
+            }
+        }
+
+        return default;
+    }
+    
     public string[] GetPlugins(bool includeVersion = false)
     {
         var items = new List<string>();

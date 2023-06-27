@@ -63,7 +63,7 @@ public static class Program
         {
             if (a.FullName.Contains("RevSharp.Xenia") && a.FullName != ownAssembly.FullName && a.FullName != sdkAssembly.FullName)
             {
-                Log.WriteLine($"Searching Assembly {a.FullName}");
+                Log.WriteLine($"Searching Assembly {a.FullName.Split(',')[0]}");
                 await i.Search(a);
             }
         }
@@ -177,6 +177,7 @@ public static class Program
     #endregion
     #region Config
     public static ConfigData ConfigData { get; set; }
+    public static string ConfigContent { get; set; } = "";
     public static string ConfigLocation => FeatureFlags.ConfigLocation;
 
     public static void ReadConfig()
@@ -184,6 +185,7 @@ public static class Program
         if (!File.Exists(ConfigLocation))
             WriteConfig();
         var content = File.ReadAllText(ConfigLocation);
+        ConfigContent = content;
         var deser = JsonSerializer.Deserialize<ConfigData>(content, SerializerOptions);
         ConfigData = deser;
     }

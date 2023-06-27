@@ -1,4 +1,6 @@
-﻿namespace RevSharp.Xenia;
+﻿using RevSharp.Xenia.Models;
+
+namespace RevSharp.Xenia;
 
 /// <summary>
 /// Content of the config that is stored at <see cref="FeatureFlags.ConfigLocation"/>
@@ -70,6 +72,7 @@ public class ConfigData
     /// Channel Id for error reporting
     /// </summary>
     public string? ErrorLogChannelId { get; set; }
+    public ModuleConfig[] Configs { get; set; }
 
     public ConfigData()
     {
@@ -86,5 +89,6 @@ public class ConfigData
         PrometheusPort = 8771;
         PrometheusEnable = true;
         ErrorLogChannelId = null;
+        Configs = Array.Empty<ModuleConfig>();
     }
 }
