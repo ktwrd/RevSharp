@@ -24,6 +24,11 @@
             WebSocket middleware for communicating with Bonfire
             </summary>
         </member>
+        <member name="P:RevSharp.Core.Client.WSLatency">
+            <summary>
+            WebSocket Ping Latency. Measured in milliseconds
+            </summary>
+        </member>
         <member name="P:RevSharp.Core.Client.Endpoint">
              <summary>
              Base REST API Endpoint for Revolt
