@@ -57,7 +57,7 @@ public partial class GoogleApiController
         
         var hash = GoogleApiController.ComputeSha256Hash(content);
         var testObjects = _storageClient.ListObjects(bucket, hash);
-        if (testObjects.Count() > 0)
+        if (testObjects.Any())
         {
             return await _storageClient.GetObjectAsync(bucket, hash);
         }

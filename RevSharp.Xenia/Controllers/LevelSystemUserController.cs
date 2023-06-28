@@ -32,7 +32,7 @@ public class LevelSystemUserController : BaseMongoController<LevelUserModel>
         var sourceItems = await sourceCollection.FindAsync(Builders<LevelMemberModel>.Filter.Empty);
         foreach (var item in await sourceItems.ToListAsync())
         {
-            if (dict.ContainsKey(item.UserId))
+            if (!dict.ContainsKey(item.UserId))
                 dict.TryAdd(
                     item.UserId, new LevelUserModel()
                     {
