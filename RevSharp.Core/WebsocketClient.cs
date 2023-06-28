@@ -94,7 +94,8 @@ internal partial class WebsocketClient
         Log.Info("Starting WS Client");
         new Thread(_ => WebSocketClient.StartOrFail()).Start();
 
-        Observable.Interval(TimeSpan.FromSeconds(30))
+        await Ping();
+        Observable.Interval(TimeSpan.FromSeconds(3))
             .Subscribe(_ => Ping().Wait());
     }
     private void HandleWebSocketMessage(ResponseMessage message)
@@ -172,6 +173,7 @@ internal partial class WebsocketClient
             case "Pong":
                 var pongData = JsonSerializer.Deserialize<BonfireGenericData<int>>(content, Client.SerializerOptions);
                 PongReceived?.Invoke(pongData?.Data ?? 0);
+                CalculatePing(pongData);
                 break;
             case "Ready":
                 var readyData = JsonSerializer.Deserialize<ReadyMessage>(content, Client.SerializerOptions);
@@ -183,11 +185,25 @@ internal partial class WebsocketClient
         EventReceived?.Invoke(deser.Type, content);
     }
 
+    private Dictionary<int, long> PongTimestampDict = new Dictionary<int, long>();
+    private void CalculatePing(BonfireGenericData<int> data)
+    {
+        var currentMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var sourceMs = PongTimestampDict[data.Data];
+        Latency = currentMs - sourceMs;
+    }
+
+    public long Latency { get; private set; } = 0;
+    
     public async Task Ping()
     {
+        var rand = new Random().Next();
+        var ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        PongTimestampDict.TryAdd(rand, ms);
+        PongTimestampDict[rand] = ms;
         await SendMessage(new BonfireGenericData<int>()
         {
-            Data = 0,
+            Data = rand,
             Type = "Ping"
         });
     }

@@ -34,6 +34,20 @@ public partial class Client
     /// WebSocket middleware for communicating with Bonfire
     /// </summary>
     internal WebsocketClient WSClient { get; set; }
+
+    /// <summary>
+    /// WebSocket Ping Latency. Measured in milliseconds
+    /// </summary>
+    public long WSLatency
+    {
+        get
+        {
+            if (WSClient != null)
+                return WSClient.Latency;
+
+            return -1;
+        }
+    }
     /// <summary>
     /// Base REST API Endpoint for Revolt
     ///
