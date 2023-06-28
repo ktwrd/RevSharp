@@ -1,3 +1,4 @@
+using Amazon.Runtime.Internal.Transform;
 using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
 using RevSharp.Xenia.Reflection;
@@ -12,10 +13,20 @@ public class HelpModule : CommandModule
     public override string? BaseCommandName => "help";
     public override bool WaitForInit => false;
     public Dictionary<string, string> HelpDict = new();
+    public Dictionary<string, string> OwnerHelpDict = new();
 
     public Dictionary<string, Dictionary<string, string>> HelpCategoryDictionary = new()
     {
-        {"other", new Dictionary<string, string>()}
+        {
+            "other", new Dictionary<string, string>()
+        }
+    };
+
+    public Dictionary<string, Dictionary<string, string>> OwnerHelpCategoryDictionary = new()
+    {
+        {
+            "other", new Dictionary<string, string>()
+        }
     };
     public override Task InitComplete()
     {
@@ -25,22 +36,36 @@ public class HelpModule : CommandModule
                 continue;
             
             var key = item.BaseCommandName;
+            if (item.BaseCommandName == BaseCommandName)
+                continue;
             if (key == null)
                 continue;
             
             var content = item.HelpContent();
             if (content == null)
                 continue;
-
-            HelpDict.TryAdd(key, content);
+            if (item.OwnerOnly)
+                OwnerHelpDict.TryAdd(key, content);
+            else
+                HelpDict.TryAdd(key, content);
             string category = (item.HelpCategory ?? "other")
                 .Trim()
                 .ToLower();
-            
-            if (!HelpCategoryDictionary.ContainsKey(category))
-                HelpCategoryDictionary.Add(category, new Dictionary<string, string>());
-            if (!HelpCategoryDictionary[category].ContainsKey(key))
-                HelpCategoryDictionary[category].Add(key, content);
+
+            if (item.OwnerOnly)
+            {
+                if (!OwnerHelpCategoryDictionary.ContainsKey(category))
+                    OwnerHelpCategoryDictionary.Add(category, new Dictionary<string, string>());
+                if (!OwnerHelpCategoryDictionary[category].ContainsKey(key))
+                    OwnerHelpCategoryDictionary[category].Add(key, content);
+            }
+            else
+            {
+                if (!HelpCategoryDictionary.ContainsKey(category))
+                    HelpCategoryDictionary.Add(category, new Dictionary<string, string>());
+                if (!HelpCategoryDictionary[category].ContainsKey(key))
+                    HelpCategoryDictionary[category].Add(key, content);
+            }
         }        
         return Task.CompletedTask;
     }
@@ -54,18 +79,20 @@ public class HelpModule : CommandModule
             Title = "Help",
             Colour = "white"
         };
-        
+        var isAdmin = Reflection.Config.OwnerUserIds.Contains(message.AuthorId);
         // No arguments given. Print out summary
         if (info.Arguments.Count < 1)
         {
             embed.Colour = "orange";
-            embed.Description = HelpContent();
+            embed.Description = HelpContent(isAdmin);
             await message.Reply(embed);
             return;
         }
 
+        var helpDict = CombinedHelpDict(isAdmin);
+        
         // 0th argument given is a valid module. print out summary
-        if (HelpDict.TryGetValue(info.Arguments[0], out var item))
+        if (helpDict.TryGetValue(info.Arguments[0], out var item))
         {
             embed.Description = item;
             await message.Reply(embed);
@@ -79,7 +106,22 @@ public class HelpModule : CommandModule
         }
     }
 
+    public Dictionary<string, string> CombinedHelpDict(bool inclAdmin)
+    {
+        var dict = new Dictionary<string, string>();
+        foreach (var pair in HelpDict)
+            dict.TryAdd(pair.Key, pair.Value);
+        if (inclAdmin)
+            foreach (var pair in OwnerHelpDict)
+                dict.TryAdd(pair.Key, pair.Value);
+        return dict;
+    }
+
     public override string? HelpContent()
+    {
+        return HelpContent(false);
+    }
+    public string? HelpContent(bool inclOwner)
     {
         var p = Program.ConfigData.Prefix;
         var text = new List<string>()
@@ -88,7 +130,23 @@ public class HelpModule : CommandModule
             $"For example, you can do `{p}help dice` to see the usage for the dice command.",
             "",
         };
-        foreach (var categoryPair in HelpCategoryDictionary)
+        var dict = new Dictionary<string, Dictionary<string, string>>();
+
+        void InsertDict(Dictionary<string, Dictionary<string, string>> d)
+        {
+            foreach (var x in d)
+            {
+                dict.TryAdd(x.Key, x.Value);
+                foreach (var i in x.Value)
+                {
+                    dict[x.Key].TryAdd(i.Key, i.Value);
+                }
+            }
+        }
+        InsertDict(HelpCategoryDictionary);
+        if (inclOwner)
+            InsertDict(OwnerHelpCategoryDictionary);
+        foreach (var categoryPair in dict)
         {
             // ignore empty categories
             if (categoryPair.Value.Count < 1)
