@@ -38,10 +38,11 @@ public class AuthentikModule : CommandModule
             });
     }
 
-    public override bool HasHelpContent => false;
+    public override bool HasHelpContent => true;
     public override string? HelpCategory => "admin";
     public override string? BaseCommandName => "auth";
     public override bool WaitForInit => false;
+    public override bool OwnerOnly => true;
 
     public override async Task CommandReceived(CommandInfo info, Message message)
     {
