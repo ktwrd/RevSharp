@@ -22,8 +22,8 @@ namespace RevSharp.Xenia.Modules
                 Title = "Xenia Info",
                 Description = string.Join("\n", new string[]
                 {
-                    "Heya I'm Skid, a general-purpose Revolt Boy made by [kate](https://kate.pet).",
-                    "If you are having any issues with Skid, don't hesitate to ask for help in [my revolt server](https://r.kate.pet/revolt) or open an issue on [our github](https://r.kate.pet/xeniaissues)",
+                    "Heya I'm Xenia, a general-purpose Revolt Bot made by [kate](https://kate.pet).",
+                    "If you are having any issues with Xenia, don't hesitate to ask for help in [my revolt server](https://r.kate.pet/revolt) or open an issue on [our github](https://r.kate.pet/xeniaissues)",
                     "",
                     "Xenia for Revolt was made proudly with [RevSharp](https://r.kate.pet/revsharp)!",
                     "",
