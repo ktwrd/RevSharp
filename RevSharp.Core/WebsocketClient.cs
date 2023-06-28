@@ -122,7 +122,23 @@ internal partial class WebsocketClient
         { "Pong", typeof(BonfireGenericData<int>) },
         { "Ready", typeof(ReadyMessage) },
         { "Message", typeof(BonfireMessage) },
-        { "NotFound", typeof(BaseTypedResponse) }
+        { "NotFound", typeof(BaseTypedResponse) },
+        { "ChannelCreate", typeof(BaseChannel)},
+        {"ChannelDelete", typeof(IdEvent)},
+        {"ChannelStartTyping", typeof(ChannelTypingEvent)},
+        {"ChannelStopTyping", typeof(ChannelTypingEvent)},
+        {"MessageAppend", typeof(MessageAppendEvent)},
+        {"MessageDelete", typeof(MessageDeletedEvent)},
+        {"MessageReact", typeof(MessageReactedEvent)},
+        {"MessageUnreact", typeof(MessageReactedEvent)},
+        {"ServerCreate", typeof(Server)},
+        {"ServerDelete", typeof(IdEvent)},
+        {"ServerMemberJoin", typeof(UserIdEvent)},
+        {"ServerMemberLeave", typeof(UserIdEvent)},
+        {"ServerRoleDelete", typeof(RoleIdEvent)},
+        {"ServerRoleUpdate", typeof(ServerRoleUpdateMessage)},
+        {"UserUpdate", typeof(UserUpdateMessage)},
+        {"UserRelationship", typeof(UserRelationshipEvent)}
     };
 
     internal event VoidDelegate AuthenticatedEventReceived;

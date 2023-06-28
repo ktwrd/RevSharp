@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using RevSharp.Core.Models;
 using RevSharp.Core.Models.WebSocket;
 
