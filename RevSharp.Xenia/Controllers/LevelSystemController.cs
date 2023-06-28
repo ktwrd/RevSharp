@@ -9,10 +9,9 @@ using RevSharp.Xenia.Reflection;
 namespace RevSharp.Xenia.Controllers;
 
 [RevSharpModule]
-public class LevelSystemController : BaseMongoController<LevelMemberModel>
+public class LevelSystemController : BaseModule
 {
     public LevelSystemController()
-        : base("levelSystem")
     {
         _random = new Random();
     }
@@ -51,15 +50,15 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
             };
         if (!serverData.Enable)
             return;
-        
-        var data = await Get(message.AuthorId, server.Id);
+
+        var dataController = Reflection.FetchModule<LevelSystemUserController>();
+        var data = await dataController.Get(message.AuthorId);
         if (data == null)
-            data = new LevelMemberModel()
+            data = new LevelUserModel()
             {
-                UserId = message.AuthorId,
-                ServerId = server.Id
+                UserId = message.AuthorId
             };
-        await Set(data);
+        await dataController.Set(data);
         
         var currentTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         var previousMessageDiff = currentTimestamp - data.LastMessageTimestamp;
@@ -129,29 +128,33 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
         }
     }
     
-    public async Task<(bool, ExperienceMetadata)> GrantXp(LevelMemberModel model, Message message, int? a = null)
+    public async Task<(bool, ExperienceMetadata)> GrantXp(LevelUserModel model, Message message, int? a = null)
     {
-        var data = await Get(model.UserId, model.ServerId);
+        var server = await message.FetchServer();
+        var dataController = Reflection.FetchModule<LevelSystemUserController>();
+        var data = await dataController.Get(model.UserId);
         if (data == null)
-            data = new LevelMemberModel()
+            data = new LevelUserModel()
             {
-                ServerId = model.ServerId,
                 UserId = model.UserId
             };
-        await Set(data);
+        data.ServerPair.TryAdd(server.Id, 0);
+        await dataController.Set(data);
         var amount = a ?? (int)_random.Next(1, 5);
 
         // Generate previous and current metadata
-        var metadataPrevious = XpHelper.Generate(data);
+        var metadataPrevious = XpHelper.Generate(data, server.Id);
         if (a != null)
-            data.Xp = (ulong)a;
+            data.ServerPair[server.Id] = (ulong)a;
         else
-            data.Xp += (ulong)amount;
-        var metadata = XpHelper.Generate(data);
+            data.ServerPair[server.Id] += (ulong)amount;
+        var metadata = XpHelper.Generate(data, server.Id);
 
         // Set previous Ids
         data.LastMessageChannelId = message.ChannelId;
         data.LastMessageId = message.Id;
+        data.LastMessageTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        await dataController.Set(data);
 
         bool levelUp = metadataPrevious.UserLevel != metadata.UserLevel;
         if (levelUp)
@@ -159,10 +162,10 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
             OnUserLevelUp(model, metadataPrevious, metadata);
         }
 
-        await Set(data);
+        await dataController.Set(data);
         return (levelUp, metadata);
     }
-    protected void OnUserLevelUp(LevelMemberModel model, ExperienceMetadata previous, ExperienceMetadata current)
+    protected void OnUserLevelUp(LevelUserModel model, ExperienceMetadata previous, ExperienceMetadata current)
     {
         if (UserLevelUp != null)
         {
@@ -170,30 +173,4 @@ public class LevelSystemController : BaseMongoController<LevelMemberModel>
         }
     }
     public event ExperienceComparisonDelegate UserLevelUp;
-
-    public async Task<LevelMemberModel?> Get(string userId, string serverId)
-    {
-        var collection = GetCollection();
-        var filter = Builders<LevelMemberModel>
-            .Filter
-            .Where(v => v.ServerId == serverId && v.UserId == userId);
-
-        var result = await collection.FindAsync(filter);
-        var item = result.FirstOrDefault();
-        return item;
-    }
-
-    public async Task Set(LevelMemberModel model)
-    {
-        var collection = GetCollection();
-        var filter = Builders<LevelMemberModel>
-            .Filter
-            .Where(v => v.ServerId == model.ServerId && v.UserId == model.UserId);
-
-        var exists = (await collection.FindAsync(filter))?.Any() ?? false;
-        if (exists)
-            await collection.ReplaceOneAsync(filter, model);
-        else
-            await collection.InsertOneAsync(model);
-    }
 }

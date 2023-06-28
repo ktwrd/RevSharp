@@ -157,6 +157,12 @@ public class XpModule : CommandModule
     
     public async Task Command_Profile(CommandInfo info, Message message)
     {
+        if (info.Arguments.Count > 1 && info.Arguments[1].ToLower() == "global")
+        {
+            await message.Reply(await GetProfile(message.AuthorId));
+            return;
+        }
+        
         var server = await message.FetchServer();
         if (server == null)
         {
@@ -180,10 +186,11 @@ public class XpModule : CommandModule
 
         int amount = int.Parse(info.Arguments[1]);
         
+        var dataController = Reflection.FetchModule<LevelSystemUserController>();
         var controller = Reflection.FetchModule<LevelSystemController>();
-        var data = await controller.Get(message.AuthorId, server.Id);
+        var data = await dataController.Get(message.AuthorId);
         await controller.GrantXp(data, message, amount);
-        var asdasd = await controller.Get(message.AuthorId, server.Id);
+        var asdasd = await dataController.Get(message.AuthorId);
         await message.Reply("ok\n```\n" + JsonSerializer.Serialize(asdasd, Program.SerializerOptions) + "\n```");
     }
     public async Task Command_SetChannel(CommandInfo info, Message message)
@@ -323,16 +330,16 @@ public class XpModule : CommandModule
     {
         try
         {
-            var controller = Reflection.FetchModule<LevelSystemController>();
-            var data = await controller.Get(userId, serverId) ?? new LevelMemberModel();
-            var metadata = XpHelper.Generate(data);
+            var dataController = Reflection.FetchModule<LevelSystemUserController>();
+            var data = await dataController.Get(userId) ?? new LevelUserModel();
+            var metadata = XpHelper.Generate(data, serverId);
             return new SendableEmbed()
             {
                 Title = "Xp System - Profile",
                 Description = string.Join(
                     "\n", new string[]
                     {
-                        $"**XP**: {data?.Xp ?? 0}",
+                        $"**XP**: {metadata?.UserXp}",
                         $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
                         $"**Level**: {metadata.UserLevel}"
                     })
@@ -353,18 +360,56 @@ public class XpModule : CommandModule
         }
     }
 
+    public async Task<SendableEmbed> GetProfile(string userId)
+    {
+        try
+        {
+            var dataController = Reflection.FetchModule<LevelSystemUserController>();
+            var data = await dataController.Get(userId) ?? new LevelUserModel();
+            ulong totalXp = 0;
+            foreach (var p in data.ServerPair)
+                totalXp += p.Value;
+            var metadata = XpHelper.Generate(data, totalXp);
+            return new SendableEmbed()
+            {
+                Title = "Xp System - Global Profile",
+                Description = string.Join(
+                    "\n", new string[]
+                    {
+                        $"**XP**: {metadata?.UserXp}",
+                        $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
+                        $"**Level**: {metadata.UserLevel}"
+                    })
+            };
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to get profile for user {userId}\n{ex}");
+            return new SendableEmbed()
+            {
+                Title = "Xp System - Profile",
+                Description = string.Join(
+                    "\n", new string[]
+                    {
+                        "Failed to fetch profile", $"`{ex.Message}`"
+                    })
+            };
+        }
+    }
+
     public override string? HelpContent()
     {
         return XeniaHelper.GenerateHelp(this, new List<(string, string)>()
         {
             ("help", "display this message"),
             ("profile", "get xp profile"),
+            ("profile global", "show xp profile for all servers combined"),
             ("setchannel", "set the current channel for level-up messages"),
             ("enable", "Enable XP System on this server."),
             ("disable", "Disable XP System on this server.")
         });
     }
-    public override bool HasHelpContent => false;
+    public override bool HasHelpContent => true;
     public override string? HelpCategory => "xp";
     public override string? BaseCommandName => "xp";
     public override bool WaitForInit => false;
