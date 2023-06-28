@@ -40,16 +40,6 @@ public class LevelSystemController : BaseModule
         var server = await message.FetchServer();
         if (server == null)
             return;
-        
-        var serverConfController = Reflection.FetchModule<LevelSystemServerConfigController>();
-        var serverData = await serverConfController.Get(server.Id);
-        if (serverData == null)
-            serverData = new LevelSystemServerConfigModel()
-            {
-                ServerId = server.Id
-            };
-        if (!serverData.Enable)
-            return;
 
         var dataController = Reflection.FetchModule<LevelSystemUserController>();
         var data = await dataController.Get(message.AuthorId);
@@ -67,6 +57,15 @@ public class LevelSystemController : BaseModule
             var (levelUp, metadata) = await GrantXp(data, message);
             if (levelUp)
             {
+                var serverConfController = Reflection.FetchModule<LevelSystemServerConfigController>();
+                var serverData = await serverConfController.Get(server.Id);
+                if (serverData == null)
+                    serverData = new LevelSystemServerConfigModel()
+                    {
+                        ServerId = server.Id
+                    };
+                if (!serverData.Enable)
+                    return;
                 await serverConfController.Set(serverData);
                 var resultEmbed = new SendableEmbed()
                 {
