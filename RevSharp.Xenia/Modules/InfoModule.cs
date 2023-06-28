@@ -32,6 +32,7 @@ namespace RevSharp.Xenia.Modules
                     $"`Uptime:     {Program.GetUptimeString()}`",
                     $"`Version:    {Program.Version}`",
                     $"`Build Date: {Program.VersionDate}`",
+                    $"`Ping: {Client.WSLatency}ms`",
                     "[View on Grafana](https://r.kate.pet/xeniastats)"
                 })
             };

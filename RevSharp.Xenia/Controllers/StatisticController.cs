@@ -55,6 +55,13 @@ namespace RevSharp.Xenia.Controllers
             await UpdateData();
             Observable.Interval(TimeSpan.FromSeconds(60))
                 .Subscribe(_ => UpdateData().Wait());
+            Observable.Interval(TimeSpan.FromSeconds(5))
+                .Subscribe(
+                    (_) =>
+                    {
+                        if (Client != null)
+                            LatencyGauge.Set(Client.WSLatency);
+                    });
             Client.ServerCreated += (s) =>
             {
                 LogEvent(
@@ -112,6 +119,9 @@ namespace RevSharp.Xenia.Controllers
                     "command_args",
                     "command_category"
                 }, publish: false);
+            LatencyGauge = CreateGauge(
+                "skid_revolt_latemcy",
+                "WebSocket message latency", publish: false);
         }
 
         private KestrelMetricServer MetricServer;
@@ -137,6 +147,7 @@ namespace RevSharp.Xenia.Controllers
         public Gauge ServerMemberGauge;
         public Gauge ServerGauge;
         public Counter CommandCounter;
+        public Gauge LatencyGauge;
 
         private async Task UpdateData()
         {
