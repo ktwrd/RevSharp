@@ -162,7 +162,6 @@ public class XpModule : CommandModule
             await message.Reply(await GetProfile(message.AuthorId));
             return;
         }
-        
         var server = await message.FetchServer();
         if (server == null)
         {
@@ -186,11 +185,10 @@ public class XpModule : CommandModule
 
         int amount = int.Parse(info.Arguments[1]);
         
-        var dataController = Reflection.FetchModule<LevelSystemUserController>();
         var controller = Reflection.FetchModule<LevelSystemController>();
-        var data = await dataController.Get(message.AuthorId);
+        var data = await controller.Get(message.AuthorId, server.Id);
         await controller.GrantXp(data, message, amount);
-        var asdasd = await dataController.Get(message.AuthorId);
+        var asdasd = await controller.Get(message.AuthorId, server.Id);
         await message.Reply("ok\n```\n" + JsonSerializer.Serialize(asdasd, Program.SerializerOptions) + "\n```");
     }
     public async Task Command_SetChannel(CommandInfo info, Message message)
@@ -330,16 +328,16 @@ public class XpModule : CommandModule
     {
         try
         {
-            var dataController = Reflection.FetchModule<LevelSystemUserController>();
-            var data = await dataController.Get(userId) ?? new LevelUserModel();
-            var metadata = XpHelper.Generate(data, serverId);
+            var controller = Reflection.FetchModule<LevelSystemController>();
+            var data = await controller.Get(userId, serverId) ?? new LevelMemberModel();
+            var metadata = XpHelper.Generate(data);
             return new SendableEmbed()
             {
                 Title = "Xp System - Profile",
                 Description = string.Join(
                     "\n", new string[]
                     {
-                        $"**XP**: {metadata?.UserXp}",
+                        $"**XP**: {data?.Xp ?? 0}",
                         $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
                         $"**Level**: {metadata.UserLevel}"
                     })
@@ -364,19 +362,19 @@ public class XpModule : CommandModule
     {
         try
         {
-            var dataController = Reflection.FetchModule<LevelSystemUserController>();
-            var data = await dataController.Get(userId) ?? new LevelUserModel();
-            ulong totalXp = 0;
-            foreach (var p in data.ServerPair)
-                totalXp += p.Value;
-            var metadata = XpHelper.Generate(data, totalXp);
+            var controller = Reflection.FetchModule<LevelSystemController>();
+            var data = await controller.GetUser(userId) ?? Array.Empty<LevelMemberModel>();
+            ulong xp = 0;
+            foreach (var item in data)
+                xp += item.Xp;
+            var metadata = XpHelper.Generate(xp);
             return new SendableEmbed()
             {
                 Title = "Xp System - Global Profile",
                 Description = string.Join(
                     "\n", new string[]
                     {
-                        $"**XP**: {metadata?.UserXp}",
+                        $"**XP**: {xp}",
                         $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
                         $"**Level**: {metadata.UserLevel}"
                     })
@@ -403,13 +401,12 @@ public class XpModule : CommandModule
         {
             ("help", "display this message"),
             ("profile", "get xp profile"),
-            ("profile global", "show xp profile for all servers combined"),
             ("setchannel", "set the current channel for level-up messages"),
             ("enable", "Enable XP System on this server."),
             ("disable", "Disable XP System on this server.")
         });
     }
-    public override bool HasHelpContent => true;
+    public override bool HasHelpContent => false;
     public override string? HelpCategory => "xp";
     public override string? BaseCommandName => "xp";
     public override bool WaitForInit => false;
