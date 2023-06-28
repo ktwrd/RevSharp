@@ -255,7 +255,7 @@ public class ContentDetectionController : BaseModule
                         "",
                         "Detections",
                         string.Join("\n", match.MajorityPairs.Select(v => $"`{v.Key} {v.Value}`")),
-                        $"[Jump to Message](https://app.revolt.chat/servers/{server.Id}/channels/{message.ChannelId}/{message.Id})",
+                        $"[Jump to Message](https://app.revolt.chat/server/{server.Id}/channel/{message.ChannelId}/{message.Id})",
                         "Hashes",
                         string.Join("\n", analysis?.HashList.Select(v => $"`{v.Item1} {v.Item2}`") ?? Array.Empty<string>()),
                         "Matches",

@@ -57,7 +57,7 @@ public class StarboardModule : CommandModule
                                         message.Content ?? "<empty>",
                                     }),
                                 Media = message?.Attachments?.Select(v => v.Id).FirstOrDefault(),
-                                Url = $"https://app.revolt.chat/servers/{server.Id}/channels/{channel.Id}/{messageId}"
+                                Url = $"https://app.revolt.chat/server/{server.Id}/channel/{channel.Id}/{messageId}"
                             }
                         }
                     });
