@@ -41,7 +41,7 @@ public partial class Client
                 return MessageCache[messageId];
         }
 
-        var msg = new Message(this, channelId, messageId);
+        var msg = new Message(this, messageId, channelId);
         msg.Client = this;
 
         if (!await msg.Fetch())
