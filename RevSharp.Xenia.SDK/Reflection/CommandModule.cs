@@ -47,6 +47,8 @@ public abstract class CommandModule : BaseModule
     }
     private async Task Client_HandleCommand(Message message)
     {
+        if (OwnerOnly && !Reflection.Config.OwnerUserIds.Contains(message.AuthorId))
+            return;
         var errorController = Reflection.FetchModule<ErrorReportController>();
         var type = this.GetType();
 
@@ -63,7 +65,6 @@ public abstract class CommandModule : BaseModule
         var author = await Client.GetUser(message.AuthorId, forceUpdate: false);
         if (author == null || author.IsBot)
             return;
-
         var server = await message.FetchServer(false);
         if (ServerOnly && server == null)
         {
@@ -143,4 +144,8 @@ public abstract class CommandModule : BaseModule
     /// When enabled, the <see cref="CommandReceived(CommandInfo, Message)"/> method will only be called when a message is sent in a server.
     /// </summary>
     public virtual bool ServerOnly => false;
+    /// <summary>
+    /// When enabled, the <see cref="CommandReceived"/> method will only be called if <see cref="Message.AuthorId"/> is in <see cref="ConfigData.OwnerUserIds"/> and it will only show in the Help command if the author is an owner.
+    /// </summary>
+    public virtual bool OwnerOnly => false;
 }
