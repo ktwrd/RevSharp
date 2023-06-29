@@ -82,8 +82,8 @@ public partial class ContentDetectionModule : CommandModule
             await Command_Status(info, message);
         else if (action == "request")
             await Command_Request(info, message);
-        else if (action == "admin")
-            await Command_Admin(info, message);
+        /*else if (action == "admin")
+            await Command_Admin(info, message);*/
         else
         {
             embed.Description = $"Action `{action}` not implemented";
