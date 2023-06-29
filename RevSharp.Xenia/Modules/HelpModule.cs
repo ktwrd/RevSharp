@@ -167,9 +167,9 @@ public class HelpModule : CommandModule
                 previousIndex = target;
             }
             text.Add($"### {formattedKey}");
-            var inner = categoryPair.Value
-                .Select(v => $"- `{v.Key}`");
-            text.AddRange(inner);
+            var inner = string.Join(", ", categoryPair.Value
+                .Select(v => $"`{v.Key}`"));
+            text.Add(inner);
         }
 
         return string.Join("\n", text);
