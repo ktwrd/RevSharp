@@ -407,7 +407,7 @@ public class XpModule : CommandModule
         });
     }
     public override bool HasHelpContent => true;
-    public override string? HelpCategory => "xp";
+    public override string? HelpCategory => null;
     public override string? BaseCommandName => "xp";
     public override bool WaitForInit => false;
 }
