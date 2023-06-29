@@ -47,21 +47,6 @@ public static class XpHelper
     }
     public static ExperienceMetadata Generate(LevelMemberModel model)
     {
-        var level = (ulong)Math.Floor(0.1 * Math.Sqrt(model.Xp));
-        var levelStart = XpForLevel(level);
-        var levelEnd = XpForLevel(level + 1);
-        var levelSize = levelEnd - levelStart;
-        var levelPerc = (model.Xp - levelStart) / (decimal)levelSize;
-        var data = new ExperienceMetadata()
-        {
-            UserLevel = level,
-            UserXp = model.Xp,
-            NextLevelXp = XpForLevel(level + 1),
-            CurrentLevelStart = levelStart,
-            CurrentLevelEnd = levelEnd,
-            CurrentLevelSize = levelEnd - levelStart,
-            NextLevelProgress = Math.Round(levelPerc, 3)
-        };
-        return data;
+        return Generate(model.Xp);
     }
 }
