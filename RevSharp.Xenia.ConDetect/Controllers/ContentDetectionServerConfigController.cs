@@ -22,6 +22,10 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
         var item = result.FirstOrDefault();
         if (item != null)
         {
+            if (item.Guid == "00000000-0000-0000-0000-000000000000")
+            {
+                item.Guid = Guid.NewGuid().ToString();
+            }
             ConfigCache.TryAdd(item.ServerId, item);
             ConfigCache[item.ServerId] = item;
             
@@ -46,8 +50,15 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
         if (ConfigCacheLastSet.TryGetValue(serverId, out var lastUpdated))
             if ((DateTimeOffset.UtcNow.ToUnixTimeSeconds() - lastUpdated) > 120)
                 return await Fetch(serverId);
+
         if (ConfigCache.TryGetValue(serverId, out var value))
+        {
+            if (value.Guid == "00000000-0000-0000-0000-000000000000")
+            {
+                ConfigCache[serverId].Guid = Guid.NewGuid().ToString();
+            }
             return value;
+        }
 
         return await Fetch(serverId);
     }
@@ -59,6 +70,10 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
             .Filter
             .Where(v => v.ServerId == model.ServerId);
 
+        if (model.Guid == "00000000-0000-0000-0000-000000000000")
+        {
+            model.Guid = Guid.NewGuid().ToString();
+        }
         var exists = (await collection.FindAsync(filter))?.Any() ?? false;
         if (exists)
             await collection.ReplaceOneAsync(filter, model);
