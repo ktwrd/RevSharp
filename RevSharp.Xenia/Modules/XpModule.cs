@@ -406,7 +406,7 @@ public class XpModule : CommandModule
             ("disable", "Disable XP System on this server.")
         });
     }
-    public override bool HasHelpContent => false;
+    public override bool HasHelpContent => true;
     public override string? HelpCategory => "xp";
     public override string? BaseCommandName => "xp";
     public override bool WaitForInit => false;
