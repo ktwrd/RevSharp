@@ -338,7 +338,7 @@ public class XpModule : CommandModule
                     "\n", new string[]
                     {
                         $"**XP**: {data?.Xp ?? 0}",
-                        $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
+                        $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelSize})",
                         $"**Level**: {metadata.UserLevel}"
                     })
             };
@@ -375,7 +375,7 @@ public class XpModule : CommandModule
                     "\n", new string[]
                     {
                         $"**XP**: {xp}",
-                        $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelEnd})",
+                        $"**Progress**: {Math.Round(metadata.NextLevelProgress * 100, 3)}% ({metadata.UserXp - metadata.CurrentLevelStart}/{metadata.CurrentLevelSize})",
                         $"**Level**: {metadata.UserLevel}"
                     })
             };
