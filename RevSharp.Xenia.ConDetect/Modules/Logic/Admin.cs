@@ -24,7 +24,7 @@ public partial class ContentDetectionModule
                             $"```",
                             $"{r} admin allow <id>            - Allow server to use CD",
                             $"{r} admin deny <id> <...reason> - Deny server to use CD",
-                            $"{r} admin deny <id> <...reason> - Ban server to use CD",
+                            $"{r} admin ban <id> <...reason> - Ban server to use CD",
                             "```"
                         })
                 });
