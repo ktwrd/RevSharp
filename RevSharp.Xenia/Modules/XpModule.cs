@@ -38,10 +38,21 @@ public class XpModule : CommandModule
             case "enable":
                 await Command_Enable(info, message);
                 break;
+            case "leaderboard":
+                await Command_Leaderboard(info, message);
+                break;
             default:
                 await Command_Help(info, message);
                 break;
         }
+    }
+
+    public async Task Command_Leaderboard(CommandInfo info, Message message)
+    {
+        string serverId = (await message.FetchServer())?.Id ?? "";
+        if (info.Arguments.Count > 1)
+            serverId = info.Arguments[1].ToUpper();
+        await message.Reply(await GenerateServerLeaderboard(serverId));
     }
 
     public async Task Command_Disable(CommandInfo info, Message message)
@@ -324,6 +335,60 @@ public class XpModule : CommandModule
             });
     }
 
+    public async Task<SendableEmbed> GenerateServerLeaderboard(string serverId)
+    {
+        var embed = new SendableEmbed()
+        {
+            Title = "Xp System - Server Leaderboard"
+        };
+        var controller = Reflection.FetchModule<LevelSystemController>();
+        if (controller == null)
+        {
+            embed.Description = $"Could not fetch LevelSystemController";
+            embed.Colour = CommandHelper.ErrorColor;
+            await ReportError(new Exception("Failed to fetch LevelSystemController"));
+            return embed;
+        }
+        var data = await controller.GetServer(serverId);
+        if (data == null || data.Length < 1)
+        {
+            embed.Description = "No records found";
+            embed.Colour = CommandHelper.ErrorColor;
+            return embed;
+        }
+
+        var tableLines = new List<string>()
+        {
+            "| Rank | Member | Level |",
+            "| ---- | ------ | ----- |"
+        };
+
+        var sorted = data.OrderByDescending(v => v.Xp).ToArray();
+        var length = Math.Min(5, sorted.Length);
+        string[] rankText = new string[]
+        {
+            ":1st_place_medal:",
+            ":2nd_place_medal:",
+            ":3rd_place_medal:",
+            ":four:",
+            ":five:"
+        };
+        for (int i = 0; i < length; i++)
+        {
+            var item = sorted[i];
+            var details = XpHelper.Generate(item.Xp);
+            tableLines.Add("| " + string.Join(" | ", new string[]
+            {
+                rankText[i],
+                $"<@{item.UserId}>",
+                $"{item.Xp}xp, level {details.UserLevel}"
+            }) + " |");
+        }
+
+        embed.Description = string.Join("\n", tableLines);
+        return embed;
+    }
+
     public async Task<SendableEmbed> GetProfile(string userId, string serverId)
     {
         try
@@ -403,7 +468,8 @@ public class XpModule : CommandModule
             ("profile", "get xp profile"),
             ("setchannel", "set the current channel for level-up messages"),
             ("enable", "Enable XP System on this server."),
-            ("disable", "Disable XP System on this server.")
+            ("disable", "Disable XP System on this server."),
+            ("leaderboard [serverId]", "get leaderboard for the current server if none specified. will display the top 5")
         });
     }
     public override bool HasHelpContent => true;
