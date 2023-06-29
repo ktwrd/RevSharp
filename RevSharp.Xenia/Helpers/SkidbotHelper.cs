@@ -27,8 +27,7 @@ public static class XeniaHelper
         foreach (var i in data)
         {
             list.Add($">`{r} {i.Item1}`");
-            list.Add($">{i.Item2}");
-            list.Add("");
+            list.Add($"{i.Item2}");
         }
         return string.Join("\n", list);
     }
