@@ -9,6 +9,7 @@ public partial class ConDetectConfigModule
 {
     public async Task Command_Threshold(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         var embed = new SendableEmbed()
         {
             Title = "Content Detection Config - Threshold"

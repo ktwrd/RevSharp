@@ -8,6 +8,7 @@ public partial class ConDetectConfigModule
 {
     public async Task Command_UseDefault(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         var action = "";
         if (info.Arguments.Count > 1)
             action = info.Arguments[1].ToLower();

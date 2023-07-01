@@ -108,6 +108,7 @@ public class ConDetectAdminModule : CommandModule
     }
     public async Task Command_Dump(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         string targetId = "";
         if (info.Arguments.Count > 1)
             targetId = info.Arguments[1].ToUpper();
@@ -126,6 +127,7 @@ public class ConDetectAdminModule : CommandModule
 
     public async Task Command_Ban(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         string targetId = "";
         if (info.Arguments.Count > 1)
             targetId = info.Arguments[1].ToUpper();
@@ -145,6 +147,7 @@ public class ConDetectAdminModule : CommandModule
     }
     public async Task Command_Deny(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         string targetId = "";
         if (info.Arguments.Count > 1)
             targetId = info.Arguments[1].ToUpper();
@@ -158,6 +161,7 @@ public class ConDetectAdminModule : CommandModule
 
     public async Task Command_Allow(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         string targetId = "";
         if (info.Arguments.Count > 1)
             targetId = info.Arguments[1].ToUpper();

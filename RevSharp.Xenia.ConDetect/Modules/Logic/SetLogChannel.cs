@@ -8,6 +8,7 @@ public partial class ContentDetectionModule
 {
     private async Task Command_SetLogChannel(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         var embed = new SendableEmbed()
         {
             Title = "Content Detection - Set Log Channel"

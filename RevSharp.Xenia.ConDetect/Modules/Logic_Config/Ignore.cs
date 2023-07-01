@@ -9,6 +9,7 @@ public partial class ConDetectConfigModule
 {
     private async Task Command_Ignore(CommandInfo info, Message message)
     {
+        await message.AddReaction(Client, "✅");
         var embed = new SendableEmbed()
         {
             Title = "Content Detection Config - Ignore",

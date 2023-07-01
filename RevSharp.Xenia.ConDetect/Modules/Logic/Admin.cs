@@ -11,6 +11,7 @@ public partial class ContentDetectionModule
         if (!Reflection.Config.OwnerUserIds.Contains(message.AuthorId))
             return;
 
+        await message.AddReaction(Client, "✅");
         if (info.Arguments.Count < 3)
         {
             var r = Reflection.Config.Prefix + BaseCommandName;
