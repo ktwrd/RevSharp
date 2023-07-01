@@ -1,6 +1,7 @@
 using System.Text.Json;
 using RevSharp.Core.Models;
 using RevSharp.Xenia.Helpers;
+using RevSharp.Xenia.Models.ContentDetection;
 using RevSharp.Xenia.Reflection;
 
 namespace RevSharp.Xenia.Modules;
@@ -34,12 +35,77 @@ public class ConDetectAdminModule : CommandModule
             case "dump":
                 await Command_Dump(info, message);
                 break;
+            case "get":
+                await Command_Get(info, message);
+                break;
             default:
                 await message.Reply($"Unknown action `{action,-1}`");
                 break;
         }
     }
 
+    public async Task Command_Get(CommandInfo info, Message message)
+    {
+        await message.AddReaction(Client, "✅");
+        string type = "all";
+        if (info.Arguments.Count > 1)
+            type = info.Arguments[1];
+        
+        var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
+        var data = await controller.FetchAll();
+        var filtered = new List<AnalysisServerConfig>();
+        foreach (var item in data)
+        {
+            if (type == "all")
+                filtered.Add(item);
+            else if (type == "ban")
+                if (item.IsBanned)
+                    filtered.Add(item);
+            else if (type == "allow")
+                if (item.Enabled)
+                    filtered.Add(item);
+            else if (type == "deny")
+                if (item is
+                    {
+                        Enabled: false,
+                        IsBanned: false
+                    })
+                    filtered.Add(item);
+        }
+
+        var descriptionLines = new List<string>();
+        foreach (var item in filtered)
+        {
+            var server = await Client.GetServer(item.ServerId);
+            string attr = "";
+            if (item.IsBanned)
+                attr += "B";
+            if (item.Enabled)
+                attr += "E";
+            if (item.AllowTextDetection)
+                attr += "T";
+            if (item.AllowMediaTextDetection)
+                attr += "M";
+            descriptionLines.Add(string.Join("\n", new string[]
+            {
+                $"- {server.Name} `{server.Id}`",
+                $"  - {attr}"
+            }));
+        }
+        var embed = new SendableEmbed()
+        {
+            Title = "Content Detection Servers",
+            Description = string.Join("\n", new string[]
+            {
+                "### Flag details",
+                "`B`; Server banned",
+                "`E`; Content Detection enabled",
+                "`T`; Text Detection enabled",
+                "`M`; OCR Text Detection enabled"
+            }.Concat(descriptionLines))
+        };
+        await message.Reply(embed);
+    }
     public async Task Command_Dump(CommandInfo info, Message message)
     {
         string targetId = "";
@@ -54,7 +120,7 @@ public class ConDetectAdminModule : CommandModule
             return;
         }
 
-        var stringContent = JsonSerializer.Serialize(d, Client.SerializerOptionsL);
+        var stringContent = JsonSerializer.Serialize(d, Client.SerializerOptionsLI);
         await message.Reply($"```json\n{stringContent}\n```");
     }
 
@@ -108,10 +174,13 @@ public class ConDetectAdminModule : CommandModule
         var d = await controller.Fetch(serverId);
         if (d == null)
             return "ServerNotFound";
+        if (d.LogChannelId.Length < 1)
+            return "ChannelNotSet";
 
         d.Enabled = true;
         d.AllowAnalysis = true;
         d.HasRequested = false;
+        d.AllowTextDetection = true;
         var channel = await Client.GetChannel(d.LogChannelId) as TextChannel;
         if (channel == null)
             return "ChannelNotFound";
@@ -131,10 +200,13 @@ public class ConDetectAdminModule : CommandModule
         var d = await controller.Fetch(serverId);
         if (d == null)
             return "ServerNotFound";
+        if (d.LogChannelId.Length < 1)
+            return "ChannelNotSet";
 
         d.Enabled = false;
         d.AllowAnalysis = false;
         d.HasRequested = false;
+        d.AllowTextDetection = false;
         var channel = await Client.GetChannel(d.LogChannelId) as TextChannel;
         if (channel == null)
             return "ChannelNotFound";
@@ -154,9 +226,12 @@ public class ConDetectAdminModule : CommandModule
         var d = await controller.Fetch(serverId);
         if (d == null)
             return "ServerNotFound";
+        if (d.LogChannelId.Length < 1)
+            return "ChannelNotSet";
 
         d.Enabled = false;
         d.AllowAnalysis = false;
+        d.AllowTextDetection = false;
         d.IsBanned = true;
         d.BanReason = reason;
         var channel = await Client.GetChannel(d.LogChannelId) as TextChannel;
@@ -179,7 +254,8 @@ public class ConDetectAdminModule : CommandModule
             ("allow <id>", "Allow server to use content detection"),
             ("deny <id>", "Deny server access, but it can request again"),
             ("ban <id> <...reason>", "Deny server access, can't request again"),
-            ("dump <id>", "Fetch db record as JSON")
+            ("dump <id>", "Fetch db record as JSON"),
+            ("get <all|allow|ban|deny>", "get specifics about servers in the db.")
         });
     }
     public override bool OwnerOnly => true;

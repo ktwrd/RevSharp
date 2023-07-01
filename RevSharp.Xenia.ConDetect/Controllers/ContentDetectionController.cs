@@ -2,6 +2,7 @@
 using System.Text.Json;
 using kate.shared.Helpers;
 using RevSharp.Core.Models;
+using RevSharp.Xenia.GoogleCloud.Perspective.Models;
 using RevSharp.Xenia.Models.ContentDetection;
 using RevSharp.Xenia.Reflection;
 using RevoltClient = RevSharp.Core.Client;
@@ -11,40 +12,17 @@ namespace RevSharp.Xenia.Modules;
 [RevSharpModule]
 public class ContentDetectionController : BaseModule
 {
-    public async Task RunDetection(Message message)
+    public async Task AnalyzeMedia(AnalysisServerConfig config,Server server, Message message)
     {
-        var server = await message.FetchServer();
-        if (server == null)
-            return;
-        var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
-        if (controller == null)
-            return;
-
-        var serverConfig = await controller.Fetch(server.Id);
-        if (serverConfig == null)
-            serverConfig = new AnalysisServerConfig()
-            {
-                ServerId = server.Id
-            };
-        await controller.Set(serverConfig);
-        if (serverConfig == null || !serverConfig.ShouldAllowAnalysis())
-            return;
-        if (message.AuthorId == Client.CurrentUserId)
-            return;
-        if (serverConfig.IgnoredAuthorIds.Contains(message.AuthorId.ToUpper()))
-            return;
-        if (serverConfig.IgnoredChannelIds.Contains(message.ChannelId.ToUpper()))
-            return;
-
         try
         {
             var analysis = await AnalyzeMessage(message);
-            var deleteMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.DeleteThreshold);
-            var flagMatch = serverConfig.GetMessageThresholdMatch(analysis, serverConfig.FlagThreshold);
+            var deleteMatch = config.GetMessageThresholdMatch(analysis, config.DeleteThreshold);
+            var flagMatch = config.GetMessageThresholdMatch(analysis, config.FlagThreshold);
             if (deleteMatch.Majority != null)
             {
                 await WriteLogThreshold(
-                    serverConfig,
+                    config,
                     ContentDetectionModule.LogDetailReason.DeleteThresholdMet,
                     deleteMatch,
                     message,
@@ -55,7 +33,7 @@ public class ContentDetectionController : BaseModule
                 {
                     if (!await message.Delete())
                     {
-                        var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+                        var channel = await Client.GetChannel(config.LogChannelId) as TextChannel;
                         await channel.SendMessage(new SendableEmbed()
                         {
                             Title = "Failed to delete message!",
@@ -68,7 +46,7 @@ public class ContentDetectionController : BaseModule
                 }
                 catch (Exception ex)
                 {
-                    var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+                    var channel = await Client.GetChannel(config.LogChannelId) as TextChannel;
                     await channel.SendMessage(new SendableEmbed()
                     {
                         Title = "Failed to delete message!",
@@ -88,7 +66,7 @@ public class ContentDetectionController : BaseModule
             else if (flagMatch.Majority != null)
             {
                 await WriteLogThreshold(
-                    serverConfig,
+                    config,
                     ContentDetectionModule.LogDetailReason.FlagThresholdMet,
                     flagMatch,
                     message,
@@ -99,7 +77,133 @@ public class ContentDetectionController : BaseModule
         catch (Exception ex)
         {
             await ReportError(ex, message, "Failed to call RunDetection");
-            await WriteLine(serverConfig, $"Failed to call RunDetection\n```\n{ex}\n```");
+            await WriteLine(config, $"Failed to call RunDetection\n```\n{ex}\n```");
+        }
+    }
+
+    public async Task AnalyzeText(AnalysisServerConfig config, Server server, Message message)
+    {
+        if (!config.AllowTextDetection)
+            return;
+        if (string.IsNullOrEmpty(message.Content))
+            return;
+
+        var googleController = Reflection.FetchModule<GoogleApiController>();
+        if (googleController == null)
+        {
+            Log.Warn("GoogleApiController is null ;w;");
+            return;
+        }
+        var requestData = new AnalyzeCommentRequest()
+            .WithText(message.Content)
+            .AddAllAttrs();
+        requestData.CommunityId = server.Id;
+        var result = await googleController.AnalyzeComment(requestData);
+
+        Dictionary<string, AnalyzeCommentScore> GenerateMatchDictionary(Dictionary<string, float> thresholds)
+        {
+            var dict = new Dictionary<string, AnalyzeCommentScore>();
+            foreach (var pair in result.AttributeScores)
+            {
+                if (!thresholds.TryGetValue(pair.Key.ToString(), out var threshVal))
+                    continue;
+                if (threshVal < 0f)
+                    continue;
+                if (pair.Value.Summary.Value >= threshVal)
+                    dict.Add(pair.Key.ToString(), pair.Value);
+            }
+
+            return dict;
+        }
+        var deleteMatches = GenerateMatchDictionary(config.TextDeleteThreshold);
+        if (deleteMatches.Count > 0)
+            await message.Delete();
+        var flagMatches = GenerateMatchDictionary(config.TextFlagThreshold);
+        
+        if (flagMatches.Count < 1 && deleteMatches.Count < 1)
+            return;
+        
+        var descriptionLines = new List<string>()
+        {
+            $"Message from <@{message.AuthorId}> in <#{message.ChannelId}>.",
+            "",
+            "Content;",
+            "```",
+            message.Content.Replace("`", "\\`"),
+            "```",
+        };
+        if (deleteMatches.Count > 0)
+        {
+            descriptionLines.AddRange(new string[]
+            {
+                "Delete Matches;",
+                string.Join("\n", deleteMatches.Select(v => $"> `{v.Key} = {Math.Round(v.Value.Summary.Value * 100, 2)}`")),
+            });
+        }
+
+        if (flagMatches.Count > 0)
+        {
+            descriptionLines.AddRange(new string[]
+            {
+                "Flag Matches;",
+                string.Join("\n", flagMatches.Select(v => $"> `{v.Key} = {Math.Round(v.Value.Summary.Value * 100, 2)}%`")),
+            });
+        }
+        descriptionLines.AddRange(new string[]
+        {
+            "Action;",
+            "> `" + (deleteMatches.Count > 0 ? "`Deleted`" : "`Flagged`") + "`"
+        });
+        var embed = new SendableEmbed()
+        {
+            Title = "Content Detection - Hate Speech Detected",
+            Description = string.Join("\n",descriptionLines)
+        };
+        
+        var channel = await Client.GetChannel(config.LogChannelId) as TextChannel;
+        var file = await Client.UploadFile(
+            new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result, RevoltClient.SerializerOptions))), "analysis.json",
+            "attachments");
+        
+        await channel.SendMessage(new DataMessageSend()
+        {
+            Attachments = new string[]{ file },
+            Embeds = new SendableEmbed[] {embed}
+        });
+    }
+    public async Task RunDetection(Message message)
+    {
+        var server = await message.FetchServer();
+        if (server == null)
+            return;
+        var controller = Reflection.FetchModule<ContentDetectionServerConfigController>();
+        if (controller == null)
+            return;
+
+        var serverConfig = await controller.Fetch(server.Id);
+        if (serverConfig == null)
+            serverConfig = new AnalysisServerConfig()
+            {
+                ServerId = server.Id
+            };
+        await controller.Set(serverConfig);
+        if (serverConfig == null || serverConfig.IsBanned || !serverConfig.Enabled)
+            return;
+        if (message.AuthorId == Client.CurrentUserId)
+            return;
+        if (serverConfig.IgnoredAuthorIds.Contains(message.AuthorId.ToUpper()))
+            return;
+        if (serverConfig.IgnoredChannelIds.Contains(message.ChannelId.ToUpper()))
+            return;
+
+        try
+        {
+            await AnalyzeText(serverConfig, server, message);
+            await AnalyzeMedia(serverConfig, server, message);
+        }
+        catch (Exception ex)
+        {
+            await ReportError(ex, message, "Failed to run content detection");
         }
     }
     

@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using kate.shared.Helpers;
 using RevSharp.Core;
 using RevSharp.Core.Models;
+using RevSharp.Xenia.GoogleCloud.Perspective.Models;
 using RevSharp.Xenia.Helpers;
 using RevSharp.Xenia.Models.ContentDetection;
 using RevSharp.Xenia.Reflection;
@@ -33,6 +35,9 @@ public partial class ConDetectConfigModule : CommandModule
                 break;
             case "threshold":
                 await Command_Threshold(info, message);
+                break;
+            case "thresholdtxt":
+                await Command_ThresholdText(info, message);
                 break;
             case "ignore":
                 await Command_Ignore(info, message);
@@ -86,6 +91,18 @@ public partial class ConDetectConfigModule : CommandModule
                 $"- `value` must be >= -1 or <= 5",
                 $"- `type` must be one of the following;",
                  "- `adult, spoof, medical, violence, racy`"
+            }
+        },
+        {
+            "thresholdtxt",
+            new string[]
+            {
+                $">`{Prefix} thresholdtxt <func=get|set> <action=delete|flag> <type> <value>`",
+                 ">Set threshold for text messages.",
+                $"- when `action` isn't valid or empty and the `func` parameter is `get`, it will print both `delete` and `flag` thresholds.",
+                $"- `value` must be >=0 or <=5. when `-1` then it will ignore",
+                $"- `type` must be one of the following (it's case-insensitive)",
+                "- " + string.Join(", ", GeneralHelper.GetEnumList<CommentAttributeName>().Select(v => $"`{v}`"))
             }
         },
         {

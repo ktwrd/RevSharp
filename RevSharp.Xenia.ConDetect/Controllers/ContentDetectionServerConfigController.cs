@@ -36,6 +36,17 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
         return item;
     }
 
+    public async Task<AnalysisServerConfig[]?> FetchAll()
+    {
+        var collection = GetCollection();
+        var filter = Builders<AnalysisServerConfig>
+            .Filter
+            .Empty;
+
+        var result = await collection.FindAsync(filter);
+        return result.ToList().ToArray();
+    }
+
     public Dictionary<string, long> ConfigCacheLastSet = new Dictionary<string, long>();
 
     private Dictionary<string, AnalysisServerConfig> ConfigCache = new Dictionary<string, AnalysisServerConfig>();

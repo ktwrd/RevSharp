@@ -94,12 +94,12 @@ public partial class ConDetectConfigModule
                     if (targetAction == "delete")
                     {
                         embed.Description =
-                            $"Delete Threshold\n```json\n{JsonSerializer.Serialize(data.DeleteThreshold, Core.Client.SerializerOptions)}\n```";
+                            $"Delete Threshold\n```json\n{JsonSerializer.Serialize(data.DeleteThreshold, Client.SerializerOptionsLI)}\n```";
                     }
                     else if (targetAction == "flag")
                     {
                         embed.Description =
-                            $"Flag Threshold\n```json\n{JsonSerializer.Serialize(data.FlagThreshold, Core.Client.SerializerOptions)}\n```";
+                            $"Flag Threshold\n```json\n{JsonSerializer.Serialize(data.FlagThreshold, Client.SerializerOptionsLI)}\n```";
                     }
                     break;
             }

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using kate.shared.Helpers;
 using RevSharp.Core;
+using RevSharp.Xenia.GoogleCloud.Perspective.Models;
 
 namespace RevSharp.Xenia.Models.ContentDetection;
 
@@ -58,6 +59,8 @@ public class AnalysisServerConfig : BaseMongoModel
         
         DeleteThreshold = DefaultDeleteThreshold;
         FlagThreshold = DefaultFlagThreshold;
+        TextDeleteThreshold = DefaultTextDeleteThreshold;
+        TextFlagThreshold = DefaultTextFlagThreshold;
     }
     public bool ShouldAllowAnalysis()
     {
@@ -87,6 +90,28 @@ public class AnalysisServerConfig : BaseMongoModel
             Racy = -1
         };
 
+    public Dictionary<string, float> TextDeleteThreshold { get; set; }
+    public Dictionary<string, float> TextFlagThreshold { get; set; }
+    public static Dictionary<string, float> DefaultTextDeleteThreshold =>
+        new()
+        {
+            { CommentAttributeName.TOXICITY.ToString(), 0.95f },
+            { CommentAttributeName.SEVERE_TOXICITY.ToString(), 0.90f },
+            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.85f },
+            { CommentAttributeName.INSULT.ToString(), 0.5f },
+            { CommentAttributeName.PROFANITY.ToString(), 0.90f },
+            { CommentAttributeName.THREAT.ToString(), 0.85f }
+        };
+    public static Dictionary<string, float> DefaultTextFlagThreshold =>
+        new()
+        {
+            { CommentAttributeName.TOXICITY.ToString(), 0.75f },
+            { CommentAttributeName.SEVERE_TOXICITY.ToString(), 0.7f },
+            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.6f },
+            { CommentAttributeName.INSULT.ToString(), 0.4f },
+            { CommentAttributeName.PROFANITY.ToString(), 0.7f },
+            { CommentAttributeName.THREAT.ToString(), 0.7f }
+        };
     
     #region Methods for matching
     public ContentAnalysisMessageMatch GetMessageThresholdMatch(AnalysisResult analysisResult,
