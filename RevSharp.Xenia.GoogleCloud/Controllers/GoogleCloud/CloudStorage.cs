@@ -57,10 +57,12 @@ public partial class GoogleApiController
         
         var hash = GoogleApiController.ComputeSha256Hash(content);
         var testObjects = _storageClient.ListObjects(bucket);
-        var filteredExistng = testObjects.Where(v => v.Name == hash);
-        if (filteredExistng.Any())
+        var filteredExisting = testObjects.Where(v => v.Name == hash);
+        if (filteredExisting.Any())
         {
-            return filteredExistng.FirstOrDefault();
+            var firstItem = filteredExisting.FirstOrDefault();
+            if (firstItem != null)
+                return firstItem;
         }
         
         AddToCache(hash, url, contentType);
