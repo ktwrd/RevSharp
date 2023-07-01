@@ -12,4 +12,14 @@ public class RevoltException : Exception
     }
     public string ResponseContent { get; protected set; }
     public new string Message { get; protected set; }
+    public override string ToString()
+    {
+        return string.Join("\n", new string[]
+        {
+            ResponseContent,
+            Message,
+            "----------------",
+            base.ToString()
+        });
+    }
 }

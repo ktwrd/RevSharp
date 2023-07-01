@@ -37,6 +37,7 @@
 
     <ItemGroup>
       <PackageReference Include="kate.shared" Version="1.0.4" />
+      <PackageReference Include="Macross.Json.Extensions" Version="3.0.0" />
       <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="System.Threading.RateLimiting" Version="7.0.0" />

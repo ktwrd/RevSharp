@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -73,6 +74,8 @@ public partial class Client
         {
             message.Content = content;
         }
+
+        message.Headers.Authorization = new AuthenticationHeaderValue(TokenIsBot ? "x-bot-token" : "x-session-token", Token);
 
         var response = await HttpClient.SendAsync(message);
         if (response.StatusCode == HttpStatusCode.TooManyRequests)

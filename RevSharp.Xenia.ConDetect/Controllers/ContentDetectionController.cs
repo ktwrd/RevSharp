@@ -201,7 +201,7 @@ public class ContentDetectionController : BaseModule
                     (v) =>
                     {
                         var pairs = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                                JsonSerializer.Serialize(v.Item1, Client.SerialzerOptions), Client.SerialzerOptions)
+                                JsonSerializer.Serialize(v.Item1, Client.SerializerOptionsL), Client.SerializerOptionsL)
                             .Select(a => $"  - {a.Key,-9}={a.Value}");
                         return $"- {v.Item2}\n" + string.Join("\n", pairs);
                     })) + "\n```");
@@ -264,7 +264,7 @@ public class ContentDetectionController : BaseModule
                             (v) =>
                             {
                                 var pairs = JsonSerializer.Deserialize<Dictionary<string, string>>(
-                                        JsonSerializer.Serialize(v.Item1, Client.SerialzerOptions), Client.SerialzerOptions)
+                                        JsonSerializer.Serialize(v.Item1, Client.SerializerOptionsL), Client.SerializerOptionsL)
                                     .Select(a => $"  - {a.Key,-9}={a.Value}");
                                 return $"- {v.Item2}\n" + string.Join("\n", pairs);
                             })),

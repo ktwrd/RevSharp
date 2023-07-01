@@ -43,6 +43,54 @@
              Value is set when <see cref="M:RevSharp.Core.Client.LoginAsync"/> is called.
              </summary>
         </member>
+        <member name="P:RevSharp.Core.Client.SerializerOptions">
+            <summary>
+            Generated via <see cref="M:RevSharp.Core.Client.GenerateSerializerOptions(System.Boolean,System.Boolean)"/> with `put` set to `false` and `indent` set to `false`. For indenting, use <see cref="P:RevSharp.Core.Client.SerializerOptionsIndent"/>
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.SerializerOptionsIndent">
+            <summary>
+            <see cref="P:RevSharp.Core.Client.SerializerOptions"/> with Indenting enabled
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.SerializerOptionsL">
+            <summary>
+            <see cref="P:RevSharp.Core.Client.SerializerOptions"/> but non-static
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.SerializerOptionsLI">
+            <summary>
+            <see cref="P:RevSharp.Core.Client.SerializerOptionsIndent"/> but non-static
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.PutSerializerOptions">
+            <summary>
+            <see cref="M:RevSharp.Core.Client.GenerateSerializerOptions(System.Boolean,System.Boolean)"/> with `put=true` and indenting disabled. For indenting, use <see cref="P:RevSharp.Core.Client.PutSerializerOptionsIndent"/>
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.PutSerializerOptionsIndent">
+            <summary>
+            Same as <see cref="P:RevSharp.Core.Client.PutSerializerOptions"/> with indenting enabled
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.PutSerializerOptionsL">
+            <summary>
+            <see cref="P:RevSharp.Core.Client.PutSerializerOptions"/> but non-static
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Client.PutSerializerOptionsLI">
+            <summary>
+            <see cref="P:RevSharp.Core.Client.PutSerializerOptionsIndent"/> but non-static
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Client.GenerateSerializerOptions(System.Boolean,System.Boolean)">
+            <summary>
+            Generate JsonSerializerOptions. `IncludeFields` is always true, Ignored everything that is read-only. Also adds support for <see cref="T:System.Runtime.Serialization.EnumMemberAttribute"/>
+            </summary>
+            <param name="put">When `true`, <see cref="P:System.Text.Json.JsonSerializerOptions.DefaultIgnoreCondition"/> will be <see cref="F:System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull"/> instead of the default</param>
+            <param name="indent">When `true`, <see cref="P:System.Text.Json.JsonSerializerOptions.WriteIndented"/> will be `true`.</param>
+            <returns></returns>
+        </member>
         <member name="M:RevSharp.Core.Client.#ctor">
             <summary>
             Create instance of Client without a token set. You can change the token with <see cref="M:RevSharp.Core.Client.SetCredentials(System.String,System.Boolean)"/>, but only before <see cref="M:RevSharp.Core.Client.LoginAsync"/> is called.
@@ -1161,6 +1209,42 @@
             Invoked when the MessageDelete event is received on the WebSocket client.
             </summary>
         </member>
+        <member name="T:RevSharp.Core.Models.DataMessageSend">
+            <summary>
+            Data that gets sent to Revolt's API when sending a message.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Nonce">
+            <summary>
+            Set automatically in constructor. Don't worry about setting this.
+            Either way, it's been deprecated and doesn't really matter.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Attachments">
+            <summary>
+            Array of Attachment Ids from Autumn. Use <see cref="M:RevSharp.Core.Client.UploadFile(System.IO.Stream,System.String,System.String)"/>
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Replies">
+            <summary>
+            Messages to reply to. If you'd like to easily reply to messages, use <see cref="M:RevSharp.Core.Models.DataMessageSend.AddReply(System.String,System.Boolean)"/>
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Embeds">
+            <summary>
+            Embeds to include in this message. Please use <see cref="M:RevSharp.Core.Models.DataMessageSend.AddEmbed(RevSharp.Core.Models.SendableEmbed)"/>
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Masquerade">
+            <summary>
+            Masquerade this message.
+            </summary>
+        </member>
+        <member name="P:RevSharp.Core.Models.DataMessageSend.Interactions">
+            <summary>
+            TODO: Not sure what this is for.
+            </summary>
+        </member>
         <member name="M:RevSharp.Core.Models.DataMessageSend.AddEmbed(RevSharp.Core.Models.SendableEmbed)">
             <summary>
             Add an embed to this message
@@ -1189,6 +1273,13 @@
             </summary>
             <param name="message">Message that we want to reply to</param>
             <param name="mention">Mention message</param>
+            <returns>Instance of this</returns>
+        </member>
+        <member name="M:RevSharp.Core.Models.DataMessageSend.WithContent(System.String)">
+            <summary>
+            Sets <see cref="P:RevSharp.Core.Models.DataMessageSend.Content"/>. Will override this field if already set.
+            </summary>
+            <param name="text">Content to set</param>
             <returns>Instance of this</returns>
         </member>
         <member name="P:RevSharp.Core.Models.SendableMessage.Nonce">

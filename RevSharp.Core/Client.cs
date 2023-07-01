@@ -62,40 +62,86 @@ public partial class Client
     /// Value is set when <see cref="LoginAsync"/> is called.
     /// </summary>
     public RevoltNodeResponse? EndpointNodeInfo { get; private set; }
+    /// <summary>
+    /// Generated via <see cref="Client.GenerateSerializerOptions(bool, bool)"/> with `put` set to `false` and `indent` set to `false`. For indenting, use <see cref="SerializerOptionsIndent"/>
+    /// </summary>
     public static JsonSerializerOptions SerializerOptions
     {
         get
         {
-            var options = new JsonSerializerOptions()
-            {
-                IgnoreReadOnlyFields = true,
-                IgnoreReadOnlyProperties = true,
-                IncludeFields = true
-            };
-
-            options.Converters.Add(new JsonStringEnumConverter());
-            
-            return options;
+            return GenerateSerializerOptions(put: false, indent: false);
         }
     }
+    /// <summary>
+    /// <see cref="Client.SerializerOptions"/> with Indenting enabled
+    /// </summary>
+    public static JsonSerializerOptions SerializerOptionsIndent
+    {
+        get
+        {
+            return GenerateSerializerOptions(put: false, indent: true);
+        }
+    }
+    /// <summary>
+    /// <see cref="SerializerOptions"/> but non-static
+    /// </summary>
+    public JsonSerializerOptions SerializerOptionsL => RevSharp.Core.Client.SerializerOptions;
+    /// <summary>
+    /// <see cref="SerializerOptionsIndent"/> but non-static
+    /// </summary>
+    public JsonSerializerOptions SerializerOptionsLI => RevSharp.Core.Client.SerializerOptionsIndent;
 
-    public JsonSerializerOptions SerialzerOptions => RevSharp.Core.Client.SerializerOptions;
-
+    /// <summary>
+    /// <see cref="GenerateSerializerOptions"/> with `put=true` and indenting disabled. For indenting, use <see cref="PutSerializerOptionsIndent"/>
+    /// </summary>
     public static JsonSerializerOptions PutSerializerOptions
     {
         get
         {
-            var options = new JsonSerializerOptions()
-            {
-                IgnoreReadOnlyFields = true,
-                IgnoreReadOnlyProperties = true,
-                IncludeFields = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
-            options.Converters.Add(new JsonStringEnumConverter());
-            return options;
+            return GenerateSerializerOptions(put: true, indent: false);
         }
     }
+    /// <summary>
+    /// Same as <see cref="PutSerializerOptions"/> with indenting enabled
+    /// </summary>
+    public static JsonSerializerOptions PutSerializerOptionsIndent
+    {
+        get
+        {
+            return GenerateSerializerOptions(put: true, indent: true);
+        }
+    }
+    /// <summary>
+    /// <see cref="PutSerializerOptions"/> but non-static
+    /// </summary>
+    public JsonSerializerOptions PutSerializerOptionsL => RevSharp.Core.Client.PutSerializerOptions;
+    /// <summary>
+    /// <see cref="PutSerializerOptionsIndent"/> but non-static
+    /// </summary>
+    public JsonSerializerOptions PutSerializerOptionsLI => RevSharp.Core.Client.PutSerializerOptionsIndent;
+
+    /// <summary>
+    /// Generate JsonSerializerOptions. `IncludeFields` is always true, Ignored everything that is read-only. Also adds support for <see cref="EnumMemberAttribute"/>
+    /// </summary>
+    /// <param name="put">When `true`, <see cref="JsonSerializerOptions.DefaultIgnoreCondition"/> will be <see cref="JsonIgnoreCondition.WhenWritingNull"/> instead of the default</param>
+    /// <param name="indent">When `true`, <see cref="JsonSerializerOptions.WriteIndented"/> will be `true`.</param>
+    /// <returns></returns>
+    internal static JsonSerializerOptions GenerateSerializerOptions(bool put = false, bool indent = false)
+    {
+        
+        var options = new JsonSerializerOptions()
+        {
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = true,
+            IncludeFields = true,
+            DefaultIgnoreCondition = put ? JsonIgnoreCondition.WhenWritingNull : JsonIgnoreCondition.Never,
+            WriteIndented = indent
+        };
+        options.Converters.Add(new JsonStringEnumConverter());
+        options.Converters.Add(new JsonStringEnumMemberConverter());
+        return options;
+    }
+
     
     public BotController Bot { get; private set; }
     internal EndpointFactory EndpointFactory { get; private set; }

@@ -54,7 +54,7 @@ public class ConDetectAdminModule : CommandModule
             return;
         }
 
-        var stringContent = JsonSerializer.Serialize(d, Client.SerialzerOptions);
+        var stringContent = JsonSerializer.Serialize(d, Client.SerializerOptionsL);
         await message.Reply($"```json\n{stringContent}\n```");
     }
 
