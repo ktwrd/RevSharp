@@ -47,6 +47,18 @@ Run the `r.cdconfig logchannel` command in the channel you just created.
 
 Then run `r.cdconfig request`
 
+## Project File Info
+| Name | Description |
+| ---- | ----------- |
+| `RevSharp.Xenia` | Base Xenia bot. References all projects that include in their name `RevSharp.Xenia.*`
+| `RevSharp.Xenia.SDK` | Xenia Plugin SDK. Includes stuff that plugins reference. |
+| `RevSharp.Xenia.ConDetect` | Content Detection powered by Google Cloud |
+| `RevSharp.Xenia.Moderaiton` | Misc Moderation stuff |
+| `RevSharp.Xenia.GoogleCloud` | Google Cloud wrappers and boilerplate code |
+| `RevSharp.Xenia.ImgWiz` | `imgwiz` command suite. esmBot clone |
+| `RevSharp.Xenia.AdminRest` | Rest API Server for creating web-based admin pages. |
+| `RevSharp.Xenia.Mongo` | MongoDB Models |
+
 ## Development
 Initialize Environment
 ```bash
