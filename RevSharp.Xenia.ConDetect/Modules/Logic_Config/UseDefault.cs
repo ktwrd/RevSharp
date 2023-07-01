@@ -44,10 +44,12 @@ public partial class ConDetectConfigModule
         if (action == "delete")
         {
             data.DeleteThreshold = AnalysisServerConfig.DefaultDeleteThreshold;
+            data.TextDeleteThreshold = AnalysisServerConfig.DefaultTextDeleteThreshold;
         }
         else if (action == "flag")
         {
             data.FlagThreshold = AnalysisServerConfig.DefaultFlagThreshold;
+            data.TextFlagThreshold = AnalysisServerConfig.DefaultTextFlagThreshold;
         }
 
 
