@@ -100,8 +100,9 @@ public class ConDetectAdminModule : CommandModule
             descriptionLines.Add(string.Join("\n", new string[]
             {
                 $"- {server.Name} `{server.Id}`",
-                $"  - {attr}"
             }));
+            if (attr.Length > 0)
+                descriptionLines.Add("  - " + attr);
         }
         var embed = new SendableEmbed()
         {
@@ -196,6 +197,7 @@ public class ConDetectAdminModule : CommandModule
         d.AllowAnalysis = true;
         d.HasRequested = false;
         d.AllowTextDetection = true;
+        await controller.Set(d);
         var channel = await Client.GetChannel(d.LogChannelId) as TextChannel;
         if (channel == null)
             return "ChannelNotFound";
@@ -205,7 +207,6 @@ public class ConDetectAdminModule : CommandModule
                 Title = "Content Detection - State Updated",
                 Description = "Your server is eligible for Content Detection and it has been enabled!"
             });
-        await controller.Set(d);
         return "Success";
     }
 
