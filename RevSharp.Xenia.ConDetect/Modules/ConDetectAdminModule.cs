@@ -76,7 +76,18 @@ public class ConDetectAdminModule : CommandModule
         var descriptionLines = new List<string>();
         foreach (var item in filtered)
         {
-            var server = await Client.GetServer(item.ServerId);
+            Server? server = null;
+            try
+            {
+                server = await Client.GetServer(item.ServerId);
+                if (server == null)
+                    throw new Exception("Server is null");
+            }
+            catch (Exception ex)
+            {
+                await ReportError(ex, message, $"Failed to get server {item.ServerId}");
+                continue;
+            }
             string attr = "";
             if (item.IsBanned)
                 attr += "B";
