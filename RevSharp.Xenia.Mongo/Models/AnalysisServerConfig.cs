@@ -97,7 +97,7 @@ public class AnalysisServerConfig : BaseMongoModel
         {
             { CommentAttributeName.TOXICITY.ToString(), 0.95f },
             { CommentAttributeName.SEVERE_TOXICITY.ToString(), 0.90f },
-            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.85f },
+            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.7f },
             { CommentAttributeName.INSULT.ToString(), 0.5f },
             { CommentAttributeName.PROFANITY.ToString(), 0.90f },
             { CommentAttributeName.THREAT.ToString(), 0.85f }
@@ -107,7 +107,7 @@ public class AnalysisServerConfig : BaseMongoModel
         {
             { CommentAttributeName.TOXICITY.ToString(), 0.75f },
             { CommentAttributeName.SEVERE_TOXICITY.ToString(), 0.7f },
-            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.6f },
+            { CommentAttributeName.IDENTITY_ATTACK.ToString(), 0.5f },
             { CommentAttributeName.INSULT.ToString(), 0.4f },
             { CommentAttributeName.PROFANITY.ToString(), 0.7f },
             { CommentAttributeName.THREAT.ToString(), 0.7f }
