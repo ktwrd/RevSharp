@@ -164,10 +164,10 @@ public class ContentDetectionController : BaseModule
         var file = await Client.UploadFile(
             new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result, RevoltClient.SerializerOptions))), "analysis.json",
             "attachments");
-        
+
         await channel.SendMessage(new DataMessageSend()
         {
-            Attachments = new string[]{ file },
+            Attachments = file == null ? Array.Empty<string>() : new string[]{ file},
             Embeds = new SendableEmbed[] {embed}
         });
     }
