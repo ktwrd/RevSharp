@@ -8,7 +8,7 @@ namespace RevSharp.Xenia.Modules;
 public class ContentDetectionServerConfigController : BaseMongoController<AnalysisServerConfig>
 {
     public ContentDetectionServerConfigController()
-        : base("contentDetectionServerConfig")
+        : base(AnalysisServerConfig.CollectionName)
     {}
 
     public async Task<AnalysisServerConfig?> Fetch(string serverId)

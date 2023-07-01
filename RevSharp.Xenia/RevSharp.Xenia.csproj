@@ -18,6 +18,7 @@
       <ProjectReference Include="..\RevSharp.Xenia.ConDetect\RevSharp.Xenia.ConDetect.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.ImgWiz\RevSharp.Xenia.ImgWiz.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.Moderation\RevSharp.Xenia.Moderation.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.Mongo\RevSharp.Xenia.Mongo.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
     </ItemGroup>
 
@@ -27,6 +28,10 @@
       <PackageReference Include="MongoDB.Driver" Version="2.20.0" />
       <PackageReference Include="prometheus-net" Version="8.0.0" />
       <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>

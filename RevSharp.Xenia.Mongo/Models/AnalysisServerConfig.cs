@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using kate.shared.Helpers;
 using RevSharp.Core;
 
@@ -6,6 +7,7 @@ namespace RevSharp.Xenia.Models.ContentDetection;
 
 public class AnalysisServerConfig : BaseMongoModel
 {
+    public const string CollectionName = "contentDetectionServerConfig";
     public string TemplateId { get; set; }
     
     public string ServerId { get; set; }
@@ -13,6 +15,18 @@ public class AnalysisServerConfig : BaseMongoModel
     public string Guid { get; set; }
     
     public bool Enabled { get; set; }
+    /// <summary>
+    /// Enable text detection on messages with Perspective. Assumes poster is >=13yo
+    ///
+    /// AnalyzeMessage->AnalyzeMessageText
+    /// </summary>
+    public bool AllowTextDetection { get; set; }
+    /// <summary>
+    /// Enable text detection with Perspective on OCR Detectected Text. Assumes poster is >=13yo
+    ///
+    /// AnalyzeMessage->GetMedia->GetMediaTextWithOCR->AnalyzeMessageText
+    /// </summary>
+    public bool AllowMediaTextDetection { get; set; }
     public bool AllowAnalysis { get; set; }
     public bool HasRequested { get; set; }
     public bool IsBanned { get; set; }
@@ -35,6 +49,9 @@ public class AnalysisServerConfig : BaseMongoModel
         HasRequested = false;
         IsBanned = false;
         BanReason = null;
+
+        AllowTextDetection = false;
+        AllowMediaTextDetection = false;
         
         IgnoredChannelIds = Array.Empty<string>();
         IgnoredAuthorIds = Array.Empty<string>();

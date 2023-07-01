@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RevSharp.Xenia.GoogleCloud\RevSharp.Xenia.GoogleCloud.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.Mongo\RevSharp.Xenia.Mongo.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
     </ItemGroup>
 
@@ -16,6 +17,10 @@
       <Reference Include="Google.Cloud.Vision.V1">
         <HintPath>..\..\..\..\.nuget\packages\google.cloud.vision.v1\3.3.0\lib\netstandard2.1\Google.Cloud.Vision.V1.dll</HintPath>
       </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\" />
     </ItemGroup>
 
 </Project>
