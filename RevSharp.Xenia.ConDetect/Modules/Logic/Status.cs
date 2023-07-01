@@ -25,8 +25,12 @@ public partial class ContentDetectionModule
         embed.Description = string.Join(
             "\n", new string[]
             {
-                "```", $"   Can Enable: {data.AllowAnalysis}", $"   Enabled   : {data.Enabled}",
+                "```",
+                $"   Can Enable: {data.AllowAnalysis}",
+                $"   Enabled   : {data.Enabled}",
                 $"   Banned    : {data.IsBanned}",
+                $"   Text      : {data.AllowTextDetection}",
+                $"   Media Text:{data.AllowMediaTextDetection}",
                 data is
                 {
                     HasRequested: true,
