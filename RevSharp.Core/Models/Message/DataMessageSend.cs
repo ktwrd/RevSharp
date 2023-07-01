@@ -56,8 +56,10 @@ public class DataMessageSend
     /// </summary>
     /// <param name="id">Attachment Id to add</param>
     /// <returns>Instance of this</returns>
-    public DataMessageSend AddAttachment(string id)
+    public DataMessageSend AddAttachment(string? id)
     {
+        if (id == null)
+            return this;
         if (Attachments == null)
             Attachments = Array.Empty<string>();
         Attachments = Attachments?.Concat(new string[] { id }).ToArray();
