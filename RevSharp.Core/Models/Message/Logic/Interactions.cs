@@ -8,11 +8,12 @@ public partial class Message
         if ((int)response.StatusCode != 204)
             throw new Exception($"Failed to add reaction, server responded with {response.StatusCode}");
 
+        await Task.Delay(500);
         Reactions.TryAdd(emoji, Array.Empty<string>());
         Reactions[emoji] = Reactions[emoji].Concat(new string[]
         {
             client.CurrentUser.Id
-        }).ToArray();
+        }).Distinct().ToArray();
     }
 
     public async Task RemoveReactions(Client client, string emoji)
