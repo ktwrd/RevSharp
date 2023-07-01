@@ -38,7 +38,7 @@ public partial class ConDetectConfigModule
             baseAction = info.Arguments[1];
         if (baseAction != "get" && baseAction != "set")
         {
-            await message.Reply($"Invalid action `{baseAction}`");
+            await message.Reply($"Invalid action `{baseAction,-1}`");
             return;
         }
 
@@ -50,8 +50,8 @@ public partial class ConDetectConfigModule
         {
             if (baseAction == "get")
             {
-                var flag = JsonSerializer.Serialize(data.TextFlagThreshold, Core.Client.SerializerOptions);
-                var del = JsonSerializer.Serialize(data.TextDeleteThreshold, Core.Client.SerializerOptions);
+                var flag = JsonSerializer.Serialize(data.TextFlagThreshold, Client.SerializerOptionsLI);
+                var del = JsonSerializer.Serialize(data.TextDeleteThreshold, Client.SerializerOptionsLI);
                 embed.Description =
                     $"Flag Threshold\n```json\n{flag}\n```\nDelete Threshold\n```json\n{del}\n```";
                 await message.Reply(embed);
@@ -74,6 +74,27 @@ public partial class ConDetectConfigModule
         if (info.Arguments.Count > 3)
             targetType = info.Arguments[3];
         
+        
+        var typeEnumMembers = GeneralHelper.GetEnumList<CommentAttributeName>();
+        if (baseAction == "get")
+        {
+            if (targetType.Length < 1)
+            {
+                if (targetAction == "delete")
+                {
+                    embed.Description =
+                        $"Delete Threshold\n```json\n{JsonSerializer.Serialize(data.TextDeleteThreshold, Client.SerializerOptionsLI)}\n```";
+                }
+                else if (targetAction == "flag")
+                {
+                    embed.Description =
+                        $"Flag Threshold\n```json\n{JsonSerializer.Serialize(data.TextFlagThreshold, Client.SerializerOptionsLI)}\n```";
+                }
+            }
+            await message.Reply(embed);
+            return;
+        }
+
         CommentAttributeName? parsedTypeMaybeNull = null;
         try
         {
@@ -99,23 +120,9 @@ public partial class ConDetectConfigModule
 
         CommentAttributeName parsedType = (CommentAttributeName)parsedTypeMaybeNull;
         
-        var typeEnumMembers = GeneralHelper.GetEnumList<CommentAttributeName>();
         if (baseAction == "get")
         {
-            if (targetType.Length < 1)
-            {
-                if (targetAction == "delete")
-                {
-                    embed.Description =
-                        $"Delete Threshold\n```json\n{JsonSerializer.Serialize(data.TextDeleteThreshold, Client.SerializerOptionsLI)}\n```";
-                }
-                else if (targetAction == "flag")
-                {
-                    embed.Description =
-                        $"Flag Threshold\n```json\n{JsonSerializer.Serialize(data.TextFlagThreshold, Client.SerializerOptionsLI)}\n```";
-                }
-            }
-            else if (typeEnumMembers.Select(v => v.ToString()).Contains(targetType.ToUpper()))
+            if (typeEnumMembers.Select(v => v.ToString()).Contains(targetType.ToUpper()))
             {
                 if (targetThreshold.TryGetValue(parsedType.ToString(), out var thresholdValue))
                 {
@@ -127,8 +134,6 @@ public partial class ConDetectConfigModule
                     embed.Colour = CommandHelper.ErrorColor;
                 }
             }
-            await message.Reply(embed);
-            return;
         }
 
         float targetValue = -1;
@@ -136,11 +141,11 @@ public partial class ConDetectConfigModule
         {
             try
             {
-                targetValue = int.Parse(info.Arguments[4]);
+                targetValue = float.Parse(info.Arguments[4]);
             }
-            catch
+            catch (Exception ex)
             {
-                await message.Reply($"Invalid value `{info.Arguments[4]}`");
+                await message.Reply($"Invalid value `{info.Arguments[4]}`\n`{ex.Message}`");
                 return;
             }
         }
