@@ -159,13 +159,23 @@ public class ContentDetectionController : BaseModule
             Title = "Content Detection - Hate Speech Detected",
             Description = string.Join("\n",descriptionLines)
         };
-        
-        var channel = await Client.GetChannel(config.LogChannelId) as TextChannel;
+        TextChannel? targetChannel = null;
+        try
+        {
+            targetChannel = await Client.GetChannel(config.LogChannelId) as TextChannel;
+            if (targetChannel == null)
+                throw new Exception("Client.GetChannel returned null");
+        }
+        catch (Exception ex)
+        {
+            await ReportError(ex, message, $"Failed to fetch channel {config.LogChannelId} as TextChannel");
+            return;
+        }
         var file = await Client.UploadFile(
             new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(result, RevoltClient.SerializerOptions))), "analysis.json",
             "attachments");
 
-        await channel.SendMessage(new DataMessageSend()
+        await targetChannel.SendMessage(new DataMessageSend()
         {
             Attachments = file == null ? Array.Empty<string>() : new string[]{ file},
             Embeds = new SendableEmbed[] {embed}
@@ -187,7 +197,7 @@ public class ContentDetectionController : BaseModule
                 ServerId = server.Id
             };
         await controller.Set(serverConfig);
-        if (serverConfig == null || serverConfig.IsBanned || !serverConfig.Enabled)
+        if (serverConfig.IsBanned || !serverConfig.Enabled)
             return;
         if (message.AuthorId == Client.CurrentUserId)
             return;
