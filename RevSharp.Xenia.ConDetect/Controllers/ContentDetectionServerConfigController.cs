@@ -58,6 +58,7 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
     /// <returns></returns>
     public async Task<AnalysisServerConfig?> Get(string serverId)
     {
+        return await Fetch(serverId);
         if (ConfigCacheLastSet.TryGetValue(serverId, out var lastUpdated))
             if ((DateTimeOffset.UtcNow.ToUnixTimeSeconds() - lastUpdated) > 120)
                 return await Fetch(serverId);
@@ -71,7 +72,6 @@ public class ContentDetectionServerConfigController : BaseMongoController<Analys
             return value;
         }
 
-        return await Fetch(serverId);
     }
     
     public async Task Set(AnalysisServerConfig model)
