@@ -23,7 +23,7 @@ public class AnalysisServerConfig : BaseMongoModel
     /// </summary>
     public bool AllowTextDetection { get; set; }
     /// <summary>
-    /// Enable text detection with Perspective on OCR Detectected Text. Assumes poster is >=13yo
+    /// Enable text detection with Perspective on OCR Detected Text. Assumes poster is >=13yo
     ///
     /// AnalyzeMessage->GetMedia->GetMediaTextWithOCR->AnalyzeMessageText
     /// </summary>
@@ -159,6 +159,12 @@ public class ContentAnalysisMessageMatch
         }.Select(v => v ? 1 : 0).Sum();
     public ConfigThreshold Threshold { get; init; }
     public AnalysisResult Analysis { get; init; }
+
+    public ContentAnalysisMessageMatch()
+    {
+        Threshold = new ConfigThreshold();
+        Analysis = new AnalysisResult();
+    }
     public string? Majority =>
         MajorityItems.FirstOrDefault();
 
@@ -184,9 +190,9 @@ public class ContentAnalysisMessageMatch
                 "Adult", "Spoof", "Medical", "Violence", "Racy"
             };
             var analysisDict = JsonSerializer.Deserialize<Dictionary<string, object>>(
-                JsonSerializer.Serialize(Analysis), Client.SerializerOptions);
+                JsonSerializer.Serialize(Analysis), Client.SerializerOptions) ?? new Dictionary<string, object>();
             var thresholdDict = JsonSerializer.Deserialize<Dictionary<string, int>>(
-                JsonSerializer.Serialize(Threshold, Client.SerializerOptions), Client.SerializerOptions);
+                JsonSerializer.Serialize(Threshold, Client.SerializerOptions), Client.SerializerOptions) ?? new Dictionary<string, int>();
             
             
             var dict = new Dictionary<string, decimal>();
@@ -196,13 +202,13 @@ public class ContentAnalysisMessageMatch
                 var thresholdValue = thresholdDict[key];
                 if (thresholdValue < 0)
                     continue;
-                var analysisResult = decimal.Parse(analysisDict[key + "Average"].ToString());
+                var analysisResult = decimal.Parse(analysisDict[key + "Average"].ToString() ?? string.Empty);
                 var things = Analysis.Annotations.Select(
                     (v) =>
                     {
                         var dct = JsonSerializer.Deserialize<Dictionary<string, object>>(
                             JsonSerializer.Serialize(v.Item1, Client.SerializerOptions), Client.SerializerOptions);
-                        return ((dct[key]).ToString(), v.Item2);
+                        return (dct?[key].ToString(), v.Item2);
                     }).ToArray();
                 if (analysisResult >= thresholdValue)
                     dict.TryAdd(key, analysisResult);
