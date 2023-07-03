@@ -30,8 +30,4 @@
       <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
 </Project>
