@@ -76,9 +76,20 @@ public partial class ConDetectConfigModule : CommandModule
             "logchannel",
             new string[]
             {
-                $">`{Prefix} logchannel <channel>`",
+                $">`{Prefix} logchannel <channel> <action> <type>`",
                 ">Set the log channel for content detection.",
-                "When channel is not specified, it will default to the channel that you're sending the message in."
+                "When channel is not specified, it will default to the channel that you're sending the message in.",
+                "If `channel` is `this`, it will use the current channel. By default it will do this if no",
+                "parameter is given in this place",
+                "- action must be one of the following",
+                "  - `action=any` will override all channel id's to the one given or the current one",
+                "  - `action=delete` will override the delete action for the type",
+                "  - `action=flag` will override the flag action for this type",
+                "- type must be one of the following",
+                "  - `type=any` will override all channel id's to the one given or the current one",
+                "  - `type=text` text detection events",
+                "  - `type=media` media detection events",
+                "default value for `type` and `action` is `any`"
             }
         },
         {
