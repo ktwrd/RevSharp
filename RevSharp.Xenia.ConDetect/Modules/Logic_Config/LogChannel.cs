@@ -34,7 +34,8 @@ public partial class ConDetectConfigModule
         string? targetChannelId = message.ChannelId;
         if (info.Arguments.Count > 1)
         {
-            targetChannelId = CommandHelper.FindChannelId(info.Arguments[1]);
+            if (info.Arguments[1] != "this")
+                targetChannelId = CommandHelper.FindChannelId(info.Arguments[1]);
         }
 
         if (targetChannelId == null)
@@ -65,7 +66,75 @@ public partial class ConDetectConfigModule
             return;
         }
 
-        data.LogChannelId = targetChannelId;
+        string targetActionId = "any";
+        if (info.Arguments.Count > 2)
+            targetActionId = info.Arguments[2];
+        if (new string[]
+            {
+                "any", "delete", "flag"
+            }.Contains(targetActionId) == false)
+        {
+            embed.Description = $"Invalid action `{targetActionId,-1}`";
+            embed.Colour = CommandHelper.ErrorColor;
+            await message.Reply(embed);
+            return;
+        }
+
+        string targetTypeId = "any";
+        if (info.Arguments.Count > 3)
+            targetTypeId = info.Arguments[3];
+        if (new string[]
+            {
+                "any", "text", "media"
+            }.Contains(targetTypeId) ==
+            false)
+        {
+            embed.Description = $"Invalid type `{targetTypeId,-1}`";
+            embed.Colour = CommandHelper.ErrorColor;
+            await message.Reply(embed);
+            return;
+        }
+
+        if (targetTypeId == "text")
+        {
+            if (targetActionId == "any")
+            {
+                data.LogChannelId_TextDelete = targetChannelId;
+                data.LogChannelId_TextFlag = targetChannelId;
+            }
+            else if (targetActionId == "delete")
+            {
+                data.LogChannelId_TextDelete = targetChannelId;
+            }
+            else if (targetActionId == "flag")
+            {
+                data.LogChannelId_TextFlag = targetChannelId;
+            }
+        }
+        else if (targetTypeId == "media")
+        {
+            if (targetActionId == "any")
+            {
+                data.LogChannelId_MediaDelete = targetChannelId;
+                data.LogChannelId_MediaFlag = targetChannelId;
+            }
+            else if (targetActionId == "delete")
+            {
+                data.LogChannelId_MediaDelete = targetChannelId;
+            }
+            else if (targetActionId == "flag")
+            {
+                data.LogChannelId_MediaFlag = targetChannelId;
+            }
+        }
+        else if (targetTypeId == "any")
+        {
+            data.LogChannelId = targetChannelId;
+            data.LogChannelId_TextDelete = targetChannelId;
+            data.LogChannelId_TextFlag = targetChannelId;
+            data.LogChannelId_MediaDelete = targetChannelId;
+            data.LogChannelId_MediaFlag = targetChannelId;
+        }
         try
         {
             await configController.Set(data);
@@ -79,7 +148,7 @@ public partial class ConDetectConfigModule
             return;
         }
 
-        embed.Description = $"Set log channel to <#{message.ChannelId}>";
+        embed.Description = $"Set log channel to <#{message.ChannelId}> ({targetActionId}, {targetTypeId})";
         embed.Colour = CommandHelper.DefaultColor;
         await message.Reply(embed);
     }

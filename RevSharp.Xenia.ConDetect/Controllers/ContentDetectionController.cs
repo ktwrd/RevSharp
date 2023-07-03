@@ -154,6 +154,8 @@ public class ContentDetectionController : BaseModule
             "Action;",
             "> `" + (deleteMatches.Count > 0 ? "`Deleted`" : "`Flagged`") + "`"
         });
+        string? targetChannelId =
+            deleteMatches.Count > 0 ? config.LogChannelId_TextDelete : config.LogChannelId_MediaFlag;
         var embed = new SendableEmbed()
         {
             Title = "Content Detection - Hate Speech Detected",
@@ -162,7 +164,7 @@ public class ContentDetectionController : BaseModule
         TextChannel? targetChannel = null;
         try
         {
-            targetChannel = await Client.GetChannel(config.LogChannelId) as TextChannel;
+            targetChannel = await Client.GetChannel(targetChannelId ?? config.LogChannelId) as TextChannel;
             if (targetChannel == null)
                 throw new Exception("Client.GetChannel returned null");
         }
@@ -395,8 +397,13 @@ public class ContentDetectionController : BaseModule
                 ContentDetectionModule.LogDetailReason.FlagThresholdMet => "orange",
                 ContentDetectionModule.LogDetailReason.Error => "white"
             };
-
-            var channel = await Client.GetChannel(serverConfig.LogChannelId) as TextChannel;
+            string? targetChannelId = reason switch
+            {
+                ContentDetectionModule.LogDetailReason.DeleteThresholdMet => serverConfig.LogChannelId_MediaDelete,
+                ContentDetectionModule.LogDetailReason.FlagThresholdMet => serverConfig.LogChannelId_MediaFlag,
+                _ => serverConfig.LogChannelId
+            };
+            var channel = await Client.GetChannel(targetChannelId ?? serverConfig.LogChannelId) as TextChannel;
             var file = await Client.UploadFile(
                 new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, RevoltClient.SerializerOptions))), "match.json",
                 "attachments");
