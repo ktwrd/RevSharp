@@ -148,7 +148,7 @@ public partial class ConDetectConfigModule
             return;
         }
 
-        embed.Description = $"Set log channel to <#{message.ChannelId}> ({targetActionId}, {targetTypeId})";
+        embed.Description = $"Set log channel to <#{targetChannelId}> ({targetActionId}, {targetTypeId})";
         embed.Colour = CommandHelper.DefaultColor;
         await message.Reply(embed);
     }
