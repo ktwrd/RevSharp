@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using kate.shared.Helpers;
 using RevSharp.Core;
+using RevSharp.Core.Models;
 using RevSharp.Xenia.GoogleCloud.Perspective.Models;
 
 namespace RevSharp.Xenia.Models.ContentDetection;
@@ -13,6 +14,29 @@ public class AnalysisServerConfig : BaseMongoModel
     
     public string ServerId { get; set; }
     public string LogChannelId { get; set; }
+    public string? LogChannelId_MediaDelete { get; set; }
+    public string? LogChannelId_MediaFlag { get; set; }
+    public string? LogChannelId_TextDelete { get; set; }
+    public string? LogChannelId_TextFlag { get; set; }
+
+    public Task<TextChannel?> GetChannel_MediaDelete(Client client) => GetChannel(client, LogChannelId_MediaDelete);
+    public Task<TextChannel?> GetChannel_MediaFlag(Client client) => GetChannel(client, LogChannelId_MediaFlag);
+    public Task<TextChannel?> GetChannel_TextDelete(Client client) => GetChannel(client, LogChannelId_TextDelete);
+    public Task<TextChannel?> GetChannel_TextFlag(Client client) => GetChannel(client, LogChannelId_TextFlag);
+
+    private async Task<TextChannel?> GetChannel(Client client, string? id)
+    {
+        id ??= LogChannelId;
+        try
+        {
+            return await client.GetChannel(id) as TextChannel;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+    
     public string Guid { get; set; }
     
     public bool Enabled { get; set; }
