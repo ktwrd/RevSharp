@@ -9,7 +9,7 @@ namespace RevSharp.Core.Models;
 /// <summary>
 /// Server Member
 /// </summary>
-public class Member : Clientable
+public partial class Member : Clientable
 {
     /// <summary>
     /// Unique member id
