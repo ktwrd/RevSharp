@@ -147,11 +147,33 @@ public partial class Member : Clientable
     }
 
     /// <summary>
-    /// Does this member have a certain permission. This only checks for the ServerId defined at <see cref="Id.Server"/>
+    /// Does this member have a certain permission. This only checks for the ServerId defined at <see cref="MemberId.Server"/>
     /// </summary>
     public Task<bool> HasPermission(PermissionFlag flag, bool forceUpdate = true)
         => HasPermission(Client, flag, forceUpdate);
 
+    /// <summary>
+    /// Get a list of what permissions this member has.
+    /// </summary>
+    /// <param name="client">Client to use</param>
+    /// <param name="forceUpdate">Pull fresh data from API</param>
+    /// <returns>List of permissions this member has.</returns>
+    public async Task<List<PermissionFlag>> GetPermissions(Client client, bool forceUpdate = true)
+    {
+        var enumList = GeneralHelper.GetEnumList<PermissionFlag>();
+        var containsPermission = new List<PermissionFlag>();
+        foreach (var item in enumList)
+        {
+            if (await HasPermission(client, item, forceUpdate))
+                containsPermission.Add(item);
+        }
+
+        return containsPermission;
+    }
+
+    /// <summary>
+    /// Emitted when this member has left the server it belongs to.
+    /// </summary>
     public event VoidDelegate Left;
 
     internal void OnLeft()

@@ -1083,7 +1083,20 @@
         </member>
         <member name="M:RevSharp.Core.Models.Member.HasPermission(RevSharp.Core.Models.PermissionFlag,System.Boolean)">
             <summary>
-            Does this member have a certain permission. This only checks for the ServerId defined at <see cref="!:Id.Server"/>
+            Does this member have a certain permission. This only checks for the ServerId defined at <see cref="!:MemberId.Server"/>
+            </summary>
+        </member>
+        <member name="M:RevSharp.Core.Models.Member.GetPermissions(RevSharp.Core.Client,System.Boolean)">
+            <summary>
+            Get a list of what permissions this member has.
+            </summary>
+            <param name="client">Client to use</param>
+            <param name="forceUpdate">Pull fresh data from API</param>
+            <returns>List of permissions this member has.</returns>
+        </member>
+        <member name="E:RevSharp.Core.Models.Member.Left">
+            <summary>
+            Emitted when this member has left the server it belongs to.
             </summary>
         </member>
         <member name="T:RevSharp.Core.Models.MemberId">
