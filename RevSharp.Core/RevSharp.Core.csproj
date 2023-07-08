@@ -14,7 +14,7 @@
         <PackageTags>revolt</PackageTags>
         <NeutralLanguage>en</NeutralLanguage>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-        <Version>1.0.5</Version>
+        <Version>1.0.6</Version>
 
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <DocumentationFile>RevSharp.xml</DocumentationFile>
