@@ -10,6 +10,8 @@ public class PartialUser
     public string? Username { get; set; }
     [JsonPropertyName("display_name")]
     public string? DisplayName { get; set; }
+    [JsonPropertyName("discriminator")]
+    public string? Discriminator { get; set; }
     [JsonPropertyName("avatar")]
     public File? Avatar { get; set; }
     [JsonPropertyName("relations")]

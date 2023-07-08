@@ -216,6 +216,8 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
 
         Id = data.Id;
         Username = data.Username;
+        Discriminator = data.Discriminator;
+        DisplayName = data.DisplayName;
         Avatar = data.Avatar;
         Relations = data.Relations;
         Badges = data.Badges;
@@ -358,6 +360,8 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
             target.Id = source.Id;
         if (source.Username != null)
             target.Username = source.Username;
+        if (source.Discriminator != null)
+            target.Discriminator = source.Discriminator;
         if (source.DisplayName != null)
             target.DisplayName = source.DisplayName;
         if (source.Avatar != null)
