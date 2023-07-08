@@ -2,16 +2,110 @@
 @{
     ViewData["Title"] = "User Details";
 }
-<div class="text-center">
+<style>
+    img.avatar {
+        max-width: 4rem;
+        max-height: 4rem;
+    }
+</style>
+<div class="text-left">
     <h3>User Details for @Model.Id</h3>
-    <table class="tab-content">
+    <table class="table">
         <tr>
             <th>Username</th>
-            <td><pre><code>@{Model.Username.ToString();}#@{ Model.Discriminator?.ToString();}</code></pre></td>
+            <td><code>@Model.Username#@Model.Discriminator</code></td>
         </tr>
         <tr>
             <th>Display Name</th>
-            <td><pre><code>@Model.DisplayName</code></pre></td>
+            <td><code>@Model.DisplayName</code></td>
+        </tr>
+        <tr>
+            <th>Avatar</th>
+            <td><img src="@Model.Avatar?.GetURL(@Model.Client)" class="avatar" /></td>
+        </tr>
+        <tr>
+            <th>Avatar Details</th>
+            <td>
+                <pre><code>Id: @Model.Avatar.Id
+Tag: @Model.Avatar.Tag
+Filename: @Model.Avatar.Filename
+Metadata.Type: @Model.Avatar.Metadata.Type
+Metadata.Width: @Model.Avatar.Metadata.Width.ToString()
+Metadata.Height: @Model.Avatar.Metadata.Height.ToString()
+Content Type: @Model.Avatar.ContentType
+Deleted: @Model.Avatar.IsDeleted.ToString()
+Reported: @Model.Avatar.IsReported.ToString()</code></pre>
+            </td>
+        </tr>
+        <tr>
+            <th>Relations</th>
+            <td>
+                <ul>
+                    @if (@Model.Relations != null)
+                    {
+                        @foreach (var item in @Model.Relations)
+                        {
+                            <li>@item.ToString()</li>
+                        }
+                    }
+                    @if (@Model.Relations == null)
+                    {
+                        <li>None</li>
+                    }
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Badges
+            </th>
+            <td>
+                <ul>
+                @foreach (var item in @Model.GetBadges())
+                {
+                    <li>@item.ToString()</li>
+                }
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <th>Profile</th>
+            <td>
+                <table>
+                    <tr>
+                        <th>Text</th>
+                        <td><code>@Model.Status.Text</code></td>
+                    </tr>
+                    <tr>
+                        <th>Presence</th>
+                        <td><code>@Model.Status.Presence.ToString()</code></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>Profile Content</th>
+            <td>
+                <pre><code>@Model.Profile.Content</code></pre>
+            </td>
+        </tr>
+        <tr>
+            <th>Flags</th>
+            <td><code>@Model.Flags.ToString()</code></td>
+        </tr>
+        <tr>
+            <th>Is Priviliged</th>
+            <td>
+                @Model.IsPrivileged.ToString()
+            </td>
+        </tr>
+        <tr>
+            <th>Relationship</th>
+            <td>@Model.Relationship.ToString()</td>
+        </tr>
+        <tr>
+            <th>Online</th>
+            <td>@Model.IsOnline.ToString()</td>
         </tr>
     </table>
 </div>
