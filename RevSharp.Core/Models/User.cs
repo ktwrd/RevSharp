@@ -85,6 +85,25 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
     /// </summary>
     [JsonPropertyName("badges")]
     public int? Badges { get; set; }
+
+    /// <summary>
+    /// Get badges this user has formatted as an enum array.
+    /// </summary>
+    /// <returns>Array of calculated <see cref="UserBadge"/></returns>
+    public UserBadge[] GetBadges()
+    {
+        var badges = new List<UserBadge>();
+        if (Badges != null)
+        {
+            var flag = Badges;
+            foreach (var item in Enum.GetValues(typeof(UserBadge)).Cast<UserBadge>())
+            {
+                if (((int)item & flag) == flag)
+                    badges.Add(item);
+            }
+        }
+        return badges.ToArray();
+    }
     /// <summary>
     /// User's current status
     /// </summary>
@@ -385,4 +404,30 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         if (source.Online != null)
             target.IsOnline = (bool)source.Online;
     }
+}
+
+public enum UserBadge
+{
+    /// Revolt Developer
+    Developer = 1<<0,
+    /// Helped translate Revolt
+    Translator = 1<<1,
+    /// Monetarily supported Revolt
+    Supporter = 1<<2,
+    /// Responsibly disclosed a security issue
+    ResponsibleDisclosure = 1<<3,
+    /// Revolt Founder
+    Founder = 1<<4,
+    /// Platform moderator
+    PlatformModeration = 1<<5,
+    /// Active monetary supporter
+    ActiveSupporter = 1<<6,
+    /// 🦊🦝
+    Paw = 1<<7,
+    /// Joined as one of the first 1000 users in 2021
+    EarlyAdopter = 1<<8,
+    /// Amogus
+    ReservedRelevantJokeBadge1 = 1<<9,
+    /// Low resolution troll face
+    ReservedRelevantJokeBadge2 = 1<<10,
 }
