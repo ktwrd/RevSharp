@@ -1,0 +1,17 @@
+@model RevSharp.Core.Models.User
+@{
+    ViewData["Title"] = "User Details";
+}
+<div class="text-center">
+    <h3>User Details for @Model.Id</h3>
+    <table class="tab-content">
+        <tr>
+            <th>Username</th>
+            <td><pre><code>@{Model.Username.ToString();}#@{ Model.Discriminator?.ToString();}</code></pre></td>
+        </tr>
+        <tr>
+            <th>Display Name</th>
+            <td><pre><code>@Model.DisplayName</code></pre></td>
+        </tr>
+    </table>
+</div>

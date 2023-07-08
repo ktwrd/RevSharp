@@ -1,0 +1,10 @@
+@model RevSharp.Core.RevoltException
+@{
+    ViewData["Title"] = "Revolt Exception";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Failed to run request</h1>
+    <pre><code>@Model.ResponseContent</code></pre>
+    <button class="btn btn-secondary" onclick="history.back()">Go Back</button>
+</div>

@@ -1,0 +1,51 @@
+@model RevSharp.Xenia.AdminPanel.Models.CDAdminViewModel
+@{
+    ViewData["Title"] = "Content Detection Admin";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Content Detection Admin Portal</h1>
+    <table>
+        <tr>
+            <th>Enabled Servers</th>
+            <td>@Model.EnabledServers.Length.ToString()</td>
+        </tr>
+    </table>
+    <table class="table">
+        <thead>
+        <tr>
+            <th colspan="3">Server</th>
+            <th colspan="6">State</th>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <th>Id</th>
+            <th>Members</th>
+            <th>Enabled</th>
+            <th>Media State</th>
+            <th>Text State</th>
+            <th>OCR State</th>
+            <th>Requested</th>
+            <th>Banned</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ServerConfigs)
+            {
+                <tr>
+                    <td>@item.ServerId</td>
+                    <td>@Model.GetServerName(item.ServerId)</td>
+                    <td>@Model.GetServer(item.ServerId)?.Members.Count().ToString()</td>
+                    <td>@Model.FormatBool(item.Enabled && (item.AllowAnalysis || item.AllowMediaTextDetection || item.AllowTextDetection))</td>
+                    <td>@Model.FormatBool(item.AllowAnalysis)</td>
+                    <td>@Model.FormatBool(item.AllowTextDetection)</td>
+                    <td>@Model.FormatBool(item.AllowMediaTextDetection)</td>
+                    <td>@Model.FormatBool(item.HasRequested)</td>
+                    <td>@Model.FormatBool(item.IsBanned)</td>
+                    <td><a class="btn btn-primary" asp-action="Details" asp-route-id="@item.ServerId">Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

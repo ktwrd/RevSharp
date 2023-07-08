@@ -1,0 +1,21 @@
+@model RevSharp.Xenia.AdminPanel.Models.CDAdminDetailModel
+@{
+    ViewData["Title"] = "Content Detection - Server Details";
+}
+<div class="text-center">
+    <h1 class="display-4">Server Details @Model.Server.Name</h1>
+    <table class="table">
+        <tr>
+            <th>Owner</th>
+            <td><a asp-action="UserDetails" asp-controller="Admin" asp-route-id="@Model.Server.OwnerId">@Model.Server.OwnerId</a></td>
+        </tr>
+        <tr>
+            <th>Name</th>
+            <td><pre><code>@Model.Server.Name</code></pre></td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td><pre><code>@Model.Server.Description</code></pre></td>
+        </tr>
+    </table>
+</div>
