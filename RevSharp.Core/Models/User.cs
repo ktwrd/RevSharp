@@ -216,7 +216,6 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         var response = await client.GetAsync($"/users/{id}");
         if (response.StatusCode != HttpStatusCode.OK)
             throw new Exception($"Failed to fetch user {id} (code: {response.StatusCode})");
-
         var stringContent = response.Content.ReadAsStringAsync().Result;
         var data = JsonSerializer.Deserialize<User>(stringContent, Client.SerializerOptions);
         return data;
@@ -251,6 +250,7 @@ public partial class User : Clientable, /*IUser,*/ ISnowflake, IFetchable
         }
         Relationship = data.Relationship;
         IsOnline = data.IsOnline;
+        await FetchProfile();
         return true;
     }
 
