@@ -6,10 +6,10 @@ namespace RevSharp.Core.Models;
 public class Clientable
 {
     private Client? _client = null;
-    internal Client? Client
+    public Client? Client
     {
         get => _client;
-        set
+        internal set
         {
             if (value != null)
                 ClientInit();
