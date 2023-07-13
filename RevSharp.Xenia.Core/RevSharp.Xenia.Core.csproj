@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>RevSharp.Xenia</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\RevSharp.Xenia.Mongo\RevSharp.Xenia.Mongo.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.SDK\RevSharp.Xenia.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Data\info-description.md" />
+    </ItemGroup>
+
+</Project>

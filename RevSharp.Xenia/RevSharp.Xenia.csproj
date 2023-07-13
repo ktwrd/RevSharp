@@ -16,6 +16,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RevSharp.Xenia.ConDetect\RevSharp.Xenia.ConDetect.csproj" />
+      <ProjectReference Include="..\RevSharp.Xenia.Core\RevSharp.Xenia.Core.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.ImgWiz\RevSharp.Xenia.ImgWiz.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.Moderation\RevSharp.Xenia.Moderation.csproj" />
       <ProjectReference Include="..\RevSharp.Xenia.Mongo\RevSharp.Xenia.Mongo.csproj" />

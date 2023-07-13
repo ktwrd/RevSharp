@@ -39,7 +39,7 @@ public class AnimalModule : CommandModule
             return;
         }
 
-        var deser = JsonSerializer.Deserialize<TinyFoxResponse>(stringContent, Program.SerializerOptions);
+        var deser = JsonSerializer.Deserialize<TinyFoxResponse>(stringContent, SerializerOptions);
         if (deser == null)
         {
             Console.Error.WriteLine($"[AnimalModule->Init] Failed to deserialize\n{stringContent}");
@@ -109,7 +109,7 @@ public class AnimalModule : CommandModule
             return null;
         }
 
-        var deser = JsonSerializer.Deserialize<TinyFoxResponse>(stringContent, Program.SerializerOptions);
+        var deser = JsonSerializer.Deserialize<TinyFoxResponse>(stringContent, SerializerOptions);
         if (deser == null)
         {
             Console.Error.WriteLine($"[AnimalModule->FetchImage] Failed to deserialize\n{stringContent}");
@@ -121,7 +121,7 @@ public class AnimalModule : CommandModule
     
     public override string? HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Reflection.Config.Prefix;
         var lines = new List<string>()
         {
             "```",
