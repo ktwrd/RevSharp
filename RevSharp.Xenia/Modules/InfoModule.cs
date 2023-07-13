@@ -35,28 +35,29 @@ namespace RevSharp.Xenia.Modules
         }
         public override async Task CommandReceived(CommandInfo info, Message message)
         {
-            var statMod = Reflection.FetchModule<StatisticController>();
-            var defaultValue = "<unknown>";
+            string action = "";
+            if (info.Arguments.Count > 0)
+                action = info.Arguments[0].ToLower();
             var embed = new SendableEmbed()
             {
-                Title = "Xenia Info",
-                Description = string.Join("\n", new string[]
-                {
-                    "Heya I'm Xenia, a general-purpose Revolt Bot made by [kate](https://kate.pet).",
-                    "If you are having any issues with Xenia, don't hesitate to ask for help in [my revolt server](https://r.kate.pet/revolt) or open an issue on [our github](https://r.kate.pet/xeniaissues)",
-                    "",
-                    "Xenia for Revolt was made proudly with [RevSharp](https://r.kate.pet/revsharp)!",
-                    "",
-                    "### Statistics",
-                    $"`Guilds:     {statMod?.ServerCount.ToString() ?? defaultValue}`",
-                    $"`Uptime:     {Program.GetUptimeString()}`",
-                    $"`Version:    {Program.Version}`",
-                    $"`Build Date: {Program.VersionDate}`",
-                    $"`Ping: {Client.WSLatency}ms`",
-                    "[View on Grafana](https://r.kate.pet/xeniastats)"
-                })
+                Title = "Xenia Info"
             };
-            embed.Description = GetContent();
+            switch (action)
+            {
+                case "modules":
+                    var plugins = Reflection.GetPlugins(includeVersion: true);
+                    embed.Title += " - Modules";
+                    embed.Description = string.Join(
+                        "\n", new string[]
+                        {
+                            "| Name | Version |", "| - | - |",
+                            string.Join("\n", plugins.Select(v => "| " + v.Replace(" ", " | ") + " |"))
+                        });
+                    break;
+                default:
+                    embed.Description = GetContent();
+                    break;
+            }
             await message.Reply(embed);
         }
 
@@ -66,7 +67,8 @@ namespace RevSharp.Xenia.Modules
             return string.Join("\n", new string[]
             {
                 "```",
-                $"{pfx}      - View information about Xenia",
+                $"{pfx}         - View information about Xenia",
+                $"{pfx} modules - List modules incl version",
                 "```",
             });
         }
