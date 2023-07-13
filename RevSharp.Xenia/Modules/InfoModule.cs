@@ -13,6 +13,26 @@ namespace RevSharp.Xenia.Modules
     [RevSharpModule]
     public class InfoModule : CommandModule
     {
+        private string GetContent()
+        {
+            var statMod = Reflection.FetchModule<StatisticController>();
+            var defaultValue = "<unknown>";
+            string content = ResourceHelper.GetAsString(GetType().Assembly, "RevSharp.Xenia.Data.info-description.md").ReplaceLineEndings("\n");
+            var replacePairs = new Dictionary<string, string>()
+            {
+                {"serverCount", statMod?.ServerCount.ToString() ?? defaultValue},
+                {"uptime", Program.GetUptimeString()},
+                {"version", Program.Version},
+                {"versionDate", Program.VersionDate.ToString()},
+                {"latency", Client.WSLatency.ToString()},
+            };
+            foreach (var pair in replacePairs)
+            {
+                content = content.Replace("$" + pair.Key + "$", pair.Value);
+            }
+
+            return content;
+        }
         public override async Task CommandReceived(CommandInfo info, Message message)
         {
             var statMod = Reflection.FetchModule<StatisticController>();
@@ -36,6 +56,7 @@ namespace RevSharp.Xenia.Modules
                     "[View on Grafana](https://r.kate.pet/xeniastats)"
                 })
             };
+            embed.Description = GetContent();
             await message.Reply(embed);
         }
 
