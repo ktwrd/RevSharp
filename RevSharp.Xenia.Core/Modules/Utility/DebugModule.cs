@@ -15,7 +15,7 @@ public class DebugModule : CommandModule
 
     public override string HelpContent()
     {
-        var p = Program.ConfigData.Prefix + BaseCommandName;
+        var p = Reflection.Config.Prefix + BaseCommandName;
         return string.Join("\n", new string[]
         {
             "```",
