@@ -1,3 +1,4 @@
+using System.Text.Json;
 using RevSharp.Core.Models;
 using RevSharp.Xenia.Controllers;
 using RevSharp.Xenia.Helpers;
@@ -6,6 +7,14 @@ namespace RevSharp.Xenia.Reflection;
 
 public abstract class CommandModule : BaseModule
 {
+    public JsonSerializerOptions SerializerOptions =>
+        new JsonSerializerOptions()
+        {
+            IgnoreReadOnlyFields = true,
+            IgnoreReadOnlyProperties = true,
+            IncludeFields = true,
+            WriteIndented = true
+        };
     public virtual Task CommandReceived(CommandInfo info, Message message)
     {
         return Task.CompletedTask;
