@@ -1733,6 +1733,12 @@
             Bitfield of user badges
             </summary>
         </member>
+        <member name="M:RevSharp.Core.Models.User.GetBadges">
+            <summary>
+            Get badges this user has formatted as an enum array.
+            </summary>
+            <returns>Array of calculated <see cref="T:RevSharp.Core.Models.UserBadge"/></returns>
+        </member>
         <member name="P:RevSharp.Core.Models.User.Status">
             <summary>
             User's current status
