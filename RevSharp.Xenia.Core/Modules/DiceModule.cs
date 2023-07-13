@@ -17,7 +17,7 @@ public class DiceModule : CommandModule
 
     public override string? HelpContent()
     {
-        var p = Program.ConfigData.Prefix;
+        var p = Reflection.Config.Prefix;
         return string.Join("\n", new string[]
         {
             "```",
@@ -35,7 +35,6 @@ public class DiceModule : CommandModule
     {
         if (info is not {Command: "dice"})
             return;
-        var help = Reflection.FetchModule<HelpModule>();
 
         var numberRegex = new Regex(@"^[0-9]+$");
         int min = 0;
@@ -47,7 +46,7 @@ public class DiceModule : CommandModule
         if (info.Arguments.Count < 1 || (info.Arguments.Count > 0  && info.Arguments[0].ToLower() == "help"))
         {
             embed.Title += " - Usage";
-            embed.Description = help.HelpDict["dice"];
+            embed.Description = HelpContent();
             embed.Colour = "red";
             await message.Reply(embed);
             return;
@@ -84,8 +83,10 @@ public class DiceModule : CommandModule
             max = int.Parse(info.Arguments[1]);
         }
 
-        int result = Program.Random.Next(min, max);
+        int result = _random.Next(min, max);
         embed.Description = $"## {result}";
         await message.Reply(embed);
     }
+
+    private readonly Random _random = new();
 }
