@@ -156,6 +156,8 @@ public class ContentDetectionController : BaseModule
         });
         string? targetChannelId =
             deleteMatches.Count > 0 ? config.LogChannelId_TextDelete : config.LogChannelId_MediaFlag;
+        if (targetChannelId?.Length < 1)
+            targetChannelId = config.LogChannelId;
         var embed = new SendableEmbed()
         {
             Title = "Content Detection - Hate Speech Detected",
@@ -403,7 +405,9 @@ public class ContentDetectionController : BaseModule
                 ContentDetectionModule.LogDetailReason.FlagThresholdMet => serverConfig.LogChannelId_MediaFlag,
                 _ => serverConfig.LogChannelId
             };
-            var channel = await Client.GetChannel(targetChannelId ?? serverConfig.LogChannelId) as TextChannel;
+            if (targetChannelId?.Length < 1)
+                targetChannelId = serverConfig.LogChannelId;
+            var channel = await Client.GetChannel(targetChannelId) as TextChannel;
             var file = await Client.UploadFile(
                 new MemoryStream(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(match, RevoltClient.SerializerOptions))), "match.json",
                 "attachments");

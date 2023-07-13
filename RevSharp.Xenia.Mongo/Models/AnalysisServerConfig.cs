@@ -14,10 +14,10 @@ public class AnalysisServerConfig : BaseMongoModel
     
     public string ServerId { get; set; }
     public string LogChannelId { get; set; }
-    public string? LogChannelId_MediaDelete { get; set; }
-    public string? LogChannelId_MediaFlag { get; set; }
-    public string? LogChannelId_TextDelete { get; set; }
-    public string? LogChannelId_TextFlag { get; set; }
+    public string LogChannelId_MediaDelete { get; set; }
+    public string LogChannelId_MediaFlag { get; set; }
+    public string LogChannelId_TextDelete { get; set; }
+    public string LogChannelId_TextFlag { get; set; }
 
     public Task<TextChannel?> GetChannel_MediaDelete(Client client) => GetChannel(client, LogChannelId_MediaDelete);
     public Task<TextChannel?> GetChannel_MediaFlag(Client client) => GetChannel(client, LogChannelId_MediaFlag);
@@ -74,6 +74,11 @@ public class AnalysisServerConfig : BaseMongoModel
         HasRequested = false;
         IsBanned = false;
         BanReason = null;
+
+        LogChannelId_MediaDelete = "";
+        LogChannelId_MediaFlag = "";
+        LogChannelId_TextDelete = "";
+        LogChannelId_TextFlag = "";
 
         AllowTextDetection = false;
         AllowMediaTextDetection = false;
